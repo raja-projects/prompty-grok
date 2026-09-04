@@ -24,23 +24,27 @@ export function Header() {
             <h1 className="font-display text-lg font-bold tracking-tight text-white sm:text-xl">
               Prompty
             </h1>
-            <p className="text-xs text-prompty-muted">
-              Photoreal people scene prompts · 18+
-            </p>
+            {!onLogin ? (
+              <p className="text-xs text-prompty-muted">
+                Photoreal people scene prompts · 18+
+              </p>
+            ) : null}
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <p className="hidden text-right text-xs text-prompty-muted sm:block">
-            Soft language · Kerala–Tamil defaults · One-click copy
-          </p>
           {!onLogin ? (
-            <button
-              type="button"
-              onClick={signOut}
-              className="rounded-lg border border-prompty-border px-2.5 py-1 text-xs text-prompty-muted transition hover:border-prompty-accent/50 hover:text-white"
-            >
-              Sign out
-            </button>
+            <>
+              <p className="hidden text-right text-xs text-prompty-muted sm:block">
+                Soft language · Kerala–Tamil defaults · One-click copy
+              </p>
+              <button
+                type="button"
+                onClick={signOut}
+                className="rounded-lg border border-prompty-border px-2.5 py-1 text-xs text-prompty-muted transition hover:border-prompty-accent/50 hover:text-white"
+              >
+                Sign out
+              </button>
+            </>
           ) : null}
         </div>
       </div>

@@ -53,9 +53,6 @@ function LoginForm() {
             <h2 className="font-display text-xl font-bold text-white">
               Sign in
             </h2>
-            <p className="text-xs text-prompty-muted">
-              Private Prompty access
-            </p>
           </div>
         </div>
 

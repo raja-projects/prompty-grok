@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
-import { Header } from "@/components/Header";
+import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,9 +19,8 @@ const display = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Prompty — People Scene Prompt Lab",
-  description:
-    "Build photorealistic adult people scene prompts with soft romance language, Kerala–Tamil defaults, camera and lighting controls.",
+  title: "Prompty",
+  description: "Private access",
   applicationName: "Prompty",
   icons: { icon: "/favicon.svg" },
 };
@@ -36,13 +35,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${display.variable} font-sans antialiased`}
       >
-        <div className="min-h-screen bg-grid-fade bg-prompty-bg">
-          <Header />
-          <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
-          <footer className="border-t border-prompty-border/60 py-8 text-center text-xs text-prompty-muted">
-            Prompty · prompt assembly only · no image/video API calls
-          </footer>
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
