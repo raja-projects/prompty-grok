@@ -402,6 +402,41 @@ export function defaultPerson(overrides?: Partial<PersonFields>): PersonFields {
   return applyKnownFaceLocks(withFace);
 }
 
+
+/** Default cast for Swap four: young-adult couple + mid-age couple (all 21+). */
+export function defaultFoursomeSwapPeople(): PersonFields[] {
+  return [
+    defaultPerson({
+      gender: "woman",
+      age: "23",
+      dressId: "w-kerala-cotton-sexy",
+      hairStyle: "Long wavy",
+      bodyType: "Slim",
+    }),
+    defaultPerson({
+      gender: "man",
+      age: "26",
+      dressId: "m-tee-shorts",
+      hairStyle: "Short neat",
+      bodyType: "Athletic",
+    }),
+    defaultPerson({
+      gender: "woman",
+      age: "42",
+      dressId: "w-skinfit-jeans-tiny-blouse",
+      hairStyle: "Long wavy",
+      bodyType: "Curvy",
+    }),
+    defaultPerson({
+      gender: "man",
+      age: "45",
+      dressId: "m-formal-undone",
+      hairStyle: "Short neat",
+      bodyType: "Broad-shouldered",
+    }),
+  ];
+}
+
 export function defaultPeopleForCount(count: PeopleCount): PersonFields[] {
   if (count === "1") {
     return [
@@ -447,26 +482,7 @@ export function defaultPeopleForCount(count: PeopleCount): PersonFields[] {
     ];
   }
   if (count === "4") {
-    return [
-      defaultPerson({ gender: "woman" }),
-      defaultPerson({
-        gender: "man",
-        dressId: "m-pathani-open",
-        hairStyle: "Side part",
-      }),
-      defaultPerson({
-        gender: "woman",
-        dressId: "w-skinfit-jeans-tiny-blouse",
-        hairStyle: "Shoulder-length bob",
-        age: "34",
-      }),
-      defaultPerson({
-        gender: "man",
-        dressId: "m-formal-undone",
-        hairStyle: "Short neat",
-        age: "34",
-      }),
-    ];
+    return defaultFoursomeSwapPeople();
   }
   return [];
 }

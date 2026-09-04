@@ -5,7 +5,8 @@ export type ActionCategoryId =
   | "romance"
   | "intimate"
   | "hardcore"
-  | "hardcore-grk";
+  | "hardcore-grk"
+  | "swap-four-grk";
 
 export interface ActionItem {
   id: string;
@@ -60,6 +61,12 @@ export const ACTION_CATEGORIES: {
     id: "hardcore-grk",
     label: "Hardcore-grk (21+)",
     description: "Fully indirect heated poses — fabric, pressure, closeness only",
+    restricted: true,
+  },
+  {
+    id: "swap-four-grk",
+    label: "Swap four (21+)",
+    description: "Partner-swap, watching, dual pairs — fully indirect fabric/pressure; auto 4 people",
     restricted: true,
   },
 ];
@@ -458,6 +465,64 @@ export const ACTIONS: ActionItem[] = [
   { id: "hc-double-claim-mouth-breast-hand-center", label: "Face on upper front hand on lower front", prompt: "one of his hands presses firmly on the soft upper front of her body through thin fabric while his face is pressed close against the soft lower front, claiming upper and lower at once", category: "hardcore-grk", placeHints: ["bedroom", "sofa"], minPeople: 2 },
   { id: "hc-from-behind-hand-on-soft-center", label: "From behind hand on soft lower front", prompt: "he presses close behind her one arm around her waist his hand cupped hard against her soft lower front through fabric rubbing firmly between her upper inner thighs while his body presses into the crease of her backside", category: "hardcore-grk", placeHints: ["bedroom", "kitchen", "home-interior"], minPeople: 2 },
 
+  // --- Swap four (21+): partner exchange / watching / dual pairs — fully indirect only ---
+  { id: "sf-soft-partner-tease-circle", label: "Soft tease in a close circle", prompt: "four adults in a close circle; soft teasing touches over fabric, warm breath, and lingering eye contact building heat without rushing", category: "swap-four-grk", placeHints: ["bedroom", "home-interior", "hotel"], minPeople: 4 },
+  { id: "sf-soft-cross-pair-kiss", label: "Cross-pair lingering kiss", prompt: "partners softly exchange: the younger woman shares a lingering heated kiss with the older man while the older woman shares the same with the younger man, hands resting at waists", category: "swap-four-grk", placeHints: ["bedroom", "sofa", "hotel"], minPeople: 4 },
+  { id: "sf-soft-watch-partner-kiss", label: "Watching partner's close kiss", prompt: "the younger man watches from nearby as the older man shares a deep lingering kiss with the younger woman, her partner's gaze heated and steady", category: "swap-four-grk", placeHints: ["bedroom", "sofa"], minPeople: 4 },
+  { id: "sf-soft-mid-woman-watched-kiss", label: "Mid-age woman kissed while watched", prompt: "the older woman shares a heated kiss with the younger man while her partner watches close by, one hand on her lower back through fabric", category: "swap-four-grk", placeHints: ["bedroom", "hotel"], minPeople: 4 },
+  { id: "sf-soft-parallel-sofa-holds", label: "Parallel sofa heated holds", prompt: "two pairs on one long sofa: each woman pressed close with the other man in quiet heated holds, fabric tension at hips and soft upper fronts", category: "swap-four-grk", placeHints: ["sofa", "home-interior"], minPeople: 4 },
+  { id: "sf-soft-fabric-explore-exchange", label: "Fabric explore after partner exchange", prompt: "after a calm partner exchange, hands explore under soft outer fabric with slow care — each woman with the other man — while original partners stay in the same room", category: "swap-four-grk", placeHints: ["bedroom", "hotel"], minPeople: 4 },
+  { id: "sf-soft-whisper-dare-circle", label: "Whispered dare circle", prompt: "four adults whispering close dares; fingertips trace waistbands and soft upper fronts through fabric, smiles and flushed cheeks", category: "swap-four-grk", placeHints: ["bedroom", "home-interior"], minPeople: 4 },
+  { id: "sf-soft-side-by-side-lap", label: "Side-by-side lap closeness", prompt: "both women seated in the other men's laps side by side, soft lower curves pressed through fabric, hands at waist, partners glancing across", category: "swap-four-grk", placeHints: ["sofa", "bedroom"], minPeople: 4 },
+
+  { id: "sf-watch-ya-woman-older-man-press", label: "Watching YA woman with older man press", prompt: "the younger man watches intently as the older man presses deep close body rhythm against the younger woman's lower torso through fabric, her legs wrapped, faces close", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-watch-mid-woman-ya-man-press", label: "Watching mid woman with YA man press", prompt: "the older man watches as the younger man presses firm rhythmic contact against the older woman's lower curves through fabric, her hands gripping his shoulders", category: "swap-four-grk", placeHints: ["bedroom", "hotel"], minPeople: 4 },
+  { id: "sf-watch-partner-face-lower-front", label: "Watching face at soft lower front", prompt: "one partner watches from the edge of the bed while the other man keeps his face pressed close against her soft lower front through thin fabric between her open thighs", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-watch-partner-face-center-brief", label: "Watching face at his center brief", prompt: "a woman keeps her face close against the other man's front center brief through fabric with slow rhythm while her own partner watches from nearby, heated and still", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-watch-straddle-pull-down", label: "Watching straddle pull-down settle", prompt: "she straddles the other man facing him as his hands lock on her waist pulling her down firmly through fabric; her partner watches the rise and fall from close range", category: "swap-four-grk", placeHints: ["bedroom", "sofa"], minPeople: 4 },
+  { id: "sf-watch-all-fours-behind", label: "Watching all-fours from-behind press", prompt: "she is on all fours; the other man presses closely behind with waist-grip rhythm against her lower curves while her partner watches from the head of the bed", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-watch-wall-press", label: "Watching wall-pressed shared rhythm", prompt: "pressed to the wall with the other man in heated shared rhythm through fabric while her partner watches from across the room, arms folded, gaze locked", category: "swap-four-grk", placeHints: ["bedroom", "hotel", "home-interior"], minPeople: 4 },
+  { id: "sf-watch-lap-bounce", label: "Watching lap bounce press", prompt: "she sits in the other man's lap facing him in a bouncing close press through fabric; her partner watches every lift, one hand resting on his own thigh", category: "swap-four-grk", placeHints: ["sofa", "chair", "bedroom"], minPeople: 4 },
+
+  { id: "sf-swap-cross-on-back-press", label: "Cross-pair on-back deep close press", prompt: "partners exchanged: each woman on her back with knees raised while the other man settles between her thighs pressing deep slow contact through fabric; both pairs on one wide bed", category: "swap-four-grk", placeHints: ["bedroom", "hotel"], minPeople: 4 },
+  { id: "sf-swap-cross-from-behind", label: "Cross-pair from-behind waist rhythm", prompt: "partners exchanged: each woman bent forward while the other man grips her waist with slow rhythmic pressing against her lower curves through fabric, side by side", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-swap-cross-straddle", label: "Cross-pair facing straddle settle", prompt: "partners exchanged: each woman straddles the other man facing forward as hands lock on waists pulling down firmly so soft lower curves press deeply through fabric", category: "swap-four-grk", placeHints: ["bedroom", "sofa"], minPeople: 4 },
+  { id: "sf-swap-cross-spoon", label: "Cross-pair side-lying from-behind press", prompt: "partners exchanged: each pair side-lying with the other man pressing from behind against her lower curves, one hand on soft upper front through fabric", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-swap-standing-then-bed", label: "Standing swap then bed settle", prompt: "standing partner exchange with deep kisses and hip presses through fabric, then both cross-pairs settle onto the bed in heated close rhythm", category: "swap-four-grk", placeHints: ["bedroom", "hotel"], minPeople: 4 },
+  { id: "sf-swap-clothes-half-on", label: "Half-dressed partner exchange", prompt: "outer layers pushed aside; partners exchange so each woman presses flush with the other man, fabric bunched at hips, soft upper fronts claimed through thin cloth", category: "swap-four-grk", placeHints: ["bedroom", "home-interior"], minPeople: 4 },
+
+  { id: "sf-parallel-dual-rhythm", label: "Parallel dual shared rhythm", prompt: "two pairs side by side on one bed, each locked in deep shared rhythm through fabric, quiet gasps overlapping, hands gripping sheets", category: "swap-four-grk", placeHints: ["bedroom", "hotel"], minPeople: 4 },
+  { id: "sf-parallel-sofa-and-floor", label: "Sofa pair and floor pair", prompt: "one cross-pair urgent on the sofa; the other cross-pair on a soft blanket on the floor — both in heated fabric-pressure rhythm at once", category: "swap-four-grk", placeHints: ["home-interior", "hotel"], minPeople: 4 },
+  { id: "sf-parallel-mirror-pairs", label: "Mirror-facing dual pairs", prompt: "both cross-pairs facing a wide mirror, each woman pressed close with the other man from behind, hands on soft upper fronts through fabric, watching themselves", category: "swap-four-grk", placeHints: ["bedroom", "hotel"], minPeople: 4 },
+
+  { id: "sf-two-on-ya-woman-watched", label: "Two men close with YA woman, partner near", prompt: "the younger woman between both men: one face close at her soft upper front through fabric, the other pressing at her soft lower front through fabric, while one original partner stays near watching", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-two-on-mid-woman-watched", label: "Two men close with mid woman, partner near", prompt: "the older woman between both men with devoted face and hand attention at soft upper and lower fronts through fabric while her partner watches from the chair", category: "swap-four-grk", placeHints: ["bedroom", "hotel"], minPeople: 4 },
+  { id: "sf-two-women-one-man-watched", label: "Two women close with one man, other watches", prompt: "both women give close face and hand attention at one man's center brief through fabric while the other man watches from nearby with heated stillness", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-ya-woman-between-cross", label: "YA woman between both men", prompt: "the younger woman pressed between both men — chest-to-back and front contact through fabric — while the older woman watches and guides a hand at a waist", category: "swap-four-grk", placeHints: ["bedroom", "sofa"], minPeople: 4 },
+  { id: "sf-mid-woman-between-cross", label: "Mid woman between both men", prompt: "the older woman pressed between both men with firm hip presses through fabric from front and behind while the younger woman watches close, lips parted", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+
+  { id: "sf-hc-crease-press-watched", label: "Deep crease press while watched", prompt: "fingers pressed firmly into the deep fabric crease of soft lower curves while the watching partner sits close enough to see every indentation in the cloth", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-face-crease-swap", label: "Face in backside crease, cross pair", prompt: "cross-paired: one man kneels with face pressed into the soft fabric crease of the other woman on all fours while the remaining pair shares a heated kiss nearby", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-center-brief-cross", label: "Cross face at center brief", prompt: "each woman keeps her face close against the other man's front center brief through fabric with slow rhythm, kneeling side by side", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-soft-lower-cross", label: "Cross face at soft lower front", prompt: "each man keeps his face close against the other woman's soft lower front through thin fabric between open thighs, both pairs on one bed", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-inverted-mutual-one-pair", label: "Inverted mutual close faces, others watch", prompt: "one cross-pair lies inverted with faces close at soft lower front and center brief through fabric; the other pair watches from the pillows", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-all-fours-dual", label: "Dual all-fours crease body press", prompt: "both women on all fours side by side; each other man behind them pressing firm slow body rhythm into deep fabric creases of soft lower curves", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-prone-dual", label: "Dual flat-on-stomach covered press", prompt: "both women flat on their stomachs; each other man covers from behind with deep grinding contact along lower torsos through fabric", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-edge-bed-dual", label: "Dual edge-of-bed standing press", prompt: "both women at opposite edges of the bed; each other man stands between open thighs pressing deep firm contact through fabric", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-shower-four-steam", label: "Steam-pressed four in bath space", prompt: "hot steam; cross-pairs pressed close against wet tile with upward rhythm through wet fabric, faces close, water running", category: "swap-four-grk", placeHints: ["bathroom", "hotel"], minPeople: 4 },
+  { id: "sf-hc-ease-reseat-watched", label: "Ease away then reseat while watched", prompt: "he eases slightly then presses back fully against her lower torso through fabric in long strokes while her partner watches every reseat from an arm's length away", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-upper-and-lower-claim-watch", label: "Upper and lower claim while watched", prompt: "one hand on soft upper front through fabric and face at soft lower front at once on the cross partner while the original partner watches, jaw tight with heat", category: "swap-four-grk", placeHints: ["bedroom", "sofa"], minPeople: 4 },
+  { id: "sf-hc-from-behind-hand-lower-watch", label: "From behind hand on lower front, watched", prompt: "pressed close behind the cross partner with a hand cupped hard at soft lower front through fabric while body presses into the backside crease; original partner watches", category: "swap-four-grk", placeHints: ["bedroom", "kitchen", "home-interior"], minPeople: 4 },
+  { id: "sf-hc-lifted-wall-cross", label: "Lifted wall press, other pair close", prompt: "one woman lifted to the wall with legs wrapped as the other man presses upward rhythm through fabric; the other cross-pair shares heated closeness right beside them", category: "swap-four-grk", placeHints: ["bedroom", "hotel"], minPeople: 4 },
+  { id: "sf-hc-reverse-straddle-dual", label: "Dual reverse straddle pull-down", prompt: "both women straddle the other men facing away; hands locked on waists pulling down so soft lower curves rise and fall through fabric with heavy rhythm", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-chest-down-hips-high-watch", label: "Chest down hips high, partner watches", prompt: "chest to the bed hips high; the other man presses into the deep fabric crease with slow heavy rhythm while her partner kneels near her face, watching", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-hand-guide-cross-mouth", label: "Guiding cross partner's face lower", prompt: "she guides the other man's head with both hands pressing his face firmly at her soft lower front through fabric while her own partner strokes her hair and watches", category: "swap-four-grk", placeHints: ["bedroom", "sofa"], minPeople: 4 },
+  { id: "sf-hc-palm-center-then-face", label: "Palm then face at center brief, watched", prompt: "her palm firm on his front center brief then her face close against that same fabric while her partner watches the alternating grip and attention", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-afterglow-tangled-four", label: "Quiet afterglow four tangled", prompt: "four adults quietly tangled in soft afterglow on wide bedding, limbs crossed, flushed skin, slow breathing, fabric half-settled", category: "swap-four-grk", placeHints: ["bedroom", "hotel"], minPeople: 4 },
+  { id: "sf-hc-midnight-rotate-pairs", label: "Midnight rotate close pairs", prompt: "at midnight the pairs rotate again: each woman locked in deep close rhythm through fabric with the other man after already sharing heat with her first partner", category: "swap-four-grk", placeHints: ["bedroom"], minPeople: 4 },
+  { id: "sf-hc-kitchen-counter-cross", label: "Kitchen-counter cross-pair heat", prompt: "one woman lifted to the kitchen counter with the other man in heated private hold; the second cross-pair pressed close at the fridge with fabric-indent hands", category: "swap-four-grk", placeHints: ["kitchen", "home-interior"], minPeople: 4 },
+  { id: "sf-hc-balcony-pull-in-swap", label: "Pulled in from balcony into swap", prompt: "pulled in from the balcony into heated indoor closeness that becomes a calm partner exchange — each woman with the other man in urgent fabric-pressure holds", category: "swap-four-grk", placeHints: ["balcony", "bedroom"], minPeople: 4 },
+
 ];
 
 export function getActionsByCategory(
@@ -465,7 +530,7 @@ export function getActionsByCategory(
   opts?: { allowIntimate?: boolean }
 ): ActionItem[] {
   if (
-    (category === "intimate" || category === "hardcore" || category === "hardcore-grk") &&
+    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-four-grk") &&
     opts?.allowIntimate === false
   )
     return [];
@@ -485,7 +550,7 @@ export function randomEverydayOrSocialAction(): ActionItem {
 
 export function isIntimateAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "intimate" || c === "hardcore" || c === "hardcore-grk";
+  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-four-grk";
 }
 
 /** Original Hardcore category only — keeps direct phrasing sanitize path. */
@@ -494,16 +559,18 @@ export function isHardcoreAction(id: string): boolean {
 }
 
 export function isHardcoreGrkAction(id: string): boolean {
-  return getActionById(id)?.category === "hardcore-grk";
+  const c = getActionById(id)?.category;
+  return c === "hardcore-grk" || c === "swap-four-grk";
 }
 
-/** Romance / Intimate / Hardcore / Hardcore-grk require every person 21+. */
+/** Romance / Intimate / Hardcore / Hardcore-grk / Swap-four require every person 21+. */
 export function categoryRequiresAdult21(category: ActionCategoryId): boolean {
   return (
     category === "romance" ||
     category === "intimate" ||
     category === "hardcore" ||
-    category === "hardcore-grk"
+    category === "hardcore-grk" ||
+    category === "swap-four-grk"
   );
 }
 
@@ -527,6 +594,7 @@ export function categoryCounts(): Record<ActionCategoryId, number> {
     intimate: 0,
     hardcore: 0,
     "hardcore-grk": 0,
+    "swap-four-grk": 0,
   };
   for (const a of ACTIONS) counts[a.category] += 1;
   return counts;

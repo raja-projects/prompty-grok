@@ -146,7 +146,7 @@ function enforceRelationshipSafety(state: SceneFormState): SceneFormState {
 
 function enforceAgeCategorySafety(state: SceneFormState): SceneFormState {
   if (!sceneHasUnder21(state.people, state.peopleCount)) return state;
-  if (!actionRequiresAdult21(state.actionId) && !["romance","intimate","hardcore","hardcore-grk"].includes(state.actionCategory)) {
+  if (!actionRequiresAdult21(state.actionId) && !["romance","intimate","hardcore","hardcore-grk","swap-four-grk"].includes(state.actionCategory)) {
     return state;
   }
   const fallback = randomEverydayOrSocialAction();

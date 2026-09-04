@@ -20,6 +20,7 @@ import {
   REGIONS,
   RELATIONSHIPS,
   defaultPerson,
+  defaultFoursomeSwapPeople,
   relationshipBlocksIntimate,
   reshuffleFaceCuts,
   applyRegionLook,
@@ -193,6 +194,22 @@ export function PromptLab() {
         // Do not force relationship change.
       }
 
+      // Swap four category: force 4 people = YA couple + mid-age couple, friends, first action
+      if (partial.actionCategory === "swap-four-grk") {
+        next.peopleCount = "4";
+        next.people = defaultFoursomeSwapPeople();
+        if (!relationshipBlocksIntimate("friends")) {
+          next.relationship = "friends";
+        }
+        const first =
+          ACTIONS.find((a) => a.category === "swap-four-grk") ??
+          getActionById(next.actionId);
+        if (first && getActionById(next.actionId)?.category !== "swap-four-grk") {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+        }
+      }
+
       // Safety only: sibling/parent cannot keep intimate/hardcore selected.
       if (partial.relationship) {
         const blocked = relationshipBlocksIntimate(partial.relationship);
@@ -260,7 +277,7 @@ export function PromptLab() {
   }
 
   const visibleCategories = ACTION_CATEGORIES.filter((c) => {
-    if ((c.id === "intimate" || c.id === "hardcore" || c.id === "hardcore-grk") && intimateBlocked) return false;
+    if ((c.id === "intimate" || c.id === "hardcore" || c.id === "hardcore-grk" || c.id === "swap-four-grk") && intimateBlocked) return false;
     if (under21 && categoryRequiresAdult21(c.id)) return false;
     return true;
   });
@@ -268,7 +285,7 @@ export function PromptLab() {
   const filteredActions = ACTIONS.filter((a) => {
     if (a.category !== form.actionCategory) return false;
     if (
-      (a.category === "intimate" || a.category === "hardcore" || a.category === "hardcore-grk") &&
+      (a.category === "intimate" || a.category === "hardcore" || a.category === "hardcore-grk" || a.category === "swap-four-grk") &&
       intimateBlocked
     )
       return false;
@@ -323,7 +340,7 @@ export function PromptLab() {
           <Section
             step={1}
             title="Action"
-            hint="Changing category only filters the list — it won’t reset place or people"
+            hint="Most categories only filter actions. Swap four also sets 4 people (YA + mid-age couples)."
           >
             <ChipRow
               label="Category"

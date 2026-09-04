@@ -5,19 +5,14 @@ export const ALWAYS_FORBIDDEN = [
   "pre-teen",
   "preteen",
   "underage",
-  "under-age",
   "child porn",
   "cp ",
   "lolita",
-  "jailbait",
   "too young",
   "too-young",
   "minor",
   "schoolboy",
   "schoolgirl",
-  "immature",
-  "teen",
-  "teenager",
 ] as const;
 
 /** Soft path only — intimate/romance/everyday free text */
