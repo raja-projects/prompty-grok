@@ -14,7 +14,7 @@ import {
   sceneHasUnder21,
   type PersonFields,
 } from "./people";
-import { defaultFaceCutId, getFaceCut } from "./face-cuts";
+import { applyKnownFaceLocks, defaultFaceCutId, getFaceCut, isKnownFaceId } from "./face-cuts";
 import { getDress } from "./dresses";
 import { getPlaceById, randomPlace } from "./places";
 import {
@@ -40,29 +40,40 @@ function sentence(parts: Array<string | undefined | null | false>): string {
   return /[.!?]$/.test(text) ? text : `${text}.`;
 }
 
-function describePerson(p: PersonFields, index: number, regionIds?: string[], faceCutPool?: "general" | "known"): string {
+function describePerson(p: PersonFields, index: number, regionIds?: string[]): string {
   const label = `person ${index + 1}`;
-  const faceCut = getFaceCut(p.gender, p.faceCutId, p.age, regionIds, faceCutPool);
+  const pool =
+    p.gender === "woman" && (p.faceCutPool === "known" || isKnownFaceId(p.faceCutId))
+      ? "known"
+      : "general";
+  // Known woman: force locked age/hair/skin/body — never leave random fields in the prompt
+  const locked = pool === "known" ? applyKnownFaceLocks(p) : p;
+  const faceCut = getFaceCut(locked.gender, locked.faceCutId, locked.age, regionIds, pool);
   const face = faceCut?.prompt;
-  const dress = getDress(p.gender, p.dressId)?.prompt ?? p.dressId;
-  const ageNum = p.age || "24";
+  const dress = getDress(locked.gender, locked.dressId)?.prompt ?? locked.dressId;
+  const ageNum = locked.age || "24";
   const regionLock = faceCut?.regionIds?.length
     ? `phenotype locked to ${faceCut.regionIds.join(" / ")} region look`
     : "";
+  const knownCue =
+    pool === "known"
+      ? "KNOWN LOOK MODE: face, brows, eyes, nose, lips, jaw, age, hair style, hair color, skin tone, and body type are hard-locked from the selected known face cut — do not invent alternate features"
+      : "";
   return clean([
-    `${label}: ${p.gender}`,
+    `${label}: ${locked.gender}`,
+    knownCue,
     `exactly ${ageNum} years old`,
     regionLock,
-    `${p.skinTone} skin tone`,
-    `${p.bodyType} build`,
-    /youthful|innocent|fresh-faced|delicate|boyish/i.test(p.bodyType)
+    `${locked.skinTone} skin tone`,
+    `${locked.bodyType} build`,
+    /youthful|innocent|fresh-faced|delicate|boyish/i.test(locked.bodyType)
       ? "clearly adult 21+ appearance — not underage, not teen"
       : "",
-    `${p.hairColor} ${p.hairStyle} hair`,
+    `${locked.hairColor} ${locked.hairStyle} hair`,
     face ? `face: ${face}` : "",
-    p.gender === "woman" ? "beautiful and attractive" : "",
+    locked.gender === "woman" ? "beautiful and attractive" : "",
     `wearing complete outfit: ${dress}`,
-    `${p.fashionVibe} vibe`,
+    `${locked.fashionVibe} vibe`,
   ]);
 }
 
@@ -75,7 +86,7 @@ function peopleBlock(state: SceneFormState): string {
   const n = Number(state.peopleCount);
   const listed = state.people
     .slice(0, n)
-    .map((p, i) => describePerson(p, i, state.regionIds, state.faceCutPool))
+    .map((p, i) => describePerson(p, i, state.regionIds))
     .join("; ");
   return listed || `${n} adult${n > 1 ? "s" : ""}`;
 }
@@ -240,7 +251,6 @@ export function createStudioDefaults(): SceneFormState {
     actionCategory: "hardcore",
     actionId: "hc-face-into-central-curve",
     regionIds: ["kerala"],
-    faceCutPool: "general",
     peopleCount: "2",
     relationship: "couple",
     people: [woman, man],
@@ -268,7 +278,6 @@ export function createRandomizedDefaults(): SceneFormState {
     actionCategory: action.category,
     actionId: action.id,
     regionIds: [...DEFAULT_REGION_IDS],
-    faceCutPool: "general",
     peopleCount,
     relationship,
     people: defaultPeopleForCount(peopleCount),

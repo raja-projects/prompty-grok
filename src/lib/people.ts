@@ -1,4 +1,5 @@
 import {
+  applyKnownFaceLocks,
   defaultFaceCutId,
   randomFaceCutId,
 } from "./face-cuts";
@@ -41,6 +42,8 @@ export interface PersonFields {
   hairColor: string;
   skinTone: string;
   faceCutId: string;
+  /** Per person: known only valid for woman. */
+  faceCutPool?: "general" | "known";
 }
 
 /** Individual ages for the picker — not ranges. */
@@ -385,14 +388,18 @@ export function defaultPerson(overrides?: Partial<PersonFields>): PersonFields {
     fashionVibe: "Everyday casual",
     hairColor: "Natural black",
     skinTone: "Medium wheatish",
-    faceCutId: defaultFaceCutId(gender, undefined, DEFAULT_REGION_IDS),
+    faceCutId: defaultFaceCutId(gender, undefined, DEFAULT_REGION_IDS, "general"),
+    faceCutPool: "general",
   };
   const merged = { ...base, ...overrides, gender: overrides?.gender ?? gender };
-  return {
+  const pool = merged.gender === "woman" ? (merged.faceCutPool ?? "general") : "general";
+  const withFace = {
     ...merged,
-    faceCutId: overrides?.faceCutId ?? defaultFaceCutId(merged.gender, merged.age, DEFAULT_REGION_IDS),
+    faceCutPool: pool,
+    faceCutId: overrides?.faceCutId ?? defaultFaceCutId(merged.gender, merged.age, DEFAULT_REGION_IDS, pool),
     dressId: overrides?.dressId ?? defaultDressId(merged.gender),
   };
+  return applyKnownFaceLocks(withFace);
 }
 
 export function defaultPeopleForCount(count: PeopleCount): PersonFields[] {
@@ -543,28 +550,36 @@ export function regionCues(ids: string[]): string {
 export function reshuffleFaceCuts(
   people: PersonFields[],
   regionIds?: string[],
-  faceCutPool?: "general" | "known",
 ): PersonFields[] {
-  return people.map((p) => ({
-    ...p,
-    faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age, regionIds, faceCutPool),
-  }));
+  return people.map((p) => {
+    const pool = p.gender === "woman" ? (p.faceCutPool ?? "general") : "general";
+    const next = {
+      ...p,
+      faceCutPool: pool,
+      faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age, regionIds, pool),
+    };
+    return applyKnownFaceLocks(next);
+  });
 }
 
 /** When region changes: swap to a matching face cut; nudge skin/hair into region prefs if off-list. */
 export function applyRegionLook(
   people: PersonFields[],
   regionIds: string[],
-  faceCutPool?: "general" | "known",
 ): PersonFields[] {
   const skins = skinTonesForRegions(regionIds);
   const hairs = hairColorsForRegions(regionIds);
   const defSkin = defaultSkinToneForRegions(regionIds);
   const defHair = defaultHairColorForRegions(regionIds);
-  return people.map((p) => ({
-    ...p,
-    faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age, regionIds, faceCutPool),
-    skinTone: skins.includes(p.skinTone) ? p.skinTone : defSkin,
-    hairColor: hairs.includes(p.hairColor) ? p.hairColor : defHair,
-  }));
+  return people.map((p) => {
+    const pool = p.gender === "woman" ? (p.faceCutPool ?? "general") : "general";
+    const next = {
+      ...p,
+      faceCutPool: pool,
+      faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age, regionIds, pool),
+      skinTone: skins.includes(p.skinTone) ? p.skinTone : defSkin,
+      hairColor: hairs.includes(p.hairColor) ? p.hairColor : defHair,
+    };
+    return applyKnownFaceLocks(next);
+  });
 }
