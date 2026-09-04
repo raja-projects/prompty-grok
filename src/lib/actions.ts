@@ -443,6 +443,22 @@ export function isHardcoreAction(id: string): boolean {
   return getActionById(id)?.category === "hardcore";
 }
 
+/** Romance / Intimate / Hardcore require every person 21+. */
+export function categoryRequiresAdult21(category: ActionCategoryId): boolean {
+  return category === "romance" || category === "intimate" || category === "hardcore";
+}
+
+export function actionRequiresAdult21(id: string): boolean {
+  const c = getActionById(id)?.category;
+  return !!c && categoryRequiresAdult21(c);
+}
+
+export const UNDER21_ALLOWED_CATEGORIES: ActionCategoryId[] = [
+  "everyday",
+  "social",
+  "physical",
+];
+
 export function categoryCounts(): Record<ActionCategoryId, number> {
   const counts = {
     everyday: 0,

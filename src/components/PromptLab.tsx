@@ -6,6 +6,7 @@ import {
   ACTIONS,
   getActionById,
   isIntimateAction,
+  categoryRequiresAdult21,
   type ActionCategoryId,
 } from "@/lib/actions";
 import {
@@ -21,6 +22,7 @@ import {
   defaultPerson,
   relationshipBlocksIntimate,
   reshuffleFaceCuts,
+  sceneHasUnder21,
   type PeopleCount,
   type Relationship,
 } from "@/lib/people";
@@ -177,6 +179,7 @@ export function PromptLab() {
   }, []);
 
   const intimateBlocked = relationshipBlocksIntimate(form.relationship);
+  const under21 = sceneHasUnder21(form.people, form.peopleCount);
   const prompts = useMemo(() => buildPrompts(form), [form]);
 
   /** Patch one field at a time — never cascade-reset unrelated selections. */
@@ -208,6 +211,18 @@ export function PromptLab() {
       }
 
       // Category chip alone does not overwrite actionId.
+
+      // Under 21: only everyday / social / physical (play)
+      if (sceneHasUnder21(next.people, next.peopleCount)) {
+        if (categoryRequiresAdult21(next.actionCategory) || categoryRequiresAdult21(getActionById(next.actionId)?.category ?? "everyday")) {
+          const fallback = ACTIONS.find((a) => a.category === "everyday");
+          if (fallback) {
+            next.actionCategory = fallback.category;
+            next.actionId = fallback.id;
+          }
+        }
+      }
+
       return next;
     });
   }
@@ -243,9 +258,11 @@ export function PromptLab() {
     });
   }
 
-  const visibleCategories = ACTION_CATEGORIES.filter(
-    (c) => !((c.id === "intimate" || c.id === "hardcore") && intimateBlocked)
-  );
+  const visibleCategories = ACTION_CATEGORIES.filter((c) => {
+    if ((c.id === "intimate" || c.id === "hardcore") && intimateBlocked) return false;
+    if (under21 && categoryRequiresAdult21(c.id)) return false;
+    return true;
+  });
 
   const filteredActions = ACTIONS.filter((a) => {
     if (a.category !== form.actionCategory) return false;
@@ -296,6 +313,12 @@ export function PromptLab() {
 
       <div className="grid gap-5 lg:grid-cols-12">
         <div className="space-y-4 lg:col-span-7">
+          {under21 ? (
+            <p className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+              Ages 18–20: Everyday / Social / Physical (play) only. Romance, Intimate, and Hardcore need everyone 21+.
+            </p>
+          ) : null}
+
           <Section
             step={1}
             title="Action"

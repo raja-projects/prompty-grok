@@ -44,7 +44,23 @@ export interface PersonFields {
 }
 
 /** Individual ages for the picker — not ranges. */
-export const AGES: Age[] = Array.from({ length: 35 }, (_, i) => String(21 + i));
+/** Ages 18–55. Under 21 only for everyday/social — Intimate/Hardcore/Romance blocked. */
+export const AGES: Age[] = Array.from({ length: 38 }, (_, i) => String(18 + i));
+
+export function ageNumber(age: Age | string | undefined): number {
+  const n = Number(age);
+  return Number.isFinite(n) ? n : 21;
+}
+
+export function isUnder21(age: Age | string | undefined): boolean {
+  return ageNumber(age) < 21;
+}
+
+export function sceneHasUnder21(people: PersonFields[], peopleCount: PeopleCount): boolean {
+  if (peopleCount === "group") return false;
+  const n = Number(peopleCount);
+  return people.slice(0, n).some((p) => isUnder21(p.age));
+}
 
 /** @deprecated alias */
 export const AGE_BANDS = AGES;
@@ -265,6 +281,44 @@ export function bodyTypesFor(gender: Gender): string[] {
   return BODY_BY_GENDER[gender];
 }
 
+/** Young-adult (18–20) body options — NOT teen/immature wording; everyday/social only. */
+export const YOUNG_ADULT_BODY_BY_GENDER: Record<Gender, string[]> = {
+  woman: [
+    "Slim young-adult frame",
+    "Petite young-adult build",
+    "Soft young-adult build",
+    "Athletic young-adult",
+    "Average young-adult",
+    "Tall lean young-adult",
+    "Fresh young-adult slender",
+    "Delicate young-adult frame",
+    "Small youthful adult figure (18–20)",
+  ],
+  man: [
+    "Slim young-adult frame",
+    "Lean young-adult",
+    "Athletic young-adult",
+    "Average young-adult",
+    "Tall lean young-adult",
+    "Soft young-adult build",
+    "Compact young-adult athletic",
+    "Fresh young-adult slender",
+  ],
+  nonbinary: [
+    "Slim young-adult frame",
+    "Average young-adult",
+    "Soft young-adult build",
+    "Tall lean young-adult",
+    "Athletic young-adult",
+    "Delicate young-adult frame",
+  ],
+};
+
+export function bodyTypesForAge(gender: Gender, age: Age | string | undefined): string[] {
+  if (isUnder21(age)) return YOUNG_ADULT_BODY_BY_GENDER[gender];
+  return BODY_BY_GENDER[gender];
+}
+
 export const FASHION_VIBES = [
   "Everyday casual",
   "Festive traditional",
@@ -401,6 +455,6 @@ export function regionCues(ids: string[]): string {
 export function reshuffleFaceCuts(people: PersonFields[]): PersonFields[] {
   return people.map((p) => ({
     ...p,
-    faceCutId: randomFaceCutId(p.gender, p.faceCutId),
+    faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age),
   }));
 }

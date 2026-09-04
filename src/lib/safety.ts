@@ -12,6 +12,11 @@ export const ALWAYS_FORBIDDEN = [
   "jailbait",
   "too young",
   "too-young",
+  "minor",
+  "schoolboy",
+  "schoolgirl",
+  "immature",
+  "teen",
   "teenager",
 ] as const;
 

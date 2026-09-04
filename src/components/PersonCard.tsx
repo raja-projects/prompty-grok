@@ -2,7 +2,8 @@
 
 import {
   AGES,
-  bodyTypesFor,
+  bodyTypesForAge,
+  isUnder21,
   FASHION_VIBES,
   GENDERS,
   HAIR_BY_GENDER,
@@ -15,7 +16,7 @@ import {
 } from "@/lib/people";
 import {
   defaultFaceCutId,
-  faceCutsFor,
+  faceCutsForAge,
 } from "@/lib/face-cuts";
 
 function SelectField({
@@ -65,11 +66,19 @@ export function PersonCard({
       const hairs = HAIR_BY_GENDER[g];
       next.dressId = defaultDressId(g);
       if (!hairs.includes(next.hairStyle)) next.hairStyle = hairs[0]!;
-      const bodies = bodyTypesFor(g);
+      const bodies = bodyTypesForAge(g, next.age);
       if (!bodies.includes(next.bodyType)) next.bodyType = bodies[0]!;
-      const cuts = faceCutsFor(g);
+      const cuts = faceCutsForAge(g, next.age);
       if (!cuts.some((c) => c.id === next.faceCutId)) {
-        next.faceCutId = defaultFaceCutId(g);
+        next.faceCutId = defaultFaceCutId(g, next.age);
+      }
+    }
+    if (partial.age && partial.age !== person.age) {
+      const bodies = bodyTypesForAge(next.gender, next.age);
+      if (!bodies.includes(next.bodyType)) next.bodyType = bodies[0]!;
+      const cuts = faceCutsForAge(next.gender, next.age);
+      if (!cuts.some((c) => c.id === next.faceCutId)) {
+        next.faceCutId = defaultFaceCutId(next.gender, next.age);
       }
     }
     onChange(next);
@@ -111,7 +120,7 @@ export function PersonCard({
             onChange={(e) => patch({ faceCutId: e.target.value })}
             className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
           >
-            {faceCutsFor(person.gender).map((f) => (
+            {faceCutsForAge(person.gender, person.age).map((f) => (
               <option key={f.id} value={f.id}>
                 {f.label}
               </option>
@@ -119,7 +128,7 @@ export function PersonCard({
           </select>
         </label>
         <SelectField
-          label="Age (exact year, 21+)"
+          label="Age (exact year)"
           value={person.age}
           options={AGES}
           onChange={(v) => patch({ age: v })}
@@ -155,7 +164,7 @@ export function PersonCard({
         <SelectField
           label="Body type"
           value={person.bodyType}
-          options={bodyTypesFor(person.gender)}
+          options={bodyTypesForAge(person.gender, person.age)}
           onChange={(v) => patch({ bodyType: v })}
         />
         <SelectField

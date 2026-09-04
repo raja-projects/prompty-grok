@@ -1,4 +1,4 @@
-import { getActionById, isHardcoreAction, isIntimateAction, randomEverydayOrSocialAction } from "./actions";
+import { getActionById, isHardcoreAction, isIntimateAction, actionRequiresAdult21, randomEverydayOrSocialAction } from "./actions";
 import {
   CAMERA_ANGLES,
   FRAMINGS,
@@ -11,6 +11,7 @@ import {
   defaultPerson,
   regionCues,
   relationshipBlocksIntimate,
+  sceneHasUnder21,
   type PersonFields,
 } from "./people";
 import { getFaceCut } from "./face-cuts";
@@ -41,7 +42,7 @@ function sentence(parts: Array<string | undefined | null | false>): string {
 
 function describePerson(p: PersonFields, index: number): string {
   const label = `person ${index + 1}`;
-  const face = getFaceCut(p.gender, p.faceCutId)?.prompt;
+  const face = getFaceCut(p.gender, p.faceCutId, p.age)?.prompt;
   const dress = getDress(p.gender, p.dressId)?.prompt ?? p.dressId;
   const ageNum = p.age || "24";
   return clean([
@@ -126,8 +127,22 @@ function enforceRelationshipSafety(state: SceneFormState): SceneFormState {
   };
 }
 
+
+function enforceAgeCategorySafety(state: SceneFormState): SceneFormState {
+  if (!sceneHasUnder21(state.people, state.peopleCount)) return state;
+  if (!actionRequiresAdult21(state.actionId) && !["romance","intimate","hardcore"].includes(state.actionCategory)) {
+    return state;
+  }
+  const fallback = randomEverydayOrSocialAction();
+  return {
+    ...state,
+    actionCategory: fallback.category,
+    actionId: fallback.id,
+  };
+}
+
 export function buildPrompts(raw: SceneFormState): BuiltPrompts {
-  const state = enforceRelationshipSafety(raw);
+  const state = enforceAgeCategorySafety(enforceRelationshipSafety(raw));
   const action = getActionById(state.actionId);
   const place = getPlaceById(state.placeId);
   const actionText = action?.prompt ?? "posed naturally";
