@@ -6,6 +6,7 @@ import {
 import {
   defaultDressId,
   dressesFor,
+  dressesForAge,
   getDress,
 } from "./dresses";
 
@@ -167,7 +168,7 @@ export const DRESS_BY_GENDER: Record<Gender, string[]> = {
   nonbinary: dressesFor("nonbinary").map((d) => d.label),
 };
 
-export { dressesFor, getDress, defaultDressId };
+export { dressesFor, dressesForAge, getDress, defaultDressId };
 
 export const HAIR_BY_GENDER: Record<Gender, string[]> = {
   woman: [

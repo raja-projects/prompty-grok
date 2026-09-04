@@ -359,6 +359,9 @@ export function PromptLab() {
 
       // Under 19: only everyday / social / physical (play)
       if (sceneHasUnder21(next.people, next.peopleCount)) {
+        next.useCustomActionPrompt = false;
+        next.customActionPrompt = "";
+        if (next.relationship === "couple" || next.relationship === "married") next.relationship = "friends";
         if (categoryRequiresAdult21(next.actionCategory) || categoryRequiresAdult21(getActionById(next.actionId)?.category ?? "everyday")) {
           const fallback = ACTIONS.find((a) => a.category === "everyday");
           if (fallback) {
@@ -501,12 +504,16 @@ export function PromptLab() {
         <FieldLabel>Describe the action in your own words</FieldLabel>
         <div className="flex items-center gap-3">
           <span className="text-prompty-accent2">✦</span>
-          <input
-            value={form.customActionPrompt}
-            onChange={(e) => patch({ customActionPrompt: e.target.value, useCustomActionPrompt: Boolean(e.target.value.trim()) })}
-            placeholder="e.g. A couple embracing in a quiet bedroom"
-            className="w-full bg-transparent text-base text-white outline-none placeholder:text-prompty-muted/50"
-          />
+          {under21 ? (
+            <span className="text-sm text-prompty-muted">Minor-safe mode is active. Choose a reviewed action below.</span>
+          ) : (
+            <input
+              value={form.customActionPrompt}
+              onChange={(e) => patch({ customActionPrompt: e.target.value, useCustomActionPrompt: Boolean(e.target.value.trim()) })}
+              placeholder="e.g. A couple embracing in a quiet bedroom"
+              className="w-full bg-transparent text-base text-white outline-none placeholder:text-prompty-muted/50"
+            />
+          )}
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           <span className="rounded-lg border border-prompty-accent2/30 bg-prompty-accent2/10 px-2.5 py-1 text-[10px] font-medium capitalize text-prompty-accent2">{form.mode}</span>
@@ -520,7 +527,7 @@ export function PromptLab() {
         <div className="space-y-4 lg:col-span-7">
           {under21 ? (
             <p className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-              Age 18: Everyday / Social / Physical (play) only. Romance, Intimate, and Hardcore need everyone 19+.
+              Minor-safe mode: ages 10–18 use reviewed Everyday, Social, and Physical/Play actions with age-appropriate styling only.
             </p>
           ) : null}
 
@@ -584,7 +591,7 @@ export function PromptLab() {
                 }) : <p className="p-3 text-xs text-prompty-muted">No matching actions.</p>}
               </div>
             </div>
-            <div>
+            {!under21 ? <div>
               <button
                 type="button"
                 aria-pressed={form.useCustomActionPrompt}
@@ -606,7 +613,7 @@ export function PromptLab() {
                   />
                 </label>
               ) : null}
-            </div>
+            </div> : null}
             {form.useCustomActionPrompt && form.customActionPrompt.trim() ? (
               <div className="flex items-center justify-between rounded-xl border border-prompty-accent2/25 bg-prompty-accent2/10 px-3 py-2 text-xs text-prompty-accent2">
                 <span>Custom action is overriding the preset</span>
@@ -639,7 +646,7 @@ export function PromptLab() {
                 <SoftSelect
                   label="Relationship"
                   value={form.relationship}
-                  options={RELATIONSHIPS.map((r) => ({
+                  options={RELATIONSHIPS.filter((r) => !under21 || ["friends", "siblings", "colleagues", "parent-child"].includes(r.id)).map((r) => ({
                     id: r.id,
                     label: r.label,
                   }))}

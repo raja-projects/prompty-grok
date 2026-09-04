@@ -10,7 +10,7 @@ import {
   HAIR_BY_GENDER,
   hairColorsForRegions,
   skinTonesForRegions,
-  dressesFor,
+  dressesForAge,
   defaultDressId,
   type PersonFields,
   type Gender,
@@ -22,6 +22,13 @@ import {
   isKnownFaceId,
 } from "@/lib/face-cuts";
 import type { FavoritePerson } from "@/lib/types";
+
+const MINOR_HAIR_BY_GENDER: Record<Gender, string[]> = {
+  woman: ["Long straight", "Long wavy", "Simple long braid", "Double long braids", "Low ponytail long", "High ponytail long"],
+  man: ["Short neat", "Side part", "Wavy medium", "Curly", "Buzz cut"],
+  nonbinary: ["Short textured", "Medium wavy", "Long loose", "Curly volume", "Neat bob", "Tied back"],
+};
+const MINOR_FASHION_VIBES = ["Everyday casual", "Festive traditional", "Urban street", "Monsoon cozy"];
 
 function SelectField({
   label,
@@ -111,6 +118,11 @@ export function PersonCard({
 
     if (Number(next.age) < 19) {
       next.faceCutPool = "general";
+      const safeDresses = dressesForAge(next.gender, next.age);
+      if (!safeDresses.some((dress) => dress.id === next.dressId)) next.dressId = safeDresses[0]!.id;
+      const safeHair = MINOR_HAIR_BY_GENDER[next.gender];
+      if (!safeHair.includes(next.hairStyle)) next.hairStyle = safeHair[0]!;
+      next.fashionVibe = "Everyday casual";
     }
 
     if (partial.gender && partial.gender !== person.gender) {
@@ -290,7 +302,7 @@ export function PersonCard({
             onChange={(e) => patch({ dressId: e.target.value })}
             className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
           >
-            {dressesFor(display.gender).map((d) => (
+            {dressesForAge(display.gender, display.age).map((d) => (
               <option key={d.id} value={d.id}>
                 {d.label}
               </option>
@@ -304,7 +316,7 @@ export function PersonCard({
               ? display.hairStyle
               : hairStyles[0]!
           }
-          options={hairStyles}
+          options={isMinor ? MINOR_HAIR_BY_GENDER[display.gender] : hairStyles}
           disabled={knownLocked}
           onChange={(v) => patch({ hairStyle: v })}
         />
@@ -327,7 +339,7 @@ export function PersonCard({
         <SelectField
           label="Fashion vibe"
           value={display.fashionVibe}
-          options={FASHION_VIBES}
+          options={isMinor ? MINOR_FASHION_VIBES : FASHION_VIBES}
           onChange={(v) => patch({ fashionVibe: v })}
         />
         <SelectField

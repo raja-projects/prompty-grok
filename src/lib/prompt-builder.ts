@@ -159,7 +159,7 @@ function enforceRelationshipSafety(state: SceneFormState): SceneFormState {
 function enforceAgeCategorySafety(state: SceneFormState): SceneFormState {
   if (!sceneHasUnder21(state.people, state.peopleCount)) return state;
   if (!actionRequiresAdult21(state.actionId) && !["romance","intimate","hardcore","hardcore-grk","swap-own-grk","swap-cross-grk","gf-exchange-grk","five-couples-games","mmf-grk","mmmf-grk","ffm-grk","crowd-press-grk","wlw-grk"].includes(state.actionCategory)) {
-    return state;
+    return { ...state, useCustomActionPrompt: false, customActionPrompt: "", relationship: state.relationship === "couple" || state.relationship === "married" ? "friends" : state.relationship };
   }
   const fallback = randomEverydayOrSocialAction();
   return {
@@ -191,6 +191,10 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
 
   const notes = sanitizeText(state.extraNotes, sanitizeMode);
   const quality = DEFAULT_QUALITY_PHRASE;
+  const minorSafe = sceneHasUnder21(state.people, state.peopleCount);
+  const minorSafetyCue = minorSafe
+    ? "strictly age-appropriate non-romantic everyday scene; ordinary family, school, friendship or supervised play context only; no sexualization, adult glamour, suggestive posing, intimate contact, exposed clothing or mature styling"
+    : "";
 
   const short = sanitizeText(
     clean([
@@ -198,6 +202,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       people,
       rel,
       regions ? `appearance cues: ${regions}` : "",
+      minorSafetyCue,
       actionText,
       faceVisibleCue,
       beautyCue,
@@ -215,6 +220,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       `Photorealistic real photograph of ${people}`,
       rel ? `They share a ${rel}` : "",
       regions ? `Cultural/appearance cues: ${regions}` : "",
+      minorSafetyCue ? `Minor-safe direction: ${minorSafetyCue}` : "",
       `Action: ${actionText}`,
       `Setting: ${placeText}`,
       `Time: ${state.timeOfDay} with ${lighting}`,

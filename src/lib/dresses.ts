@@ -125,6 +125,31 @@ export const NONBINARY_DRESSES: DressOption[] = [
   { id: "nb-open-shirt", label: "Open shirt + pants", prompt: "shirt worn open over a tank with straight pants, androgynous coastal vibe" },
 ];
 
+export const MINOR_DRESSES_BY_GENDER: Record<Gender, DressOption[]> = {
+  woman: [
+    { id: "girl-tee-jeans", label: "T-shirt + full-length jeans", prompt: "age-appropriate crew-neck cotton T-shirt and comfortable full-length jeans with sneakers" },
+    { id: "girl-kurta-leggings", label: "Modest kurta + leggings", prompt: "age-appropriate knee-length cotton kurta with full-length opaque leggings and flat sandals" },
+    { id: "girl-salwar-set", label: "Simple salwar set", prompt: "age-appropriate cotton salwar kameez with full-length trousers and neatly arranged dupatta" },
+    { id: "girl-hoodie-joggers", label: "Hoodie + joggers", prompt: "age-appropriate pullover hoodie with relaxed full-length joggers and practical trainers" },
+    { id: "girl-school-casual", label: "Polo + straight trousers", prompt: "age-appropriate polo shirt with comfortable straight full-length trousers and sneakers" },
+    { id: "girl-sports-set", label: "Sports tee + track pants", prompt: "age-appropriate sports T-shirt with full-length track pants and running shoes" },
+  ],
+  man: [
+    { id: "boy-tee-jeans", label: "T-shirt + full-length jeans", prompt: "age-appropriate crew-neck cotton T-shirt and comfortable full-length jeans with sneakers" },
+    { id: "boy-shirt-trousers", label: "Casual shirt + trousers", prompt: "age-appropriate button-front casual shirt worn closed with full-length cotton trousers" },
+    { id: "boy-kurta-pajama", label: "Kurta + pajama trousers", prompt: "age-appropriate modest kurta with full-length pajama trousers and sandals" },
+    { id: "boy-hoodie-joggers", label: "Hoodie + joggers", prompt: "age-appropriate pullover hoodie with relaxed full-length joggers and trainers" },
+    { id: "boy-polo-chinos", label: "Polo + chinos", prompt: "age-appropriate polo shirt with full-length chinos and sneakers" },
+    { id: "boy-sports-set", label: "Sports tee + track pants", prompt: "age-appropriate sports T-shirt with full-length track pants and running shoes" },
+  ],
+  nonbinary: [
+    { id: "minor-nb-tee-jeans", label: "T-shirt + full-length jeans", prompt: "age-appropriate relaxed crew-neck T-shirt with full-length jeans and sneakers" },
+    { id: "minor-nb-hoodie-joggers", label: "Hoodie + joggers", prompt: "age-appropriate hoodie with relaxed full-length joggers and trainers" },
+    { id: "minor-nb-kurta-trousers", label: "Kurta + trousers", prompt: "age-appropriate modest kurta with comfortable full-length trousers" },
+    { id: "minor-nb-sports-set", label: "Sports tee + track pants", prompt: "age-appropriate sports T-shirt with full-length track pants and running shoes" },
+  ],
+};
+
 export const DRESS_OPTIONS_BY_GENDER: Record<Gender, DressOption[]> = {
   woman: WOMAN_DRESSES,
   man: MAN_DRESSES,
@@ -135,8 +160,12 @@ export function dressesFor(gender: Gender): DressOption[] {
   return DRESS_OPTIONS_BY_GENDER[gender];
 }
 
+export function dressesForAge(gender: Gender, age?: string): DressOption[] {
+  return Number(age) < 19 ? MINOR_DRESSES_BY_GENDER[gender] : dressesFor(gender);
+}
+
 export function getDress(gender: Gender, idOrPrompt: string): DressOption | undefined {
-  const list = dressesFor(gender);
+  const list = [...dressesFor(gender), ...MINOR_DRESSES_BY_GENDER[gender]];
   return list.find((d) => d.id === idOrPrompt || d.prompt === idOrPrompt || d.label === idOrPrompt) ?? list[0];
 }
 
