@@ -9,6 +9,7 @@ export type ActionCategoryId =
   | "swap-own-grk"
   | "swap-cross-grk"
   | "gf-exchange-grk"
+  | "five-couples-games"
   | "mmf-grk"
   | "mmmf-grk"
   | "ffm-grk"
@@ -95,6 +96,12 @@ export const ACTION_CATEGORIES: {
     id: "gf-exchange-grk",
     label: "Girlfriend exchange (19+)",
     description: "Two consenting adult couples sharing mutual interest at secluded public spots — simultaneous own-partner and other-partner affection; auto 4 people",
+    restricted: true,
+  },
+  {
+    id: "five-couples-games",
+    label: "Five couples · party games (19+)",
+    description: "Ten consenting adults playing partner-selection and couples-party games; auto Group mode",
     restricted: true,
   },
   {
@@ -192,6 +199,60 @@ const GF_EXCHANGE_ACTIONS: ActionItem[] = GF_EXCHANGE_SPOTS.flatMap((spot) =>
     ...(moment.id === "rear-hip" ? { autoCamera: "back" as const, autoFraming: "full-body" as const } : { autoCamera: "3/4" as const, autoFraming: "full-body" as const }),
   }))
 );
+
+const FIVE_COUPLES_LOCK = "Exactly five established adult couples, ten consenting adults age 19 or older, participate knowingly and enthusiastically. Keep the scene playful, fully clothed and non-graphic; make every selected pairing unambiguous through tokens, keys, cards, gestures and positions, with distinct faces, believable group spacing and no uninvolved bystanders.";
+
+const FIVE_COUPLES_GAME_ACTION_BASES: ActionItem[] = [
+  { id: "fcg-car-key-bowl", label: "Car-key bowl partner draw", prompt: `each man places a clearly different car key in a glass bowl; the five women draw one key each and stand beside the matching key owner while original partners watch with amused approval. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior"], minPeople: 10 },
+  { id: "fcg-colored-key-tags", label: "Colored key-tag match", prompt: `five colored key tags are drawn at random, and each woman matches her tag to the man wearing the same colored wrist ribbon, forming five new visible pairs. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-partner-name-cards", label: "Partner-name card reveal", prompt: `everyone draws a face-down name card, then reveals it together and moves beside the assigned adult partner, holding the card visibly for a clear group reveal. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior", "hotel"], minPeople: 10 },
+  { id: "fcg-number-token-pairs", label: "Matching-number tokens", prompt: `ten adults draw numbered tokens from two separate bowls; matching numbers find each other and form five temporary pairs around the room. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior", "hotel"], minPeople: 10 },
+  { id: "fcg-mask-choice", label: "Masked partner choice", prompt: `the five men wear elegant eye masks while the five women each choose a partner by placing a colored ribbon in his hand, followed by a smiling simultaneous reveal. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-spin-bottle-pairs", label: "Five-way bottle pairing", prompt: `five labeled bottles spin in the center of a seated circle, each pointer assigning one new adult pair; the final five pairings sit together with linked hands. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior"], minPeople: 10 },
+  { id: "fcg-secret-symbol", label: "Secret-symbol match", prompt: `each adult receives a hidden symbol card and searches the party for the person with the matching symbol, then reveals both cards side by side. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-dice-rotation", label: "Dice partner rotation", prompt: `a large pair of dice determines how many places each person rotates around a ten-seat circle, creating five new neighboring pairs who greet with a playful fully clothed embrace. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior"], minPeople: 10 },
+  { id: "fcg-music-stop-pair", label: "Music-stop pairing", prompt: `the adults mingle while music plays and pair with the nearest eligible participant when it stops, producing five clear smiling pairs in mid-game. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-ribbon-path", label: "Follow the ribbon", prompt: `five long colored ribbons cross the room, each woman holding one end and following it through the playful tangle to the man holding its matching end. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior", "hotel"], minPeople: 10 },
+  { id: "fcg-envelope-choice", label: "Sealed-envelope choice", prompt: `five sealed envelopes each contain a man's portrait card; the women open them simultaneously and move toward the selected partner for a clear reveal. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-bracelet-exchange", label: "Bracelet exchange pairing", prompt: `the women place their distinct bracelets into velvet bags, the men draw one each, and the owners step forward to form five exchanged pairs. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel"], minPeople: 10 },
+  { id: "fcg-photo-puzzle", label: "Portrait puzzle match", prompt: `each adult receives half of a portrait puzzle and searches for the person holding the matching half, ending in five pairs displaying completed cards. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior"], minPeople: 10 },
+  { id: "fcg-chair-draw", label: "Five-chair partner draw", prompt: `five men sit in numbered chairs while the women draw chair numbers from a decorated box and stand behind the selected seat with hands on shoulders. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-card-suit", label: "Matching card-suit pairs", prompt: `custom playing cards contain five unique paired emblems; everyone draws, finds the adult holding the twin emblem and poses together displaying both cards. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior", "hotel"], minPeople: 10 },
+  { id: "fcg-compliment-choice", label: "Anonymous compliment choice", prompt: `the adults read anonymous compliment notes aloud, then each writer steps beside the recipient when invited, forming five mutually selected pairs. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior"], minPeople: 10 },
+  { id: "fcg-lantern-color", label: "Lantern-color pairing", prompt: `under five differently colored lanterns, matching color tokens guide the adults into five clearly separated new pairs. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["rooftop-corner-night", "garden"], minPeople: 10 },
+  { id: "fcg-treasure-clue", label: "Partner treasure clues", prompt: `each adult follows a short clue trail to locate a matching participant, meeting at five marked stations for the final smiling reveal. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["garden", "hotel"], minPeople: 10 },
+  { id: "fcg-eye-contact-round", label: "Mutual eye-contact choice", prompt: `after a quiet circle round, consenting adults indicate mutual choices with matching hand signs and reorganize into five temporary pairs. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior", "hotel"], minPeople: 10 },
+  { id: "fcg-couple-challenge-wheel", label: "Couples challenge wheel", prompt: `a colorful wheel assigns five mixed pairs simple affectionate challenges such as a dance turn, linked-arm walk, cheek kiss or close portrait pose while original partners cheer. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-key-reveal-rear-embrace", label: "Key reveal and rear embrace", prompt: `five women draw keys and find the matching men, then each selected pair moves into a close rear embrace while original partners stand nearby sharing amused approving looks. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-crossed-couple-kiss-line", label: "Exchanged kiss line", prompt: `the ten adults form two facing lines and each woman steps toward the chosen man for a cinematic kiss or cheek kiss while her own partner keeps a visible linked-hand connection. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "rooftop-corner-night"], minPeople: 10 },
+  { id: "fcg-five-chair-lap-poses", label: "Five chair-lap poses", prompt: `five selected men sit in sturdy chairs and the matched women sit sideways across their laps in fully clothed supported poses, original partners gathered close in a playful semicircle. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-rotating-waist-holds", label: "Rotating waist holds", prompt: `each round rotates the women one place around the circle, producing five new pairs with clear hands at shoulders and covered waists while original couples remain connected by matching wrist ribbons. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["home-interior", "hotel"], minPeople: 10 },
+  { id: "fcg-blindfold-voice-choice", label: "Blindfold voice choice", prompt: `the blindfolded adults identify a chosen partner by voice, remove the masks together and settle into five close fully clothed embraces with hands visibly placed at upper backs and waists. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-dance-card-pressure", label: "Dance-card close holds", prompt: `dance cards assign five exchanged pairs who move into close ballroom holds, covered hips and waists held firmly as dresses pull into natural folds and original partners applaud. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["hotel", "home-interior"], minPeople: 10 },
+  { id: "fcg-sofa-pair-rotation", label: "Sofa pair rotation", prompt: `five exchanged pairs occupy a long sectional sofa in varied seated and side-lap arrangements, hands at shoulders, waists and covered outer hips while everyone remains clearly visible. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["sofa", "hotel"], minPeople: 10 },
+  { id: "fcg-partner-photo-dares", label: "Partner portrait dares", prompt: `drawn cards assign five exchanged pairs increasingly close portrait poses: linked hands, cheek kisses, rear embraces, supported dips and shoulder-to-waist holds. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["studio", "hotel"], minPeople: 10 },
+  { id: "fcg-ribbon-cross-embrace", label: "Cross-ribbon embraces", prompt: `matching ribbons lead everyone to exchanged partners, then the five original couples keep one ribbon-linked hand while sharing a second simultaneous embrace across the group. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["garden", "hotel"], minPeople: 10 },
+  { id: "fcg-midnight-key-pairs", label: "Midnight key-pair reveal", prompt: `at a private midnight gathering, keys reveal five exchanged pairings who stand under separate lamps in close fully clothed holds, with original partners visible beside them and all ten faces readable. ${FIVE_COUPLES_LOCK}`, category: "five-couples-games", placeHints: ["rooftop-corner-night", "hotel"], minPeople: 10 },
+];
+
+const FIVE_COUPLES_AFTER_PAIRING = [
+  "After the reveal, every exchanged pair shares a close fully clothed embrace, one hand at the upper back and one at the covered waist, while each original couple preserves a visible linked-hand connection.",
+  "The chosen pairs move into supported dance dips and lingering kisses, with hands firm at shoulders and covered waists and all five original partners visibly approving.",
+  "Each new pair settles into a side-by-side seated hold, shoulders touching and palms visibly pressing through clothing at the outer waist and upper back.",
+  "The five exchanged pairs form a rear-facing portrait line, hands creating visible dress-fabric pressure at covered outer hips while every woman turns her face back toward camera.",
+  "The game continues with close cheek kisses and waist pulls, each original partner remaining beside the exchanged pair with a hand-link or shoulder touch.",
+  "Each selected pair performs a slow turn into a firm face-to-face hold, layered clothing compressed at shoulders, waist and outer hips with realistic balance.",
+  "The adults form a ten-person chain of overlapping embraces, with every original and exchanged connection visually distinct through colored ribbons and separate hand placement.",
+  "The chosen partners take five supported seated poses, hands at upper backs, covered thighs and waists while original partners lean in for a shared group portrait.",
+  "Each woman stands between her original and selected partner, sharing a kiss with one while maintaining a visible hand or waist connection with the other.",
+  "The round ends in five compact three-person clusters: each woman centered between original and selected partners under strong but fully clothed shoulder, waist and outer-hip holds.",
+] as const;
+
+const FIVE_COUPLES_GAME_ACTIONS: ActionItem[] = FIVE_COUPLES_GAME_ACTION_BASES.map((action, index) => ({
+  ...action,
+  prompt: `${action.prompt} ${FIVE_COUPLES_AFTER_PAIRING[index % FIVE_COUPLES_AFTER_PAIRING.length]}`,
+  autoFraming: "wide",
+}));
 
 export const ACTIONS: ActionItem[] = [
   // Everyday / posture
@@ -960,6 +1021,7 @@ export const ACTIONS: ActionItem[] = [
   { id: "mmmf-dress-hem-pressure-lock", label: "Fitted-dress pressure lock", prompt: "one consenting adult woman age 19 or older remains fully covered in a fitted knee-length dress while three adult men surround her in a high-tension standing pose; hands grip over the dress at her waist, outer hips, shoulder blades and lower-back curve, visibly stretching the fabric into deep directional folds without lifting the hem or exposing anatomy; her turned face and all three men's faces remain clear, realistic balance and indirect wording only", category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "3/4", autoFraming: "full-body" },
   ...MMMF_MORE_ACTIONS,
   ...GF_EXCHANGE_ACTIONS,
+  ...FIVE_COUPLES_GAME_ACTIONS,
 
   // --- Crowd press (19+): crowded stranger fabric pressure that looks casual ---
   { id: "cp-bus-board-backside", label: "Crowded bus boarding, backside fabric press", prompt: "on crowded bus steps a mid-age man stands close behind a young adult woman and presses both hands firmly into the soft lower curves of her backside to guide her inside, fabric strongly indented, both looking ahead calm as if nothing unusual. Camera from behind her back clearly shows a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. He stays close behind her. Calm ordinary expressions as if nothing unusual is happening.", category: "crowd-press-grk", placeHints: ["station", "street", "bus-last-row"], minPeople: 2, autoCamera: "back", autoFraming: "half-body"},
@@ -1111,7 +1173,7 @@ export function getActionsByCategory(
   opts?: { allowIntimate?: boolean }
 ): ActionItem[] {
   if (
-    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-own-grk" || category === "swap-cross-grk" || category === "gf-exchange-grk" || category === "mmf-grk" || category === "mmmf-grk" || category === "ffm-grk" || category === "crowd-press-grk" || category === "wlw-grk") &&
+    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-own-grk" || category === "swap-cross-grk" || category === "gf-exchange-grk" || category === "five-couples-games" || category === "mmf-grk" || category === "mmmf-grk" || category === "ffm-grk" || category === "crowd-press-grk" || category === "wlw-grk") &&
     opts?.allowIntimate === false
   )
     return [];
@@ -1131,7 +1193,7 @@ export function randomEverydayOrSocialAction(): ActionItem {
 
 export function isIntimateAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "gf-exchange-grk" || c === "mmf-grk" || c === "mmmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
+  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "gf-exchange-grk" || c === "five-couples-games" || c === "mmf-grk" || c === "mmmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
 }
 
 /** Original Hardcore category only — keeps direct phrasing sanitize path. */
@@ -1141,7 +1203,7 @@ export function isHardcoreAction(id: string): boolean {
 
 export function isHardcoreGrkAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "gf-exchange-grk" || c === "mmf-grk" || c === "mmmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
+  return c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "gf-exchange-grk" || c === "five-couples-games" || c === "mmf-grk" || c === "mmmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
 }
 
 /** Romance / Intimate / Hardcore / Hardcore-grk / Swap-four require every person 19+. */
@@ -1153,6 +1215,7 @@ export function categoryRequiresAdult21(category: ActionCategoryId): boolean {
     category === "hardcore-grk" ||
     category === "swap-own-grk" || category === "swap-cross-grk" ||
     category === "gf-exchange-grk" ||
+    category === "five-couples-games" ||
     category === "mmf-grk" ||
     category === "mmmf-grk" ||
     category === "ffm-grk" ||
@@ -1184,6 +1247,7 @@ export function categoryCounts(): Record<ActionCategoryId, number> {
     "swap-own-grk": 0,
     "swap-cross-grk": 0,
     "gf-exchange-grk": 0,
+    "five-couples-games": 0,
     "mmf-grk": 0,
     "mmmf-grk": 0,
     "ffm-grk": 0,
