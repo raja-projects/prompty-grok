@@ -8,7 +8,8 @@ export type ActionCategoryId =
   | "hardcore-grk"
   | "swap-four-grk"
   | "mmf-grk"
-  | "ffm-grk";
+  | "ffm-grk"
+  | "crowd-press-grk";
 
 export interface ActionItem {
   id: string;
@@ -81,6 +82,12 @@ export const ACTION_CATEGORIES: {
     id: "ffm-grk",
     label: "Two women + him (21+)",
     description: "Two women with one man — fully indirect fabric/pressure; auto 3 people",
+    restricted: true,
+  },
+  {
+    id: "crowd-press-grk",
+    label: "Crowd press (21+)",
+    description: "Crowded stranger fabric pressure that looks casual — soft curves only; auto YA woman + mid-age man",
     restricted: true,
   },
 ];
@@ -668,6 +675,48 @@ export const ACTIONS: ActionItem[] = [
   { id: "ffm-stacked-soft-upper", label: "Stacked soft upper fronts against him", prompt: "both women press soft upper fronts against his chest and back through fabric in a slow sandwich of closeness, mouths at his neck", category: "ffm-grk", placeHints: ["bedroom", "sofa"], minPeople: 3 },
   { id: "ffm-ease-reseat-second-holds", label: "Ease and reseat with one, second holds her", prompt: "with one woman he eases slightly then presses back fully through fabric in long strokes while the second woman holds her open and shares kisses", category: "ffm-grk", placeHints: ["bedroom"], minPeople: 3 },
 
+  // --- Crowd press (21+): crowded stranger fabric pressure that looks casual ---
+  { id: "cp-bus-board-backside", label: "Crowded bus boarding, backside fabric press", prompt: "on crowded bus steps a mid-age man stands close behind a young adult woman and presses both hands firmly into the soft lower curves of her backside to guide her inside, fabric strongly indented, both looking ahead calm as if nothing unusual", category: "crowd-press-grk", placeHints: ["station", "street", "bus-last-row"], minPeople: 2 },
+  { id: "cp-bus-aisle-hip", label: "Packed bus aisle, hip and soft curves press", prompt: "standing in a packed city-bus aisle, he stays close behind her with steady hip pressure and a firm hand on her soft lower curves through fabric, both facing forward with ordinary calm expressions among other riders", category: "crowd-press-grk", placeHints: ["bus-last-row", "station"], minPeople: 2 },
+  { id: "cp-bus-seat-arm-upper", label: "Crowded bus seat, arm across soft upper front", prompt: "sitting very close on a crowded bus bench, his arm wraps naturally around her as if steadying himself, hand resting low on the soft upper front of her body over thin fabric with clear indentation, both looking out the window casually", category: "crowd-press-grk", placeHints: ["bus-last-row", "station"], minPeople: 2 },
+  { id: "cp-metro-rail-backside", label: "Packed metro, hand on soft backside at the rail", prompt: "standing in a packed metro car holding the overhead rail, he is pressed close behind her by the crowd while one hand locks firmly on her soft backside curves through fabric, faces calm and ordinary among riders", category: "crowd-press-grk", placeHints: ["metro-end-car", "station"], minPeople: 2 },
+  { id: "cp-metro-door-upper", label: "Metro near doors, palm on soft upper front", prompt: "crowded near metro doors, his body close in front of her, one palm pressed firmly into her soft upper front through thin fabric as if bracing for the jolt, both staring ahead with blank calm faces", category: "crowd-press-grk", placeHints: ["metro-end-car", "station"], minPeople: 2 },
+  { id: "cp-market-crowd-backside", label: "Market crowd, firm backside press while walking", prompt: "walking through a tightly packed market, he stays close behind her and presses a hand hard into the soft lower curves of her backside through fabric, both browsing stalls with casual faces as if the hold is only crowd pressure", category: "crowd-press-grk", placeHints: ["market", "street"], minPeople: 2 },
+  { id: "cp-market-side-upper", label: "Market squeeze, side palm on soft upper front", prompt: "in a narrow market lane packed with shoppers, he is squeezed beside her with a palm firmly indenting her soft upper front through blouse fabric, both looking at goods with ordinary calm expressions", category: "crowd-press-grk", placeHints: ["market", "street"], minPeople: 2 },
+  { id: "cp-festival-crowd-both", label: "Festival crush, backside and soft upper front", prompt: "in a tightly packed festival fairground, the crowd presses him against her from behind; one hand deep on soft lower backside curves and the other across soft upper front through fabric, both facing the lights calmly as if nothing is happening", category: "crowd-press-grk", placeHints: ["festival-fair", "street"], minPeople: 2 },
+  { id: "cp-station-platform-back", label: "Packed platform, backside grip while waiting", prompt: "on a packed railway platform, he stands close behind her in the crush with fingers locked on her soft backside through fabric, both watching the tracks with calm blank faces", category: "crowd-press-grk", placeHints: ["station", "platform-end-beyond-board"], minPeople: 2 },
+  { id: "cp-station-queue-upper", label: "Ticket queue, casual soft upper front press", prompt: "in a long crowded ticket queue, he stands close behind her with a hand resting low on her soft upper front over fabric in a casual protective-looking hold, both facing forward patiently", category: "crowd-press-grk", placeHints: ["station", "street"], minPeople: 2 },
+  { id: "cp-auto-rickshaw-upper", label: "Crowded auto, soft upper front press", prompt: "sitting very close beside her in a crowded auto rickshaw, his hand pressed firmly into her soft upper front through thin top fabric, cloth clearly indented, both looking ahead as if nothing unusual", category: "crowd-press-grk", placeHints: ["auto-rickshaw", "street"], minPeople: 2 },
+  { id: "cp-auto-rickshaw-thigh-back", label: "Crowded auto, thigh and soft backside press", prompt: "cramped in an auto rickshaw, his thigh pressed hard against her soft lower curves and a hand steady on her soft backside through fabric, calm ordinary faces toward the road", category: "crowd-press-grk", placeHints: ["auto-rickshaw", "street"], minPeople: 2 },
+  { id: "cp-street-walk-chest-arm", label: "Busy street walk, arm low on soft upper front", prompt: "walking close on a busy town street, his arm draped around her with hand locked firmly on the soft upper front of her body through fabric, deep indentation, both looking ahead casually as if it is a normal protective hold", category: "crowd-press-grk", placeHints: ["street", "market"], minPeople: 2 },
+  { id: "cp-street-walk-backside", label: "Busy street walk, locked hand on soft backside", prompt: "walking through street crowd, his hand locked firmly on her soft backside with heavy pressure into soft lower curves, tight fabric deeply indented, both calm and looking ahead as if nothing is happening", category: "crowd-press-grk", placeHints: ["street", "market"], minPeople: 2 },
+  { id: "cp-elevator-crowd-back", label: "Packed elevator, backside fabric press", prompt: "in a packed elevator, he is pressed flush behind her by other riders while both hands settle into her soft lower backside curves through fabric, faces blank and calm staring at the floor numbers", category: "crowd-press-grk", placeHints: ["hotel-elevator-lobby", "mall-stairwell"], minPeople: 2 },
+  { id: "cp-elevator-crowd-upper", label: "Packed elevator, soft upper front brace", prompt: "crowded elevator jolt; he braces with a firm palm on her soft upper front through fabric from the side, both looking at the panel with ordinary calm expressions", category: "crowd-press-grk", placeHints: ["hotel-elevator-lobby", "mall-corridor"], minPeople: 2 },
+  { id: "cp-mall-crowd-backside", label: "Mall crowd, guiding backside press", prompt: "in a dense mall corridor crowd, he guides her forward with both hands firmly pressing her soft backside through fabric, shoppers around them, both faces casual and unbothered", category: "crowd-press-grk", placeHints: ["mall-corridor", "mall-stairwell", "street"], minPeople: 2 },
+  { id: "cp-mall-escalator-hip", label: "Packed escalator, hip flush and soft curves", prompt: "on a packed escalator he stands one step behind with hips flush and a hand resting heavy on her soft lower curves through fabric, both facing up with calm blank looks", category: "crowd-press-grk", placeHints: ["mall-corridor", "mall-stairwell"], minPeople: 2 },
+  { id: "cp-temple-crowd-side", label: "Temple exterior crowd, side soft upper press", prompt: "in a dense exterior crowd near a temple precinct (not sacred interior), he is pressed to her side with a palm indenting soft upper front through fabric, both facing forward respectfully calm", category: "crowd-press-grk", placeHints: ["temple-vicinity", "festival-fair"], minPeople: 2 },
+  { id: "cp-fair-queue-crease", label: "Fair queue, fingers at soft fabric crease", prompt: "standing in a packed fairground queue, he close behind her with fingers pressed into the deep fabric crease of her soft lower curves, both staring ahead patiently as if only crowd pressure", category: "crowd-press-grk", placeHints: ["festival-fair", "amusement-queue-shade"], minPeople: 2 },
+  { id: "cp-rain-crowd-umbrella", label: "Monsoon crowd under shared space, soft curves press", prompt: "in monsoon street crowd under a shared shelter, he pressed close behind her with firm hands on soft backside curves through damp fabric, both watching the rain with calm faces", category: "crowd-press-grk", placeHints: ["monsoon-street", "street", "bus-stop-night"], minPeople: 2 },
+  { id: "cp-train-vestibule-press", label: "Crowded train vestibule, full soft curves press", prompt: "packed train vestibule between coaches, standing room only; he pressed flush behind her with hands deep on soft lower curves through fabric, both holding poles with ordinary calm faces", category: "crowd-press-grk", placeHints: ["train-empty-coach", "station"], minPeople: 2 },
+  { id: "cp-bridge-crowd-upper", label: "Pedestrian bridge crush, soft upper front press", prompt: "on a packed pedestrian overbridge, crowd squeeze forces him beside her with a firm hand on soft upper front through fabric, both moving with the flow looking casual", category: "crowd-press-grk", placeHints: ["street", "station"], minPeople: 2 },
+  { id: "cp-supermarket-aisle-back", label: "Busy supermarket aisle, backside press while reaching", prompt: "in a busy supermarket aisle he stands close behind as she reaches a shelf, one hand firmly pressing soft lower backside curves through fabric, both looking at products with blank calm faces", category: "crowd-press-grk", placeHints: ["supermarket-freezer-aisle", "market"], minPeople: 2 },
+  { id: "cp-kirana-crowd-side", label: "Crowded kirana counter, side soft upper press", prompt: "at a crowded kirana counter, he squeezed beside her with palm pressure on soft upper front through fabric while waiting, both facing the shopkeeper calmly", category: "crowd-press-grk", placeHints: ["kirana-back-godown", "market"], minPeople: 2 },
+  { id: "cp-theatre-crowd-exit", label: "Theatre exit crush, soft backside hold", prompt: "in the crush of a theatre exit crowd, he stays glued behind her with a locked hand on soft backside curves through fabric, both shuffling forward with calm ordinary faces", category: "crowd-press-grk", placeHints: ["theater-side-aisle", "street"], minPeople: 2 },
+  { id: "cp-theatre-seat-arm", label: "Packed theatre seats, arm on soft upper front", prompt: "in tightly packed theatre seats, his arm rests across her with hand cupping soft upper front through fabric under cover of darkness, both watching the screen with calm faces", category: "crowd-press-grk", placeHints: ["theater-side-aisle"], minPeople: 2 },
+  { id: "cp-wedding-crowd-back", label: "Wedding guest crush, soft backside press", prompt: "in a dense wedding lawn crowd, he pressed behind her with firm pressure into soft lower curves through festive fabric, both looking toward the stage as if nothing unusual", category: "crowd-press-grk", placeHints: ["festival-fair", "street"], minPeople: 2 },
+  { id: "cp-bus-stop-crowd-hip", label: "Crowded bus stop, hip flush soft curves", prompt: "at a packed bus stop shelter, standing room only; his hips flush against her soft lower curves through fabric with a steady hand at her waist-backside, both watching for the bus calmly", category: "crowd-press-grk", placeHints: ["bus-stop-night", "street", "station"], minPeople: 2 },
+  { id: "cp-crowd-jolt-both-hands", label: "Crowd jolt, both hands claiming soft curves", prompt: "a sudden crowd surge presses him into her from behind; both hands claim soft upper front and soft backside through fabric in one motion, then they keep walking with calm blank faces as if it was only the jolt", category: "crowd-press-grk", placeHints: ["market", "station", "street", "festival-fair"], minPeople: 2 },
+  { id: "cp-crowd-still-hold", label: "Stuck in crowd, still firm soft curves hold", prompt: "stuck unmoving in a dense crowd, he maintains a still firm hold on her soft backside and soft upper front through fabric for a long moment, both staring ahead with unreadable calm faces", category: "crowd-press-grk", placeHints: ["metro-end-car", "festival-fair", "market"], minPeople: 2 },
+  { id: "cp-crowd-repeat-brush", label: "Crowd walk, repeated intentional soft curves brush", prompt: "walking through a dense crowd, he repeatedly and intentionally brushes and presses soft lower curves and soft upper front through fabric as if accidental, her and his faces staying casually blank", category: "crowd-press-grk", placeHints: ["market", "street", "mall-corridor"], minPeople: 2 },
+  { id: "cp-crowd-phone-distract-press", label: "Crowd, phone distraction, firm soft curves press", prompt: "in a packed street while she checks her phone, he stands close behind pressing firmly into soft backside curves through fabric, both looking ordinary among the crowd", category: "crowd-press-grk", placeHints: ["street", "station", "market"], minPeople: 2 },
+  { id: "cp-crowd-bag-cover-hand", label: "Crowd, bag covering a firm soft upper press", prompt: "in a busy market his hand presses firmly into her soft upper front through fabric, partly hidden by a shopping bag between them, both faces calm and casual", category: "crowd-press-grk", placeHints: ["market", "mall-corridor", "street"], minPeople: 2 },
+  { id: "cp-crowd-shawl-cover-back", label: "Crowd, shawl covering soft backside press", prompt: "in a packed outdoor crowd his hand works under the edge of her shawl pressing soft lower backside curves through fabric, both looking ahead respectfully calm", category: "crowd-press-grk", placeHints: ["festival-fair", "temple-vicinity", "street"], minPeople: 2 },
+  { id: "cp-crowd-facing-camera-casual", label: "Crowd street, casual soft upper front press toward camera", prompt: "standing very close in a busy street facing the camera, his hand clearly on her soft upper front over her blouse pressing firmly so fabric shows natural indentation, calm ordinary expressions as if nothing is happening", category: "crowd-press-grk", placeHints: ["street", "village-path", "market"], minPeople: 2 },
+  { id: "cp-crowd-window-queue", label: "Shop window crowd, soft backside from behind", prompt: "pressed in a crowd at a shop window display, he behind her with both hands deep on soft lower curves through fabric, both watching the display with blank calm faces", category: "crowd-press-grk", placeHints: ["mall-corridor", "market", "street"], minPeople: 2 },
+  { id: "cp-crowd-stairs-up", label: "Crowded stairs up, soft curves press from behind", prompt: "climbing crowded public stairs, he one step behind pressing hips and hands into soft lower curves through fabric, both looking up the stairs casually", category: "crowd-press-grk", placeHints: ["station", "mall-stairwell", "street"], minPeople: 2 },
+  { id: "cp-crowd-stairs-down-upper", label: "Crowded stairs down, soft upper front from ahead", prompt: "descending packed stairs, he slightly ahead turning with a bracing palm on her soft upper front through fabric, both navigating the crowd with calm faces", category: "crowd-press-grk", placeHints: ["station", "mall-stairwell"], minPeople: 2 },
+  { id: "cp-crowd-night-market-both", label: "Night market crush, soft upper and backside", prompt: "night market crush; he glued behind her with one hand on soft upper front and one on soft backside through fabric, neon lights, both browsing calmly as if the holds are only crowd force", category: "crowd-press-grk", placeHints: ["market", "festival-fair", "street"], minPeople: 2 },
+
 
 ];
 
@@ -676,7 +725,7 @@ export function getActionsByCategory(
   opts?: { allowIntimate?: boolean }
 ): ActionItem[] {
   if (
-    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-four-grk" || category === "mmf-grk" || category === "ffm-grk") &&
+    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-four-grk" || category === "mmf-grk" || category === "ffm-grk" || category === "crowd-press-grk") &&
     opts?.allowIntimate === false
   )
     return [];
@@ -696,7 +745,7 @@ export function randomEverydayOrSocialAction(): ActionItem {
 
 export function isIntimateAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-four-grk" || c === "mmf-grk" || c === "ffm-grk";
+  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-four-grk" || c === "mmf-grk" || c === "ffm-grk" || c === "crowd-press-grk";
 }
 
 /** Original Hardcore category only — keeps direct phrasing sanitize path. */
@@ -706,7 +755,7 @@ export function isHardcoreAction(id: string): boolean {
 
 export function isHardcoreGrkAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "hardcore-grk" || c === "swap-four-grk" || c === "mmf-grk" || c === "ffm-grk";
+  return c === "hardcore-grk" || c === "swap-four-grk" || c === "mmf-grk" || c === "ffm-grk" || c === "crowd-press-grk";
 }
 
 /** Romance / Intimate / Hardcore / Hardcore-grk / Swap-four require every person 21+. */
@@ -718,7 +767,8 @@ export function categoryRequiresAdult21(category: ActionCategoryId): boolean {
     category === "hardcore-grk" ||
     category === "swap-four-grk" ||
     category === "mmf-grk" ||
-    category === "ffm-grk"
+    category === "ffm-grk" ||
+    category === "crowd-press-grk"
   );
 }
 
@@ -745,6 +795,7 @@ export function categoryCounts(): Record<ActionCategoryId, number> {
     "swap-four-grk": 0,
     "mmf-grk": 0,
     "ffm-grk": 0,
+    "crowd-press-grk": 0,
   };
   for (const a of ACTIONS) counts[a.category] += 1;
   return counts;

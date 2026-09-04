@@ -23,6 +23,7 @@ import {
   defaultFoursomeSwapPeople,
   defaultMmfPeople,
   defaultFfmPeople,
+  defaultCrowdPressPeople,
   relationshipBlocksIntimate,
   reshuffleFaceCuts,
   applyRegionLook,
@@ -244,6 +245,20 @@ export function PromptLab() {
         }
       }
 
+      // Crowd press: YA woman + mid-age man, strangers, crowded vibe
+      if (partial.actionCategory === "crowd-press-grk") {
+        next.peopleCount = "2";
+        next.people = defaultCrowdPressPeople();
+        next.relationship = "strangers";
+        const first =
+          ACTIONS.find((a) => a.category === "crowd-press-grk") ??
+          getActionById(next.actionId);
+        if (first && getActionById(next.actionId)?.category !== "crowd-press-grk") {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+        }
+      }
+
       // Safety only: sibling/parent cannot keep intimate/hardcore selected.
       if (partial.relationship) {
         const blocked = relationshipBlocksIntimate(partial.relationship);
@@ -311,7 +326,7 @@ export function PromptLab() {
   }
 
   const visibleCategories = ACTION_CATEGORIES.filter((c) => {
-    if ((c.id === "intimate" || c.id === "hardcore" || c.id === "hardcore-grk" || c.id === "swap-four-grk" || c.id === "mmf-grk" || c.id === "ffm-grk") && intimateBlocked) return false;
+    if ((c.id === "intimate" || c.id === "hardcore" || c.id === "hardcore-grk" || c.id === "swap-four-grk" || c.id === "mmf-grk" || c.id === "ffm-grk" || c.id === "crowd-press-grk") && intimateBlocked) return false;
     if (under21 && categoryRequiresAdult21(c.id)) return false;
     return true;
   });
@@ -319,7 +334,7 @@ export function PromptLab() {
   const filteredActions = ACTIONS.filter((a) => {
     if (a.category !== form.actionCategory) return false;
     if (
-      (a.category === "intimate" || a.category === "hardcore" || a.category === "hardcore-grk" || a.category === "swap-four-grk" || a.category === "mmf-grk" || a.category === "ffm-grk") &&
+      (a.category === "intimate" || a.category === "hardcore" || a.category === "hardcore-grk" || a.category === "swap-four-grk" || a.category === "mmf-grk" || a.category === "ffm-grk" || a.category === "crowd-press-grk") &&
       intimateBlocked
     )
       return false;
@@ -374,7 +389,7 @@ export function PromptLab() {
           <Section
             step={1}
             title="Action"
-            hint="Most categories only filter actions. Swap four=4; Two men+her / Two women+him=3."
+            hint="Most categories only filter actions. Swap four=4; MMF/FFM=3; Crowd press=2 strangers."
           >
             <ChipRow
               label="Category"
