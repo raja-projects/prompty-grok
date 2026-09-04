@@ -198,17 +198,21 @@ export function PromptLab() {
         // Do not force relationship change.
       }
 
-      // Swap four: force 4 people = YA couple + mid-age couple
-      if (partial.actionCategory === "swap-four-grk") {
+      // Own pairs / Own+neighbor press: force 4 people = YA couple + mid-age couple
+      if (
+        partial.actionCategory === "swap-own-grk" ||
+        partial.actionCategory === "swap-cross-grk"
+      ) {
         next.peopleCount = "4";
         next.people = defaultFoursomeSwapPeople();
         if (!relationshipBlocksIntimate("friends")) {
           next.relationship = "friends";
         }
+        const cat = partial.actionCategory;
         const first =
-          ACTIONS.find((a) => a.category === "swap-four-grk") ??
+          ACTIONS.find((a) => a.category === cat) ??
           getActionById(next.actionId);
-        if (first && getActionById(next.actionId)?.category !== "swap-four-grk") {
+        if (first && getActionById(next.actionId)?.category !== cat) {
           next.actionId = first.id;
           next.actionCategory = first.category;
         }
@@ -348,7 +352,7 @@ export function PromptLab() {
   }
 
   const visibleCategories = ACTION_CATEGORIES.filter((c) => {
-    if ((c.id === "intimate" || c.id === "hardcore" || c.id === "hardcore-grk" || c.id === "swap-four-grk" || c.id === "mmf-grk" || c.id === "ffm-grk" || c.id === "crowd-press-grk" || c.id === "wlw-grk") && intimateBlocked) return false;
+    if ((c.id === "intimate" || c.id === "hardcore" || c.id === "hardcore-grk" || c.id === "swap-own-grk" || c.id === "swap-cross-grk" || c.id === "mmf-grk" || c.id === "ffm-grk" || c.id === "crowd-press-grk" || c.id === "wlw-grk") && intimateBlocked) return false;
     if (under21 && categoryRequiresAdult21(c.id)) return false;
     return true;
   });
@@ -356,7 +360,7 @@ export function PromptLab() {
   const filteredActions = ACTIONS.filter((a) => {
     if (a.category !== form.actionCategory) return false;
     if (
-      (a.category === "intimate" || a.category === "hardcore" || a.category === "hardcore-grk" || a.category === "swap-four-grk" || a.category === "mmf-grk" || a.category === "ffm-grk" || a.category === "crowd-press-grk" || a.category === "wlw-grk") &&
+      (a.category === "intimate" || a.category === "hardcore" || a.category === "hardcore-grk" || a.category === "swap-own-grk" || a.category === "swap-cross-grk" || a.category === "mmf-grk" || a.category === "ffm-grk" || a.category === "crowd-press-grk" || a.category === "wlw-grk") &&
       intimateBlocked
     )
       return false;
