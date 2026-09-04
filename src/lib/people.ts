@@ -47,8 +47,8 @@ export interface PersonFields {
 }
 
 /** Individual ages for the picker — not ranges. */
-/** Ages 18–55. Under 21 only for everyday/social — Intimate/Hardcore/Romance blocked. */
-export const AGES: Age[] = Array.from({ length: 38 }, (_, i) => String(18 + i));
+/** Ages 18–80. Under 21 only for everyday/social — Intimate/Hardcore/Romance blocked. */
+export const AGES: Age[] = Array.from({ length: 63 }, (_, i) => String(18 + i));
 
 export function ageNumber(age: Age | string | undefined): number {
   const n = Number(age);
