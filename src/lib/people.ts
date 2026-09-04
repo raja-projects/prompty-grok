@@ -2,16 +2,16 @@ import {
   defaultFaceCutId,
   randomFaceCutId,
 } from "./face-cuts";
+import {
+  defaultDressId,
+  dressesFor,
+  getDress,
+} from "./dresses";
 
 export type Gender = "woman" | "man" | "nonbinary";
 
-export type AgeBand =
-  | "21–24"
-  | "23–27"
-  | "28–32"
-  | "33–40"
-  | "41–50"
-  | "51+";
+/** Single adult age year (21+), not a range. */
+export type Age = string;
 
 export type PeopleCount = "1" | "2" | "3" | "4" | "group";
 
@@ -33,8 +33,8 @@ export interface RegionOption {
 
 export interface PersonFields {
   gender: Gender;
-  ageBand: AgeBand;
-  dress: string;
+  age: Age;
+  dressId: string;
   hairStyle: string;
   bodyType: string;
   fashionVibe: string;
@@ -43,14 +43,11 @@ export interface PersonFields {
   faceCutId: string;
 }
 
-export const AGE_BANDS: AgeBand[] = [
-  "21–24",
-  "23–27",
-  "28–32",
-  "33–40",
-  "41–50",
-  "51+",
-];
+/** Individual ages for the picker — not ranges. */
+export const AGES: Age[] = Array.from({ length: 35 }, (_, i) => String(21 + i));
+
+/** @deprecated alias */
+export const AGE_BANDS = AGES;
 
 export const PEOPLE_COUNTS: { id: PeopleCount; label: string }[] = [
   { id: "1", label: "1 person" },
@@ -146,50 +143,12 @@ export const GENDERS: { id: Gender; label: string }[] = [
 ];
 
 export const DRESS_BY_GENDER: Record<Gender, string[]> = {
-  woman: [
-    "Kerala kasavu saree",
-    "Tamil silk saree",
-    "Cotton saree",
-    "Salwar kameez",
-    "Anarkali",
-    "Mundu set / set mundu",
-    "Kurti with jeans",
-    "Western dress",
-    "Blouse and skirt",
-    "Lehenga (tasteful)",
-    "Office formals",
-    "Casual tee and jeans",
-    "Linen summer outfit",
-    "Maxi dress",
-    "Churidar",
-  ],
-  man: [
-    "Mundu and shirt",
-    "White shirt and trousers",
-    "Kurta pajama",
-    "Veshti / dhoti with shirt",
-    "Casual shirt and jeans",
-    "Linen shirt",
-    "Office formals",
-    "Polo and chinos",
-    "Pathani suit",
-    "South Indian wedding sherwani (tasteful)",
-    "Tee and shorts",
-    "Nehru jacket over shirt",
-    "Safari-style shirt",
-  ],
-  nonbinary: [
-    "Smart casual mix",
-    "Kurta with trousers",
-    "Linen co-ord",
-    "Oversized shirt and pants",
-    "Gender-fluid fusion wear",
-    "Casual tee and jeans",
-    "Layered jacket look",
-    "Soft saree drape (tasteful)",
-    "Mundu with contemporary top",
-  ],
+  woman: dressesFor("woman").map((d) => d.label),
+  man: dressesFor("man").map((d) => d.label),
+  nonbinary: dressesFor("nonbinary").map((d) => d.label),
 };
+
+export { dressesFor, getDress, defaultDressId };
 
 export const HAIR_BY_GENDER: Record<Gender, string[]> = {
   woman: [
@@ -272,21 +231,23 @@ export const SKIN_TONES = [
 ] as const;
 
 export function defaultPerson(overrides?: Partial<PersonFields>): PersonFields {
+  const gender = overrides?.gender ?? "woman";
   const base: PersonFields = {
-    gender: "woman",
-    ageBand: "23–27",
-    dress: "Cotton saree",
-    hairStyle: "Long wavy",
+    gender,
+    age: "24",
+    dressId: defaultDressId(gender),
+    hairStyle: gender === "man" ? "Short neat" : gender === "nonbinary" ? "Medium wavy" : "Long wavy",
     bodyType: "Average",
     fashionVibe: "Everyday casual",
     hairColor: "Natural black",
     skinTone: "Medium wheatish",
-    faceCutId: defaultFaceCutId("woman"),
-    ...overrides,
+    faceCutId: defaultFaceCutId(gender),
   };
+  const merged = { ...base, ...overrides, gender: overrides?.gender ?? gender };
   return {
-    ...base,
-    faceCutId: overrides?.faceCutId ?? defaultFaceCutId(base.gender),
+    ...merged,
+    faceCutId: overrides?.faceCutId ?? defaultFaceCutId(merged.gender),
+    dressId: overrides?.dressId ?? defaultDressId(merged.gender),
   };
 }
 
@@ -295,7 +256,7 @@ export function defaultPeopleForCount(count: PeopleCount): PersonFields[] {
     return [
       defaultPerson({
         gender: "woman",
-        dress: "Kerala kasavu saree",
+        dressId: "w-kerala-cotton-sexy",
         hairStyle: "Jasmine-adorned braid",
       }),
     ];
@@ -304,33 +265,33 @@ export function defaultPeopleForCount(count: PeopleCount): PersonFields[] {
     return [
       defaultPerson({
         gender: "woman",
-        dress: "Kerala kasavu saree",
+        dressId: "w-kerala-cotton-sexy",
         hairStyle: "Long wavy",
-        ageBand: "23–27",
+        age: "24",
       }),
       defaultPerson({
         gender: "man",
-        dress: "Mundu and shirt",
+        dressId: "m-mundu-bare",
         hairStyle: "Short neat",
-        ageBand: "28–32",
+        age: "29",
         bodyType: "Athletic",
       }),
     ];
   }
   if (count === "3") {
     return [
-      defaultPerson({ gender: "woman", ageBand: "23–27" }),
+      defaultPerson({ gender: "woman", age: "24" }),
       defaultPerson({
         gender: "man",
-        dress: "Casual shirt and jeans",
+        dressId: "m-tee-shorts",
         hairStyle: "Wavy medium",
-        ageBand: "28–32",
+        age: "29",
       }),
       defaultPerson({
         gender: "woman",
-        dress: "Salwar kameez",
+        dressId: "w-skintight-salwar",
         hairStyle: "Ponytail",
-        ageBand: "21–24",
+        age: "22",
       }),
     ];
   }
@@ -339,20 +300,20 @@ export function defaultPeopleForCount(count: PeopleCount): PersonFields[] {
       defaultPerson({ gender: "woman" }),
       defaultPerson({
         gender: "man",
-        dress: "Kurta pajama",
+        dressId: "m-pathani-open",
         hairStyle: "Side part",
       }),
       defaultPerson({
         gender: "woman",
-        dress: "Kurti with jeans",
+        dressId: "w-skinfit-jeans-tiny-blouse",
         hairStyle: "Shoulder-length bob",
-        ageBand: "33–40",
+        age: "34",
       }),
       defaultPerson({
         gender: "man",
-        dress: "White shirt and trousers",
+        dressId: "m-formal-undone",
         hairStyle: "Short neat",
-        ageBand: "33–40",
+        age: "34",
       }),
     ];
   }

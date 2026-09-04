@@ -1,14 +1,15 @@
 "use client";
 
 import {
-  AGE_BANDS,
+  AGES,
   BODY_TYPES,
-  DRESS_BY_GENDER,
   FASHION_VIBES,
   GENDERS,
   HAIR_BY_GENDER,
   HAIR_COLORS,
   SKIN_TONES,
+  dressesFor,
+  defaultDressId,
   type PersonFields,
   type Gender,
 } from "@/lib/people";
@@ -61,9 +62,8 @@ export function PersonCard({
     const next = { ...person, ...partial };
     if (partial.gender && partial.gender !== person.gender) {
       const g = partial.gender as Gender;
-      const dresses = DRESS_BY_GENDER[g];
       const hairs = HAIR_BY_GENDER[g];
-      if (!dresses.includes(next.dress)) next.dress = dresses[0]!;
+      next.dressId = defaultDressId(g);
       if (!hairs.includes(next.hairStyle)) next.hairStyle = hairs[0]!;
       const cuts = faceCutsFor(g);
       if (!cuts.some((c) => c.id === next.faceCutId)) {
@@ -117,17 +117,27 @@ export function PersonCard({
           </select>
         </label>
         <SelectField
-          label="Age (21+ only)"
-          value={person.ageBand}
-          options={AGE_BANDS}
-          onChange={(v) => patch({ ageBand: v as PersonFields["ageBand"] })}
+          label="Age (exact year, 21+)"
+          value={person.age}
+          options={AGES}
+          onChange={(v) => patch({ age: v })}
         />
-        <SelectField
-          label="Dress"
-          value={person.dress}
-          options={DRESS_BY_GENDER[person.gender]}
-          onChange={(v) => patch({ dress: v })}
-        />
+        <label className="block space-y-1 sm:col-span-2">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
+            Dress / attire
+          </span>
+          <select
+            value={person.dressId}
+            onChange={(e) => patch({ dressId: e.target.value })}
+            className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
+          >
+            {dressesFor(person.gender).map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.label}
+              </option>
+            ))}
+          </select>
+        </label>
         <SelectField
           label="Hair style"
           value={person.hairStyle}

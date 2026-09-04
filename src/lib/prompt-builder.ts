@@ -13,6 +13,7 @@ import {
   type PersonFields,
 } from "./people";
 import { getFaceCut } from "./face-cuts";
+import { getDress } from "./dresses";
 import { getPlaceById, randomPlace } from "./places";
 import {
   DEFAULT_NEGATIVE,
@@ -40,15 +41,17 @@ function sentence(parts: Array<string | undefined | null | false>): string {
 function describePerson(p: PersonFields, index: number): string {
   const label = `person ${index + 1}`;
   const face = getFaceCut(p.gender, p.faceCutId)?.prompt;
+  const dress = getDress(p.gender, p.dressId)?.prompt ?? p.dressId;
+  const ageNum = p.age || "24";
   return clean([
     `${label}: ${p.gender}`,
-    `age ${p.ageBand}`,
+    `exactly ${ageNum} years old`,
     `${p.skinTone} skin tone`,
     `${p.bodyType} build`,
     `${p.hairColor} ${p.hairStyle} hair`,
     face ? `face: ${face}` : "",
     p.gender === "woman" ? "beautiful and attractive" : "",
-    `wearing ${p.dress}`,
+    `wearing ${dress}`,
     `${p.fashionVibe} vibe`,
   ]);
 }
