@@ -33,6 +33,7 @@ export const PLACES: PlaceItem[] = [
   { id: "museum", label: "Museum / gallery", prompt: "a quiet museum gallery" },
   { id: "airport", label: "Airport arrivals", prompt: "an airport arrivals hall" },
   { id: "monsoon-street", label: "Monsoon street", prompt: "a rain-washed street during monsoon" },
+  { id: "hotel", label: "Hotel room (tasteful)", prompt: "a tasteful hotel room with soft lamps and neat bedding" },
 ];
 
 export function getPlaceById(id: string): PlaceItem | undefined {

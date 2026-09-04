@@ -33,6 +33,15 @@ export const FORBIDDEN_TERMS = [
   "aroused",
   "arousal",
   "face blush",
+  "cowgirl",
+  "doggy style",
+  "creampie",
+  "cumshot",
+  "deepthroat",
+  "threesome",
+  "gangbang",
+  "bdsm",
+  "bondage",
 ] as const;
 
 export const DEFAULT_NEGATIVE =
