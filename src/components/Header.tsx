@@ -1,4 +1,18 @@
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
+
 export function Header() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const onLogin = pathname === "/login";
+
+  async function signOut() {
+    await fetch("/api/logout", { method: "POST" });
+    router.replace("/login");
+    router.refresh();
+  }
+
   return (
     <header className="relative z-10 border-b border-prompty-border/80 bg-prompty-bg/70 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
@@ -15,9 +29,20 @@ export function Header() {
             </p>
           </div>
         </div>
-        <p className="hidden text-right text-xs text-prompty-muted sm:block">
-          Soft language · Kerala–Tamil defaults · One-click copy
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="hidden text-right text-xs text-prompty-muted sm:block">
+            Soft language · Kerala–Tamil defaults · One-click copy
+          </p>
+          {!onLogin ? (
+            <button
+              type="button"
+              onClick={signOut}
+              className="rounded-lg border border-prompty-border px-2.5 py-1 text-xs text-prompty-muted transition hover:border-prompty-accent/50 hover:text-white"
+            >
+              Sign out
+            </button>
+          ) : null}
+        </div>
       </div>
     </header>
   );
