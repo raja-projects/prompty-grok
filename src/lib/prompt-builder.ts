@@ -12,6 +12,10 @@ import {
   relationshipBlocksIntimate,
   type PersonFields,
 } from "./people";
+import {
+  getFaceCut,
+  WOMAN_BEAUTY_HARD_RULE,
+} from "./face-cuts";
 import { getPlaceById, randomPlace } from "./places";
 import {
   DEFAULT_NEGATIVE,
@@ -38,12 +42,15 @@ function sentence(parts: Array<string | undefined | null | false>): string {
 
 function describePerson(p: PersonFields, index: number): string {
   const label = `person ${index + 1}`;
+  const face = getFaceCut(p.gender, p.faceCutId)?.prompt;
   return clean([
     `${label}: ${p.gender}`,
     `age ${p.ageBand}`,
     `${p.skinTone} skin tone`,
     `${p.bodyType} build`,
     `${p.hairColor} ${p.hairStyle} hair`,
+    face ? `face: ${face}` : "",
+    p.gender === "woman" ? WOMAN_BEAUTY_HARD_RULE : "",
     `wearing ${p.dress}`,
     `${p.fashionVibe} vibe`,
   ]);
@@ -98,6 +105,11 @@ function femaleFaceVisibleCue(state: SceneFormState): string {
   );
 }
 
+function femaleBeautyCue(state: SceneFormState): string {
+  if (!sceneHasWoman(state)) return "";
+  return WOMAN_BEAUTY_HARD_RULE;
+}
+
 function cameraPhrase(state: SceneFormState): string {
   const angle =
     CAMERA_ANGLES.find((a) => a.id === state.cameraAngle)?.prompt ?? "";
@@ -138,6 +150,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
         : "";
 
   const faceVisibleCue = femaleFaceVisibleCue(state);
+  const beautyCue = femaleBeautyCue(state);
 
   const notes = sanitizeText(state.extraNotes, sanitizeMode);
   const quality = DEFAULT_QUALITY_PHRASE;
@@ -150,6 +163,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       actionText,
       partnerAgencyCue,
       faceVisibleCue,
+      beautyCue,
       `at ${placeText}`,
       `${state.timeOfDay} lighting`,
       camera,
@@ -168,6 +182,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       `Setting: ${placeText}`,
       `Time: ${state.timeOfDay} with ${lighting}`,
       faceVisibleCue ? `Face visibility: ${faceVisibleCue}` : "",
+      beautyCue ? `Beauty: ${beautyCue}` : "",
       `Camera: ${camera}`,
       `Quality: ${quality}`,
       state.mode === "video"

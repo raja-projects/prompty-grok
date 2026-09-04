@@ -1,3 +1,8 @@
+import {
+  defaultFaceCutId,
+  randomFaceCutId,
+} from "./face-cuts";
+
 export type Gender = "woman" | "man" | "nonbinary";
 
 export type AgeBand =
@@ -35,6 +40,7 @@ export interface PersonFields {
   fashionVibe: string;
   hairColor: string;
   skinTone: string;
+  faceCutId: string;
 }
 
 export const AGE_BANDS: AgeBand[] = [
@@ -266,7 +272,7 @@ export const SKIN_TONES = [
 ] as const;
 
 export function defaultPerson(overrides?: Partial<PersonFields>): PersonFields {
-  return {
+  const base: PersonFields = {
     gender: "woman",
     ageBand: "23–27",
     dress: "Cotton saree",
@@ -275,7 +281,12 @@ export function defaultPerson(overrides?: Partial<PersonFields>): PersonFields {
     fashionVibe: "Everyday casual",
     hairColor: "Natural black",
     skinTone: "Medium wheatish",
+    faceCutId: defaultFaceCutId("woman"),
     ...overrides,
+  };
+  return {
+    ...base,
+    faceCutId: overrides?.faceCutId ?? defaultFaceCutId(base.gender),
   };
 }
 
@@ -356,4 +367,16 @@ export function regionCues(ids: string[]): string {
   const selected = REGIONS.filter((r) => ids.includes(r.id));
   if (!selected.length) return "";
   return selected.map((r) => r.cues).join("; ");
+}
+
+export function reshuffleFaceCuts(people: PersonFields[]): PersonFields[] {
+  return people.map((p) => ({
+    ...p,
+    faceCutId: randomFaceCutId(p.gender, p.faceCutId),
+    hairColor: HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)]!,
+    skinTone: SKIN_TONES[Math.floor(Math.random() * SKIN_TONES.length)]!,
+    hairStyle: HAIR_BY_GENDER[p.gender][
+      Math.floor(Math.random() * HAIR_BY_GENDER[p.gender].length)
+    ]!,
+  }));
 }

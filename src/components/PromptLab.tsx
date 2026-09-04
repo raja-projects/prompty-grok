@@ -20,6 +20,7 @@ import {
   RELATIONSHIPS,
   defaultPeopleForCount,
   relationshipBlocksIntimate,
+  reshuffleFaceCuts,
   type PeopleCount,
   type Relationship,
 } from "@/lib/people";
@@ -121,6 +122,18 @@ export function PromptLab() {
   function resetRandom() {
     setForm(createRandomizedDefaults());
     setActionQuery("");
+  }
+
+  function changeFacesOnly() {
+    setForm((prev) => {
+      if (prev.peopleCount === "group") {
+        return prev;
+      }
+      return {
+        ...prev,
+        people: reshuffleFaceCuts(prev.people),
+      };
+    });
   }
 
   const visibleCategories = ACTION_CATEGORIES.filter(
@@ -312,7 +325,18 @@ export function PromptLab() {
 
           {/* C. Count + relationship + people */}
           <section className="space-y-3">
-            <h3 className="text-sm font-semibold text-white">People</h3>
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-white">People</h3>
+              {form.peopleCount !== "group" ? (
+                <button
+                  type="button"
+                  onClick={changeFacesOnly}
+                  className="rounded-full border border-prompty-border px-2.5 py-1 text-[11px] font-medium text-prompty-muted hover:border-prompty-accent/50 hover:text-white"
+                >
+                  Change faces
+                </button>
+              ) : null}
+            </div>
             <ChipGroup
               label="How many"
               options={PEOPLE_COUNTS.map((p) => p.label)}
@@ -517,6 +541,13 @@ export function PromptLab() {
               className="rounded-xl border border-prompty-border px-4 py-2.5 text-sm text-prompty-muted hover:text-white"
             >
               Randomize
+            </button>
+            <button
+              type="button"
+              onClick={changeFacesOnly}
+              className="rounded-xl border border-prompty-accent/50 px-4 py-2.5 text-sm text-prompty-accent2 hover:text-white"
+            >
+              Change faces
             </button>
           </div>
         </div>

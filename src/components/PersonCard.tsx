@@ -12,6 +12,10 @@ import {
   type PersonFields,
   type Gender,
 } from "@/lib/people";
+import {
+  defaultFaceCutId,
+  faceCutsFor,
+} from "@/lib/face-cuts";
 
 function SelectField({
   label,
@@ -61,6 +65,10 @@ export function PersonCard({
       const hairs = HAIR_BY_GENDER[g];
       if (!dresses.includes(next.dress)) next.dress = dresses[0]!;
       if (!hairs.includes(next.hairStyle)) next.hairStyle = hairs[0]!;
+      const cuts = faceCutsFor(g);
+      if (!cuts.some((c) => c.id === next.faceCutId)) {
+        next.faceCutId = defaultFaceCutId(g);
+      }
     }
     onChange(next);
   }
@@ -92,8 +100,24 @@ export function PersonCard({
             ))}
           </div>
         </label>
+        <label className="block space-y-1 sm:col-span-2">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
+            Face cut
+          </span>
+          <select
+            value={person.faceCutId}
+            onChange={(e) => patch({ faceCutId: e.target.value })}
+            className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
+          >
+            {faceCutsFor(person.gender).map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+        </label>
         <SelectField
-          label="Age (18+ only)"
+          label="Age (21+ only)"
           value={person.ageBand}
           options={AGE_BANDS}
           onChange={(v) => patch({ ageBand: v as PersonFields["ageBand"] })}
