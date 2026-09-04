@@ -3,12 +3,11 @@
 import {
   AGES,
   bodyTypesForAge,
-  isUnder21,
   FASHION_VIBES,
   GENDERS,
   HAIR_BY_GENDER,
-  HAIR_COLORS,
-  SKIN_TONES,
+  hairColorsForRegions,
+  skinTonesForRegions,
   dressesFor,
   defaultDressId,
   type PersonFields,
@@ -53,12 +52,18 @@ function SelectField({
 export function PersonCard({
   index,
   person,
+  regionIds,
   onChange,
 }: {
   index: number;
   person: PersonFields;
+  regionIds: string[];
   onChange: (p: PersonFields) => void;
 }) {
+  const skinOpts = skinTonesForRegions(regionIds);
+  const hairOpts = hairColorsForRegions(regionIds);
+  const faceOpts = faceCutsForAge(person.gender, person.age, regionIds);
+
   function patch(partial: Partial<PersonFields>) {
     const next = { ...person, ...partial };
     if (partial.gender && partial.gender !== person.gender) {
@@ -68,17 +73,17 @@ export function PersonCard({
       if (!hairs.includes(next.hairStyle)) next.hairStyle = hairs[0]!;
       const bodies = bodyTypesForAge(g, next.age);
       if (!bodies.includes(next.bodyType)) next.bodyType = bodies[0]!;
-      const cuts = faceCutsForAge(g, next.age);
+      const cuts = faceCutsForAge(g, next.age, regionIds);
       if (!cuts.some((c) => c.id === next.faceCutId)) {
-        next.faceCutId = defaultFaceCutId(g, next.age);
+        next.faceCutId = defaultFaceCutId(g, next.age, regionIds);
       }
     }
     if (partial.age && partial.age !== person.age) {
       const bodies = bodyTypesForAge(next.gender, next.age);
       if (!bodies.includes(next.bodyType)) next.bodyType = bodies[0]!;
-      const cuts = faceCutsForAge(next.gender, next.age);
+      const cuts = faceCutsForAge(next.gender, next.age, regionIds);
       if (!cuts.some((c) => c.id === next.faceCutId)) {
-        next.faceCutId = defaultFaceCutId(next.gender, next.age);
+        next.faceCutId = defaultFaceCutId(next.gender, next.age, regionIds);
       }
     }
     onChange(next);
@@ -116,11 +121,11 @@ export function PersonCard({
             Face cut
           </span>
           <select
-            value={person.faceCutId}
+            value={faceOpts.some((f) => f.id === person.faceCutId) ? person.faceCutId : (faceOpts[0]?.id ?? "")}
             onChange={(e) => patch({ faceCutId: e.target.value })}
             className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
           >
-            {faceCutsForAge(person.gender, person.age).map((f) => (
+            {faceOpts.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.label}
               </option>
@@ -157,8 +162,8 @@ export function PersonCard({
         />
         <SelectField
           label="Hair color"
-          value={person.hairColor}
-          options={HAIR_COLORS}
+          value={hairOpts.includes(person.hairColor) ? person.hairColor : hairOpts[0]!}
+          options={hairOpts}
           onChange={(v) => patch({ hairColor: v })}
         />
         <SelectField
@@ -175,8 +180,8 @@ export function PersonCard({
         />
         <SelectField
           label="Skin tone"
-          value={person.skinTone}
-          options={SKIN_TONES}
+          value={skinOpts.includes(person.skinTone) ? person.skinTone : skinOpts[0]!}
+          options={skinOpts}
           onChange={(v) => patch({ skinTone: v })}
         />
       </div>

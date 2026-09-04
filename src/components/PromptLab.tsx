@@ -22,6 +22,7 @@ import {
   defaultPerson,
   relationshipBlocksIntimate,
   reshuffleFaceCuts,
+  applyRegionLook,
   sceneHasUnder21,
   type PeopleCount,
   type Relationship,
@@ -254,7 +255,7 @@ export function PromptLab() {
   function changeFacesOnly() {
     setForm((prev) => {
       if (prev.peopleCount === "group") return prev;
-      return { ...prev, people: reshuffleFaceCuts(prev.people) };
+      return { ...prev, people: reshuffleFaceCuts(prev.people, prev.regionIds) };
     });
   }
 
@@ -411,9 +412,15 @@ export function PromptLab() {
                         const regionIds = has
                           ? form.regionIds.filter((x) => x !== r.id)
                           : [...form.regionIds, r.id];
-                        patch({
-                          regionIds: regionIds.length ? regionIds : ["kerala"],
-                        });
+                        const nextIds = regionIds.length ? regionIds : ["kerala"];
+                        setForm((prev) => ({
+                          ...prev,
+                          regionIds: nextIds,
+                          people:
+                            prev.peopleCount === "group"
+                              ? prev.people
+                              : applyRegionLook(prev.people, nextIds),
+                        }));
                       }}
                       className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
                         active
@@ -455,6 +462,7 @@ export function PromptLab() {
                       key={i}
                       index={i}
                       person={person}
+                      regionIds={form.regionIds}
                       onChange={(p) => {
                         const people = [...form.people];
                         people[i] = p;

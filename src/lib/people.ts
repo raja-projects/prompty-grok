@@ -91,62 +91,62 @@ export const REGIONS: RegionOption[] = [
   {
     id: "kerala",
     label: "Kerala / Malayali",
-    cues: "South Indian Malayali features, soft coastal Indian look, optional kasavu or mundu accents",
+    cues: "HARD LOCK: every person must look clearly Malayali South Indian from Kerala — South Indian Malayali facial features only; not Western European, not East Asian, not African, not Middle Eastern; optional kasavu/mundu attire accents",
   },
   {
     id: "tamil",
     label: "Tamil / Tamil Nadu",
-    cues: "Tamil South Indian features, tasteful South Indian attire cues such as saree or veshti accents",
+    cues: "HARD LOCK: every person must look clearly Tamil South Indian from Tamil Nadu — Tamil facial features only; not Western European, not East Asian, not African; optional saree/veshti attire accents",
   },
   {
     id: "sri-lankan-tamil",
     label: "Sri Lankan Tamil",
-    cues: "Sri Lankan Tamil features, elegant South Asian attire hints",
+    cues: "HARD LOCK: every person must look clearly Sri Lankan Tamil — Sri Lankan Tamil facial features only; not Western European, not East Asian; elegant South Asian attire hints",
   },
   {
     id: "north-indian",
     label: "North Indian",
-    cues: "North Indian features, optional kurta or salwar accents",
+    cues: "HARD LOCK: every person must look clearly North Indian — North Indian facial features only; not East Asian, not African, not Dravidian-only South Indian; optional kurta/salwar accents",
   },
   {
     id: "bengali",
     label: "Bengali",
-    cues: "Bengali features, soft East Indian look, optional cotton saree or kurta accents",
+    cues: "HARD LOCK: every person must look clearly Bengali East Indian — Bengali facial features only; not East Asian, not Western European; optional cotton saree/kurta accents",
   },
   {
     id: "telugu",
     label: "Telugu",
-    cues: "Telugu South Indian features, tasteful South Indian dress cues",
+    cues: "HARD LOCK: every person must look clearly Telugu South Indian — Telugu facial features only; not Western European, not East Asian; tasteful South Indian dress cues",
   },
   {
     id: "kannada",
     label: "Kannada",
-    cues: "Kannada South Indian features, regional attire hints",
+    cues: "HARD LOCK: every person must look clearly Kannada South Indian — Kannada facial features only; not Western European, not East Asian; regional attire hints",
   },
   {
     id: "western",
     label: "Western",
-    cues: "Western features, contemporary global fashion",
+    cues: "HARD LOCK: every person must look clearly Western European / Caucasian — Western facial features only; not South Asian, not East Asian, not African; contemporary global fashion",
   },
   {
     id: "east-asian",
     label: "East Asian",
-    cues: "East Asian features, modern East Asian fashion cues",
+    cues: "HARD LOCK: every person must look clearly East Asian — East Asian facial features only; not South Asian, not Western European, not African; modern East Asian fashion cues",
   },
   {
     id: "middle-eastern",
     label: "Middle Eastern",
-    cues: "Middle Eastern features, elegant regional fashion accents",
+    cues: "HARD LOCK: every person must look clearly Middle Eastern — Middle Eastern facial features only; not East Asian, not South Indian, not Nordic Western; elegant regional fashion accents",
   },
   {
     id: "african",
     label: "African / Afro-diaspora",
-    cues: "African or Afro-diaspora features, rich modern fashion cues",
+    cues: "HARD LOCK: every person must look clearly African or Afro-diaspora — African facial features only; not East Asian, not South Asian, not Western European; rich modern fashion cues",
   },
   {
     id: "latin",
     label: "Latin American",
-    cues: "Latin American features, warm contemporary style",
+    cues: "HARD LOCK: every person must look clearly Latin American — Latin American facial features only; not East Asian, not Nordic Western, not South Indian; warm contemporary style",
   },
 ];
 
@@ -362,12 +362,12 @@ export function defaultPerson(overrides?: Partial<PersonFields>): PersonFields {
     fashionVibe: "Everyday casual",
     hairColor: "Natural black",
     skinTone: "Medium wheatish",
-    faceCutId: defaultFaceCutId(gender),
+    faceCutId: defaultFaceCutId(gender, undefined, DEFAULT_REGION_IDS),
   };
   const merged = { ...base, ...overrides, gender: overrides?.gender ?? gender };
   return {
     ...merged,
-    faceCutId: overrides?.faceCutId ?? defaultFaceCutId(merged.gender),
+    faceCutId: overrides?.faceCutId ?? defaultFaceCutId(merged.gender, merged.age, DEFAULT_REGION_IDS),
     dressId: overrides?.dressId ?? defaultDressId(merged.gender),
   };
 }
@@ -445,16 +445,101 @@ export function relationshipBlocksIntimate(rel: Relationship): boolean {
   return RELATIONSHIPS.find((r) => r.id === rel)?.blocksIntimate ?? false;
 }
 
+
+/** Preferred skin tones per region (first = default). */
+export const SKIN_TONES_BY_REGION: Record<string, readonly string[]> = {
+  kerala: ["Fair warm", "Light wheatish", "Medium wheatish", "Golden tan"],
+  tamil: ["Fair warm", "Light wheatish", "Medium wheatish", "Golden tan", "Deep brown"],
+  "sri-lankan-tamil": ["Light wheatish", "Medium wheatish", "Golden tan", "Deep brown"],
+  "north-indian": ["Fair warm", "Light wheatish", "Medium wheatish", "Golden tan"],
+  bengali: ["Fair warm", "Light wheatish", "Medium wheatish"],
+  telugu: ["Light wheatish", "Medium wheatish", "Golden tan", "Deep brown"],
+  kannada: ["Fair warm", "Light wheatish", "Medium wheatish", "Golden tan"],
+  western: ["Fair warm", "Light wheatish", "Golden tan"],
+  "east-asian": ["Fair warm", "Light wheatish", "Medium wheatish"],
+  "middle-eastern": ["Light wheatish", "Medium wheatish", "Golden tan", "Deep brown"],
+  african: ["Deep brown", "Rich dark brown", "Golden tan", "Medium wheatish"],
+  latin: ["Light wheatish", "Medium wheatish", "Golden tan", "Deep brown"],
+};
+
+/** Preferred hair colors per region (first = default). */
+export const HAIR_COLORS_BY_REGION: Record<string, readonly string[]> = {
+  kerala: ["Natural black", "Dark brown"],
+  tamil: ["Natural black", "Dark brown"],
+  "sri-lankan-tamil": ["Natural black", "Dark brown"],
+  "north-indian": ["Natural black", "Dark brown", "Warm brown"],
+  bengali: ["Natural black", "Dark brown"],
+  telugu: ["Natural black", "Dark brown"],
+  kannada: ["Natural black", "Dark brown"],
+  western: ["Dark brown", "Warm brown", "Soft auburn", "Natural black", "Subtle highlights"],
+  "east-asian": ["Natural black", "Dark brown"],
+  "middle-eastern": ["Natural black", "Dark brown"],
+  african: ["Natural black", "Dark brown"],
+  latin: ["Natural black", "Dark brown", "Warm brown", "Soft auburn"],
+};
+
+export function primaryRegionId(regionIds: string[] | undefined): string {
+  return regionIds?.[0] || DEFAULT_REGION_IDS[0] || "kerala";
+}
+
+export function skinTonesForRegions(regionIds: string[] | undefined): string[] {
+  const ids = regionIds?.length ? regionIds : DEFAULT_REGION_IDS;
+  const set = new Set<string>();
+  for (const id of ids) {
+    for (const s of SKIN_TONES_BY_REGION[id] ?? SKIN_TONES) set.add(s);
+  }
+  return set.size ? [...set] : [...SKIN_TONES];
+}
+
+export function hairColorsForRegions(regionIds: string[] | undefined): string[] {
+  const ids = regionIds?.length ? regionIds : DEFAULT_REGION_IDS;
+  const set = new Set<string>();
+  for (const id of ids) {
+    for (const h of HAIR_COLORS_BY_REGION[id] ?? HAIR_COLORS) set.add(h);
+  }
+  return set.size ? [...set] : [...HAIR_COLORS];
+}
+
+export function defaultSkinToneForRegions(regionIds: string[] | undefined): string {
+  const id = primaryRegionId(regionIds);
+  return SKIN_TONES_BY_REGION[id]?.[0] ?? "Medium wheatish";
+}
+
+export function defaultHairColorForRegions(regionIds: string[] | undefined): string {
+  const id = primaryRegionId(regionIds);
+  return HAIR_COLORS_BY_REGION[id]?.[0] ?? "Natural black";
+}
+
 export function regionCues(ids: string[]): string {
   const selected = REGIONS.filter((r) => ids.includes(r.id));
   if (!selected.length) return "";
   return selected.map((r) => r.cues).join("; ");
 }
 
-/** Only swaps faceCutId — hair, body, dress, skin stay unchanged. */
-export function reshuffleFaceCuts(people: PersonFields[]): PersonFields[] {
+/** Only swaps faceCutId — hair, body, dress, skin stay unchanged. Region-filtered. */
+export function reshuffleFaceCuts(
+  people: PersonFields[],
+  regionIds?: string[],
+): PersonFields[] {
   return people.map((p) => ({
     ...p,
-    faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age),
+    faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age, regionIds),
+  }));
+}
+
+/** When region changes: swap to a matching face cut; nudge skin/hair into region prefs if off-list. */
+export function applyRegionLook(
+  people: PersonFields[],
+  regionIds: string[],
+): PersonFields[] {
+  const skins = skinTonesForRegions(regionIds);
+  const hairs = hairColorsForRegions(regionIds);
+  const defSkin = defaultSkinToneForRegions(regionIds);
+  const defHair = defaultHairColorForRegions(regionIds);
+  return people.map((p) => ({
+    ...p,
+    faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age, regionIds),
+    skinTone: skins.includes(p.skinTone) ? p.skinTone : defSkin,
+    hairColor: hairs.includes(p.hairColor) ? p.hairColor : defHair,
   }));
 }

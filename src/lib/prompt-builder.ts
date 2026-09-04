@@ -14,7 +14,7 @@ import {
   sceneHasUnder21,
   type PersonFields,
 } from "./people";
-import { getFaceCut } from "./face-cuts";
+import { defaultFaceCutId, getFaceCut } from "./face-cuts";
 import { getDress } from "./dresses";
 import { getPlaceById, randomPlace } from "./places";
 import {
@@ -40,14 +40,19 @@ function sentence(parts: Array<string | undefined | null | false>): string {
   return /[.!?]$/.test(text) ? text : `${text}.`;
 }
 
-function describePerson(p: PersonFields, index: number): string {
+function describePerson(p: PersonFields, index: number, regionIds?: string[]): string {
   const label = `person ${index + 1}`;
-  const face = getFaceCut(p.gender, p.faceCutId, p.age)?.prompt;
+  const faceCut = getFaceCut(p.gender, p.faceCutId, p.age, regionIds);
+  const face = faceCut?.prompt;
   const dress = getDress(p.gender, p.dressId)?.prompt ?? p.dressId;
   const ageNum = p.age || "24";
+  const regionLock = faceCut?.regionIds?.length
+    ? `phenotype locked to ${faceCut.regionIds.join(" / ")} region look`
+    : "";
   return clean([
     `${label}: ${p.gender}`,
     `exactly ${ageNum} years old`,
+    regionLock,
     `${p.skinTone} skin tone`,
     `${p.bodyType} build`,
     /youthful|innocent|fresh-faced|delicate|boyish/i.test(p.bodyType)
@@ -70,7 +75,7 @@ function peopleBlock(state: SceneFormState): string {
   const n = Number(state.peopleCount);
   const listed = state.people
     .slice(0, n)
-    .map((p, i) => describePerson(p, i))
+    .map((p, i) => describePerson(p, i, state.regionIds))
     .join("; ");
   return listed || `${n} adult${n > 1 ? "s" : ""}`;
 }
@@ -206,6 +211,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
 
 /** Fixed studio defaults — used on load and Reset. Independent fields. */
 export function createStudioDefaults(): SceneFormState {
+  const studioRegions = ["kerala"];
   const woman = defaultPerson({
     gender: "woman",
     age: "21",
@@ -215,6 +221,7 @@ export function createStudioDefaults(): SceneFormState {
     fashionVibe: "Everyday casual",
     hairColor: "Natural black",
     skinTone: "Fair warm",
+    faceCutId: defaultFaceCutId("woman", "21", studioRegions),
   });
   const man = defaultPerson({
     gender: "man",
@@ -225,6 +232,7 @@ export function createStudioDefaults(): SceneFormState {
     fashionVibe: "Everyday casual",
     hairColor: "Natural black",
     skinTone: "Medium wheatish",
+    faceCutId: defaultFaceCutId("man", "34", studioRegions),
   });
   return {
     mode: "image",
