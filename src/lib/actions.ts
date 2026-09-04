@@ -6,7 +6,8 @@ export type ActionCategoryId =
   | "intimate"
   | "hardcore"
   | "hardcore-grk"
-  | "swap-four-grk";
+  | "swap-four-grk"
+  | "mmf-grk";
 
 export interface ActionItem {
   id: string;
@@ -67,6 +68,12 @@ export const ACTION_CATEGORIES: {
     id: "swap-four-grk",
     label: "Swap four (21+)",
     description: "Partner-swap, watching, dual pairs — fully indirect fabric/pressure; auto 4 people",
+    restricted: true,
+  },
+  {
+    id: "mmf-grk",
+    label: "Two men + her (21+)",
+    description: "One woman with two men — fully indirect fabric/pressure; auto 3 people",
     restricted: true,
   },
 ];
@@ -564,6 +571,51 @@ export const ACTIONS: ActionItem[] = [
   { id: "sf-own-guide-other-onto-his-thigh", label: "Own pair close, guide other wife onto thigh", prompt: "staying joined with his own partner through fabric; he guides the other wife to sit partly on his thigh, hand firm on her hip and soft lower front while her husband kisses her neck", category: "swap-four-grk", placeHints: ["sofa", "bedroom"], minPeople: 4 },
   { id: "sf-own-pinch-other-through-fabric", label: "Own rhythm, teasing pinch on other wife", prompt: "own-pair deep shared rhythm through fabric; free fingers tease and lightly pinch the other wife's soft upper front peaks through thin fabric while she stays with her husband", category: "swap-four-grk", placeHints: ["bedroom", "sofa"], minPeople: 4 },
 
+  // --- Two men + her (21+): 1 woman, 2 men — fully indirect fabric/pressure only ---
+  { id: "mmf-soft-between-both", label: "Soft between both men", prompt: "she stands between both men; soft teasing hands on her waist and soft upper front through fabric, warm breath on both sides of her neck", category: "mmf-grk", placeHints: ["bedroom", "home-interior", "hotel"], minPeople: 3 },
+  { id: "mmf-soft-kiss-one-held-other", label: "Kissing one while the other holds her", prompt: "she shares a lingering heated kiss with one man while the other presses close behind, hands firm on her hips through fabric", category: "mmf-grk", placeHints: ["bedroom", "sofa"], minPeople: 3 },
+  { id: "mmf-soft-lap-and-kneel", label: "In one lap, other kneeling close", prompt: "she sits in one man's lap in a quiet heated hold through fabric while the other kneels close, hands exploring her soft thighs", category: "mmf-grk", placeHints: ["sofa", "bedroom"], minPeople: 3 },
+  { id: "mmf-soft-guided-hands", label: "Guiding both men's hands on her", prompt: "she guides both men's hands over her soft upper front and soft lower curves through fabric, building heat without rushing", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-front-behind-press", label: "Pressed front and behind", prompt: "she is pressed between both men — chest-to-chest with one, close from behind with the other — firm hip pressure through fabric from both sides", category: "mmf-grk", placeHints: ["bedroom", "hotel", "home-interior"], minPeople: 3 },
+  { id: "mmf-front-behind-rhythm", label: "Front-and-behind shared rhythm", prompt: "one man pressed flush to her front and one to her back, both moving in a slow shared rhythm through fabric while she holds onto the man facing her", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-wall-sandwich", label: "Wall sandwich close press", prompt: "her back to the wall with one man kissing her deep; the second man presses close at her side and backside, hands claiming soft upper front and hip through fabric", category: "mmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 3 },
+  { id: "mmf-sofa-between", label: "Sofa between both men", prompt: "on the sofa she sits between both men; one kisses her while the other cups her soft upper front through fabric and presses a hand between her soft thighs", category: "mmf-grk", placeHints: ["sofa", "home-interior"], minPeople: 3 },
+  { id: "mmf-onback-one-deep-one-upper", label: "On back: one deep press, one at soft upper front", prompt: "she lies on her back knees raised; one man settles between her thighs pressing deep slow contact through fabric while the other claims her soft upper front with mouth and hands through thin fabric", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-onback-legs-shoulders-second-kiss", label: "Legs raised deep press, second at her mouth", prompt: "she lies back with legs toward one man's shoulders as he presses deep rhythmic contact through fabric; the second man kneels at her head sharing a heated kiss and guiding her hands", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-allfours-behind-and-front", label: "All fours: behind press and face at front", prompt: "she is on all fours; one man presses closely behind with waist-grip rhythm against her lower curves through fabric while she keeps her face close against the other man's front center brief through fabric", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-allfours-crease-and-upper", label: "All fours: crease press and soft upper claim", prompt: "on all fours looking back; one man presses into the deep fabric crease of her soft lower curves while the other reaches under to claim her soft upper front through fabric", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-straddle-one-other-behind", label: "Straddle one, other pressed behind", prompt: "she straddles one man facing him as his hands pull her down firmly through fabric; the second man kneels close behind pressing into her backside crease and soft upper front", category: "mmf-grk", placeHints: ["bedroom", "sofa"], minPeople: 3 },
+  { id: "mmf-straddle-one-face-other", label: "Straddle one, face close to the other", prompt: "she straddles one man in rising rhythm through fabric while leaning to keep her face close against the other man's front center brief through fabric", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-reverse-straddle-second-front", label: "Reverse straddle, second man at her front", prompt: "she straddles one man facing away with pull-down rhythm through fabric; the second man stands or kneels in front so she can press her face and hands at his center brief through fabric", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-lap-bounce-second-hands", label: "Lap bounce, second man's hands all over", prompt: "she settles bouncing in one man's lap through fabric; the second man stands beside them firmly grabbing her soft upper front, hair, and soft lower curves", category: "mmf-grk", placeHints: ["sofa", "chair", "bedroom"], minPeople: 3 },
+  { id: "mmf-edge-bed-standing-second-mouth", label: "Edge standing press, second devoted face", prompt: "she sits at the bed edge; one man stands between her thighs in deep close press through fabric while the other kneels to keep his face close at her soft lower front beside that contact", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-side-lying-front-behind", label: "Side-lying: one behind, one in front", prompt: "she lies on her side; one man presses from behind against her lower curves through fabric while the other faces her sharing deep kisses and palm pressure on soft upper front", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-prone-covered-second-hands", label: "Prone covered press, second man's hands", prompt: "she lies flat on her stomach; one man covers from behind with deep grinding contact through fabric while the second man's hands claim her soft upper front from the side and grip her hair", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-chest-down-hips-high-both", label: "Chest down hips high, both men close", prompt: "chest to the bed hips high; one man presses slow heavy rhythm into her deep fabric crease while the other offers his center brief to her face through fabric", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-lifted-one-other-supports", label: "Lifted by one, other supports and claims", prompt: "one man lifts her with legs wrapped in upward rhythm through fabric; the second man supports her from the side, hands firm on soft upper front and soft lower curves", category: "mmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 3 },
+  { id: "mmf-shower-steam-both", label: "Steam shower, both pressed close", prompt: "hot water; she pressed to wet tile with one man in deep upward rhythm through wet fabric while the other claims her mouth and soft upper front beside them", category: "mmf-grk", placeHints: ["bathroom", "hotel"], minPeople: 3 },
+  { id: "mmf-face-lower-other-center", label: "Face at her soft lower front, she at his center", prompt: "one man keeps his face devoted at her soft lower front through fabric between her thighs while she keeps her face close against the other man's front center brief through fabric", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-invert-one-second-upper", label: "Inverted with one, second at soft upper front", prompt: "she and one man lie inverted with faces close at soft lower front and center brief through fabric; the second man claims her soft upper front with hands and mouth through thin fabric", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-kneeling-both-centers", label: "Kneeling attention on both center briefs", prompt: "she kneels between both standing men, alternating slow close face attention at each front center brief through fabric while their hands rest in her hair", category: "mmf-grk", placeHints: ["bedroom", "home-interior"], minPeople: 3 },
+  { id: "mmf-both-hands-on-her-lower", label: "Both men's hands at soft lower front", prompt: "she stands or sits open; both men press hands firmly at her soft lower front and upper inner thighs through fabric, sharing the claim while kissing her neck and mouth", category: "mmf-grk", placeHints: ["bedroom", "sofa"], minPeople: 3 },
+  { id: "mmf-both-on-upper-front", label: "Both men on soft upper front", prompt: "both men give devoted face and hand attention to her soft upper front through fabric at once while she arches between them", category: "mmf-grk", placeHints: ["bedroom", "sofa"], minPeople: 3 },
+  { id: "mmf-one-rhythm-other-grabs", label: "One in deep rhythm, other grabs freely", prompt: "one man locked with her in deep shared rhythm through fabric; the other stays close grabbing her soft upper front, hair, backside, and guiding her chin into kisses", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-rotate-who-is-deep", label: "Rotate who presses deep", prompt: "she stays centered between both men; they calmly rotate who presses deep against her lower torso through fabric and who claims her mouth and soft upper front", category: "mmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 3 },
+  { id: "mmf-seated-over-face-other-behind", label: "Seated over one face, other behind", prompt: "she sits over one man's devoted face with soft lower front close through fabric while the other man presses close behind with hands on her soft upper front and hips", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-lotus-one-other-kneels", label: "Lotus with one, other kneeling close", prompt: "wrapped face-to-face in one man's lap in slow seated shared rhythm through fabric; the second man kneels beside them pressing hands into her soft backside crease and soft upper front", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-bent-furniture-both", label: "Bent to furniture, both men claiming", prompt: "she leans forward on a dresser; one man grips her waist with rhythmic pressing from behind through fabric while the other stands at her face for close center-brief attention through fabric", category: "mmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 3 },
+  { id: "mmf-counter-lift-second-hands", label: "Counter lift press, second man's hands", prompt: "lifted onto a counter with one man between her thighs in deep close press through fabric; the second man beside them firmly claims soft upper front and kisses her", category: "mmf-grk", placeHints: ["kitchen", "hotel"], minPeople: 3 },
+  { id: "mmf-door-press-second-joins", label: "Door press, second man joins", prompt: "pressed to a closed door with one man in urgent hold through fabric; the second man joins, sandwiching her with hands on soft curves from the free side", category: "mmf-grk", placeHints: ["hotel", "home-interior"], minPeople: 3 },
+  { id: "mmf-mirror-both-behind-front", label: "Mirror: one behind, one in front", prompt: "facing a mirror; one man pressed behind with hip rhythm through fabric and hands on soft upper front while the other faces her, kissing and pressing flush at her soft lower front", category: "mmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 3 },
+  { id: "mmf-floor-blanket-both", label: "Floor blanket, both men on her", prompt: "on a soft blanket she is between both men — one deep at her lower torso through fabric, the other devoted at soft upper front and mouth — limbs tangled", category: "mmf-grk", placeHints: ["home-interior", "bedroom"], minPeople: 3 },
+  { id: "mmf-afterglow-between-both", label: "Afterglow between both men", prompt: "quiet afterglow; she tangled between both men on wide bedding, their hands still resting on her soft curves through half-settled fabric, slow breathing", category: "mmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 3 },
+  { id: "mmf-ease-reseat-second-holds", label: "Ease and reseat, second man holds her open", prompt: "one man eases slightly then presses back fully against her lower torso through fabric in long strokes while the second man holds her thighs open and kisses her", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-hair-guided-between", label: "Hair guided between both", prompt: "both men take turns guiding her head with hands in her hair — close face attention at center briefs through fabric — while the other grips her soft lower curves from behind", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-standing-bent-second-under", label: "Standing bent, second man under her", prompt: "she bends forward braced on the wall with one man behind in waist rhythm through fabric; the second man slips lower in front keeping his face close at her soft lower front through fabric", category: "mmf-grk", placeHints: ["bedroom", "home-interior"], minPeople: 3 },
+  { id: "mmf-spit-roast-pose-indirect", label: "Face-forward and from-behind at once", prompt: "aligned so one man is close at her face and center brief through fabric while the other presses deep from behind into her soft lower curves through fabric in matching rhythm", category: "mmf-grk", placeHints: ["bedroom"], minPeople: 3 },
+  { id: "mmf-double-hip-claim", label: "Both men claiming her hips", prompt: "both men lock hands on her hips from front and behind, pulling her into overlapping fabric-pressure rhythms while she gasps softly between them", category: "mmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 3 },
+  { id: "mmf-night-long-rotate", label: "Night-long rotate attention", prompt: "through the night both men rotate who takes deep shared rhythm through fabric with her and who gives devoted face and hand attention at soft upper and lower fronts", category: "mmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 3 },
+
 
 ];
 
@@ -572,7 +624,7 @@ export function getActionsByCategory(
   opts?: { allowIntimate?: boolean }
 ): ActionItem[] {
   if (
-    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-four-grk") &&
+    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-four-grk" || category === "mmf-grk") &&
     opts?.allowIntimate === false
   )
     return [];
@@ -592,7 +644,7 @@ export function randomEverydayOrSocialAction(): ActionItem {
 
 export function isIntimateAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-four-grk";
+  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-four-grk" || c === "mmf-grk";
 }
 
 /** Original Hardcore category only — keeps direct phrasing sanitize path. */
@@ -602,7 +654,7 @@ export function isHardcoreAction(id: string): boolean {
 
 export function isHardcoreGrkAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "hardcore-grk" || c === "swap-four-grk";
+  return c === "hardcore-grk" || c === "swap-four-grk" || c === "mmf-grk";
 }
 
 /** Romance / Intimate / Hardcore / Hardcore-grk / Swap-four require every person 21+. */
@@ -612,7 +664,8 @@ export function categoryRequiresAdult21(category: ActionCategoryId): boolean {
     category === "intimate" ||
     category === "hardcore" ||
     category === "hardcore-grk" ||
-    category === "swap-four-grk"
+    category === "swap-four-grk" ||
+    category === "mmf-grk"
   );
 }
 
@@ -637,6 +690,7 @@ export function categoryCounts(): Record<ActionCategoryId, number> {
     hardcore: 0,
     "hardcore-grk": 0,
     "swap-four-grk": 0,
+    "mmf-grk": 0,
   };
   for (const a of ACTIONS) counts[a.category] += 1;
   return counts;

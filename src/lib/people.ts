@@ -404,6 +404,34 @@ export function defaultPerson(overrides?: Partial<PersonFields>): PersonFields {
 
 
 /** Default cast for Swap four: young-adult couple + mid-age couple (all 21+). */
+
+/** Default cast for Two men + her: one woman + two men (all 21+). */
+export function defaultMmfPeople(): PersonFields[] {
+  return [
+    defaultPerson({
+      gender: "woman",
+      age: "24",
+      dressId: "w-kerala-cotton-sexy",
+      hairStyle: "Long wavy",
+      bodyType: "Curvy",
+    }),
+    defaultPerson({
+      gender: "man",
+      age: "28",
+      dressId: "m-tee-shorts",
+      hairStyle: "Short neat",
+      bodyType: "Athletic",
+    }),
+    defaultPerson({
+      gender: "man",
+      age: "34",
+      dressId: "m-formal-undone",
+      hairStyle: "Short neat",
+      bodyType: "Broad-shouldered",
+    }),
+  ];
+}
+
 export function defaultFoursomeSwapPeople(): PersonFields[] {
   return [
     defaultPerson({

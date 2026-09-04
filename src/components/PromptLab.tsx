@@ -21,6 +21,7 @@ import {
   RELATIONSHIPS,
   defaultPerson,
   defaultFoursomeSwapPeople,
+  defaultMmfPeople,
   relationshipBlocksIntimate,
   reshuffleFaceCuts,
   applyRegionLook,
@@ -194,7 +195,7 @@ export function PromptLab() {
         // Do not force relationship change.
       }
 
-      // Swap four category: force 4 people = YA couple + mid-age couple, friends, first action
+      // Swap four: force 4 people = YA couple + mid-age couple
       if (partial.actionCategory === "swap-four-grk") {
         next.peopleCount = "4";
         next.people = defaultFoursomeSwapPeople();
@@ -205,6 +206,22 @@ export function PromptLab() {
           ACTIONS.find((a) => a.category === "swap-four-grk") ??
           getActionById(next.actionId);
         if (first && getActionById(next.actionId)?.category !== "swap-four-grk") {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+        }
+      }
+
+      // Two men + her: force 3 people = 1 woman + 2 men
+      if (partial.actionCategory === "mmf-grk") {
+        next.peopleCount = "3";
+        next.people = defaultMmfPeople();
+        if (!relationshipBlocksIntimate("friends")) {
+          next.relationship = "friends";
+        }
+        const first =
+          ACTIONS.find((a) => a.category === "mmf-grk") ??
+          getActionById(next.actionId);
+        if (first && getActionById(next.actionId)?.category !== "mmf-grk") {
           next.actionId = first.id;
           next.actionCategory = first.category;
         }
@@ -277,7 +294,7 @@ export function PromptLab() {
   }
 
   const visibleCategories = ACTION_CATEGORIES.filter((c) => {
-    if ((c.id === "intimate" || c.id === "hardcore" || c.id === "hardcore-grk" || c.id === "swap-four-grk") && intimateBlocked) return false;
+    if ((c.id === "intimate" || c.id === "hardcore" || c.id === "hardcore-grk" || c.id === "swap-four-grk" || c.id === "mmf-grk") && intimateBlocked) return false;
     if (under21 && categoryRequiresAdult21(c.id)) return false;
     return true;
   });
@@ -285,7 +302,7 @@ export function PromptLab() {
   const filteredActions = ACTIONS.filter((a) => {
     if (a.category !== form.actionCategory) return false;
     if (
-      (a.category === "intimate" || a.category === "hardcore" || a.category === "hardcore-grk" || a.category === "swap-four-grk") &&
+      (a.category === "intimate" || a.category === "hardcore" || a.category === "hardcore-grk" || a.category === "swap-four-grk" || a.category === "mmf-grk") &&
       intimateBlocked
     )
       return false;
@@ -340,7 +357,7 @@ export function PromptLab() {
           <Section
             step={1}
             title="Action"
-            hint="Most categories only filter actions. Swap four also sets 4 people (YA + mid-age couples)."
+            hint="Most categories only filter actions. Swap four sets 4 people; Two men + her sets 3 (1F+2M)."
           >
             <ChipRow
               label="Category"
