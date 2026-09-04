@@ -4,7 +4,8 @@ export type ActionCategoryId =
   | "physical"
   | "romance"
   | "intimate"
-  | "hardcore";
+  | "hardcore"
+  | "hardcore-grk";
 
 export interface ActionItem {
   id: string;
@@ -53,6 +54,12 @@ export const ACTION_CATEGORIES: {
     id: "hardcore",
     label: "Hardcore (21+)",
     description: "Direct action phrasing from heated scenes — adults 21+ only",
+    restricted: true,
+  },
+  {
+    id: "hardcore-grk",
+    label: "Hardcore-grk (21+)",
+    description: "Fully indirect heated poses — fabric, pressure, closeness only",
     restricted: true,
   },
 ];
@@ -409,48 +416,47 @@ export const ACTIONS: ActionItem[] = [
   { id: "hc-mouth-against-soft-lower-front", label: "Mouth against soft lower front through fabric", prompt: "his face pressed close against the soft lower front through thin fabric with devoted heated attention", category: "hardcore", placeHints: ["kitchen", "bedroom"], minPeople: 2 },
   { id: "hc-fabric-indent-backside-both-hands", label: "Both hands fabric-indent backside", prompt: "both hands gripping the center of her backside with strong fabric tension and heavy indentation mapping his gripping force", category: "hardcore", placeHints: ["pool", "bedroom"], minPeople: 2 },
 
-  // --- Expanded Hardcore: full complete acts, he/she, indirect but unmistakable ---
-  { id: "hc-deep-crease-press-fingers", label: "Deep backside crease press", prompt: "she stands slightly bent forward; he presses his fingers firmly into the deep fabric crease between the soft lower curves of her backside, holding steady pressure along the warm middle line while her breath deepens", category: "hardcore", placeHints: ["bedroom", "home-interior"], minPeople: 2 },
-  { id: "hc-thumb-spread-crease", label: "Thumbs into soft crease", prompt: "she bends forward braced on the bed; he kneels behind her resting both thumbs deep into the soft middle crease of her lower curves, spreading gentle firm pressure along that line with focused attention", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-face-buried-crease-lick", label: "Face pressed into soft crease", prompt: "she is on all fours; he kneels low behind her with his face pressed tightly into the soft middle crease of her lower curves, mouth moving slowly against warm skin and fabric while his hands hold her hips", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-mouth-on-firm-center", label: "Close mouth attention at his center", prompt: "he sits back against the headboard thighs open; she leans in close between them bringing her mouth to the firm front center of him, lips staying sealed with slow devoted attention while he watches her", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-kneeling-taking-him-deep", label: "Kneeling devoted mouth at his center", prompt: "she kneels in front of him hands on his hips, bringing her mouth close against the firm front center of his body with deep slow rhythm, staying tightly connected there while he rests a hand lightly in her hair", category: "hardcore", placeHints: ["bedroom", "home-interior"], minPeople: 2 },
-  { id: "hc-lying-side-mouth-on-him", label: "Side-lying mouth along his front center", prompt: "they lie on their sides facing each other; she lowers her head along his front upper inner thighs and gives slow close mouth attention along the firm center line of him, lingering with warm contact", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-standing-her-mouth-on-him", label: "Kneeling mouth at standing center", prompt: "he stands; she sinks to her knees and presses her mouth firmly against the front center of him, one hand steady at the base of that contact while she keeps slow close rhythm", category: "hardcore", placeHints: ["bedroom", "shower", "home-interior"], minPeople: 2 },
-  { id: "hc-tongue-soft-lower-folds", label: "Close mouth between raised knees", prompt: "she lies back with knees raised and open; he lowers his face between her thighs pressing close against her soft lower front, mouth moving slowly with devoted attention while she grips the sheets", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-mouth-devoted-soft-center", label: "Mouth devoted at soft lower front", prompt: "his face pressed close against her soft lower front between her thighs, mouth moving with careful heated focus while her legs rest over his shoulders and her fingers tangle in his hair", category: "hardcore", placeHints: ["bedroom", "sofa"], minPeople: 2 },
-  { id: "hc-face-between-thighs-long-licks", label: "Face between thighs soft lower front", prompt: "she sits at the edge of the bed; he kneels between her open thighs pressing his face into her soft lower front, giving long slow mouth attention upward while holding her hips steady", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-sixty-nine-mutual-mouth", label: "Inverted mutual close mouth attention", prompt: "they lie inverted against each other; her mouth stays devoted at the firm front center of him while his mouth stays devoted at her soft lower front at the same time, both giving close heated attention", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-mouth-on-soft-breast", label: "Mouth sealed on soft upper front", prompt: "he cups the soft upper front of her body and brings his mouth firmly against the soft curve of her breast, lips sealed with slow devoted pressure while his tongue traces gently and her back arches toward him", category: "hardcore", placeHints: ["bedroom", "sofa"], minPeople: 2 },
-  { id: "hc-both-breasts-mouth-and-hand", label: "Mouth and hand on soft upper front", prompt: "she straddles his lap facing him; he brings his mouth to one soft breast with firm sealed attention while his other hand presses and shapes her other soft upper curve, both claimed at once", category: "hardcore", placeHints: ["bedroom", "sofa"], minPeople: 2 },
-  { id: "hc-from-behind-mouth-on-breast", label: "From behind mouth on soft upper front", prompt: "he stands behind her one arm around her waist, leaning over her shoulder to bring his mouth firmly against her soft upper front while his other hand presses between her upper inner thighs", category: "hardcore", placeHints: ["bedroom", "home-interior"], minPeople: 2 },
-  { id: "hc-missionary-deep-joining", label: "Missionary close deep body join", prompt: "she lies on her back knees raised and open; he settles fully between her thighs pressing his body deeply against her soft lower front with slow heavy rhythmic presses, hips locked tight to hers, faces close, every movement fully seated against her", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-missionary-legs-on-shoulders", label: "Missionary legs raised deep press", prompt: "she lies back with both legs up on his shoulders; he folds her close and presses deep rhythmic contact into her soft lower front with long firm strokes, her soft lower curves tilted up to meet him fully", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-missionary-deep-hold", label: "Missionary deep hold grind", prompt: "in close missionary he presses fully against her soft lower front and holds deep grinding slow circles, her legs wrapped around his waist pulling him tighter into that contact", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-all-fours-rear-deep-entry", label: "All fours deep rear press", prompt: "she is on all fours looking back; he kneels behind gripping her hips and presses deep rhythmic contact into the soft middle crease of her lower curves with slow controlled strokes, soft curves meeting him on every press", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-all-fours-soft-center-from-behind", label: "All fours deep from behind", prompt: "she is on all fours; he presses close behind her driving deep rhythmic contact against her soft lower front from behind, hands locked on her waist pulling her back into each firm press", category: "hardcore", placeHints: ["bedroom", "sofa"], minPeople: 2 },
-  { id: "hc-prone-flat-deep-press", label: "Prone flat deep body press", prompt: "she lies flat on her stomach; he covers her from behind pressing deep rhythmic contact along her soft lower front, full body weight settling her into the mattress with slow grinding presses", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-cowgirl-she-sinks-deep", label: "She settles deep over him", prompt: "he lies on his back; she straddles him facing forward and settles her soft lower front fully down against the firm front center of him, rolling her hips with full weight while his hands grip her soft lower curves", category: "hardcore", placeHints: ["bedroom", "sofa"], minPeople: 2 },
-  { id: "hc-reverse-cowgirl-deep", label: "Reverse straddle deep settle", prompt: "she straddles him facing away leaning forward on her hands; he guides her hips as she settles deep against him, soft lower curves rising and falling with heavy rhythm", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-spooning-deep-from-behind", label: "Spooning deep press from behind", prompt: "they lie on their sides spooned; he presses deep slow rhythmic contact against her soft lower front from behind, one hand on her soft upper front, her knee lifted to open that contact", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-standing-lift-deep", label: "Standing lift deep body join", prompt: "he lifts her with her back to the wall, her legs wrapped around his waist as he presses deep upward rhythmic contact against her soft lower front, holding her firmly while their faces stay close", category: "hardcore", placeHints: ["bedroom", "home-interior", "shower"], minPeople: 2 },
-  { id: "hc-edge-of-bed-deep-thrust", label: "Edge of bed deep standing press", prompt: "she sits at the edge of the bed leaning back on her hands; he stands between her open thighs pressing deep firm rhythmic contact into her soft lower front, her legs hooked around him", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-bent-over-desk-deep", label: "Bent over deep from behind", prompt: "she bends forward over a desk or bed edge; he stands behind gripping her hips and presses deep hard rhythmic contact against her soft lower front, soft lower curves meeting him on every push", category: "hardcore", placeHints: ["bedroom", "office", "mall-office"], minPeople: 2 },
-  { id: "hc-licking-inner-thighs-to-center", label: "Mouth along inner thighs to soft lower front", prompt: "he gives slow close mouth attention up her inner thighs until his face reaches her soft lower front, lingering with warm devoted contact over her most private soft center while she opens wider", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-her-hand-guiding-his-mouth", label: "Her hands guiding his face lower", prompt: "she guides his head with both hands pressing his face firmly against her soft lower front, holding him there as he gives close heated mouth attention with hungry focus", category: "hardcore", placeHints: ["bedroom", "sofa"], minPeople: 2 },
-  { id: "hc-hand-stroking-him-into-mouth", label: "Hand and mouth at his firm center", prompt: "she wraps one hand around the firm front center of him with steady strokes while bringing her mouth close against him with sealed attention, alternating tight hand rhythm and close mouth contact", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-him-licking-while-fingers-deep", label: "Mouth and fingers at soft lower front", prompt: "his mouth works slowly against her soft lower front while his fingers press deep into the soft warm folds there, curling firmly as her hips lift into his hand and mouth", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-her-riding-his-mouth", label: "She settles over his mouth", prompt: "he lies on his back; she kneels over his face lowering her soft lower front onto his mouth, rolling gently as he gives upward devoted mouth attention while both hands grip her soft lower curves", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-deep-rear-crease-then-entry", label: "Crease press then deep rear contact", prompt: "first he presses thumbs deep into the warm middle crease of her backside spreading soft pressure; then he guides firm close contact into that same rear line with deep slow presses while she stays on all fours", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-face-down-ass-up-deep", label: "Chest down hips high deep press", prompt: "she presses her chest to the bed with hips high; he kneels behind and drives deep rhythmic contact against her soft lower front and middle crease, hands spreading her soft lower curves wide", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-lap-facing-deep-bounce", label: "In his lap deep bounce join", prompt: "she sits in his lap facing him fully pressed close; he holds her soft lower curves and lifts her so she settles deep against the firm front center of him in a bouncing rhythm, soft upper fronts pressed to his chest", category: "hardcore", placeHints: ["sofa", "bedroom", "chair"], minPeople: 2 },
-  { id: "hc-shower-wall-deep-thrust", label: "Shower wall deep body join", prompt: "hot water running; her back to the wet tiles one leg hooked around him as he presses deep upward rhythmic contact against her soft lower front, mouths open close, bodies slick and locked", category: "hardcore", placeHints: ["shower"], minPeople: 2 },
-  { id: "hc-slow-pullout-deep-drive", label: "Slow ease then deep reseat press", prompt: "in close missionary he eases almost away from her soft lower front then presses back in fully with a deep firm stroke, repeating the long contact while she holds him tight", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-mouth-on-him-eye-contact", label: "Mouth at his center with eye contact", prompt: "she looks up into his eyes while her mouth stays sealed in close attention at the firm front center of him, keeping slow deep rhythm as he brushes her cheek", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-spread-folds-tongue-point", label: "Thumbs open soft lower front mouth focus", prompt: "his thumbs gently open the soft warm area of her lower front; he gives precise close mouth attention over her most sensitive peak in tight circles while she trembles", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
-  { id: "hc-double-claim-mouth-breast-hand-center", label: "Mouth on breast hand on soft lower front", prompt: "he gives firm sealed mouth attention on her soft breast while his hand slides between her thighs pressing and rubbing her soft lower front, claiming upper and lower at once", category: "hardcore", placeHints: ["bedroom", "sofa"], minPeople: 2 },
-  { id: "hc-from-behind-hand-on-soft-center", label: "From behind hand on soft lower front", prompt: "he presses close behind her one arm around her waist his hand cupped hard against her soft lower front rubbing firmly between her thighs while the firm front of him presses into the crease of her backside", category: "hardcore", placeHints: ["bedroom", "kitchen", "home-interior"], minPeople: 2 },
-
+  // --- Hardcore-grk: fully indirect only (pose / fabric / pressure / closeness) ---
+  { id: "hc-deep-crease-press-fingers", label: "Fingers into deep fabric crease", prompt: "she stands slightly bent; he presses his fingers firmly into the deep fabric crease of her soft lower curves, holding steady pressure so the fabric shows a sharp indentation", category: "hardcore-grk", placeHints: ["bedroom", "home-interior"], minPeople: 2 },
+  { id: "hc-thumb-spread-crease", label: "Thumbs into soft fabric crease", prompt: "she bends forward braced on the bed; he kneels behind resting both thumbs deep into the soft fabric crease of her lower curves, applying firm even pressure along that line", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-face-buried-crease-lick", label: "Face pressed into backside fabric crease", prompt: "she is on all fours; he kneels low behind her with his face pressed tightly into the soft fabric crease of her backside, mouth moving slowly against the fabric while his hands hold her hips", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-mouth-on-firm-center", label: "Close face at his center brief", prompt: "he sits back against the headboard; she leans between his open thighs bringing her face close against the front center brief of him, staying devoted there with slow quiet attention while he watches her", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-kneeling-taking-him-deep", label: "Kneeling close at his center brief", prompt: "she kneels in front of him hands on his hips, face kept close against the firm front center through fabric with slow steady rhythm while he rests a hand lightly in her hair", category: "hardcore-grk", placeHints: ["bedroom", "home-interior"], minPeople: 2 },
+  { id: "hc-lying-side-mouth-on-him", label: "Side-lying face along center brief", prompt: "they lie on their sides facing each other; she lowers her head along his front upper inner thighs keeping her face close against his center brief with slow warm attention", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-standing-her-mouth-on-him", label: "Kneeling face at standing center brief", prompt: "he stands; she sinks to her knees and presses her face firmly against the front center of him through fabric, one hand steady nearby while she keeps slow close rhythm", category: "hardcore-grk", placeHints: ["bedroom", "shower", "home-interior"], minPeople: 2 },
+  { id: "hc-tongue-soft-lower-folds", label: "Face between raised knees soft lower front", prompt: "she lies back with knees raised and open; he lowers his face between her thighs pressing close against her soft lower front through thin fabric with devoted attention while she grips the sheets", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-mouth-devoted-soft-center", label: "Face devoted at soft lower front", prompt: "his face pressed close against her soft lower front through thin fabric between her thighs with careful heated focus while her legs rest over his shoulders and her fingers tangle in his hair", category: "hardcore-grk", placeHints: ["bedroom", "sofa"], minPeople: 2 },
+  { id: "hc-face-between-thighs-long-licks", label: "Kneeling face at soft lower front", prompt: "she sits at the edge of the bed; he kneels between her open thighs pressing his face into her soft lower front through fabric, giving long slow close attention while holding her hips steady", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-sixty-nine-mutual-mouth", label: "Inverted mutual close face attention", prompt: "they lie inverted against each other; her face stays close against his center brief through fabric while his face stays close against her soft lower front through fabric at the same time", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-mouth-on-soft-breast", label: "Face against soft upper front", prompt: "he cups the soft upper front of her body through thin fabric and brings his face firmly against that soft rounded shape with slow devoted pressure while her back arches toward him", category: "hardcore-grk", placeHints: ["bedroom", "sofa"], minPeople: 2 },
+  { id: "hc-both-breasts-mouth-and-hand", label: "Face and hand on soft upper front", prompt: "she straddles his lap facing him; he brings his face to one soft upper curve through fabric while his other hand presses and shapes her other soft upper curve, both claimed through thin fabric", category: "hardcore-grk", placeHints: ["bedroom", "sofa"], minPeople: 2 },
+  { id: "hc-from-behind-mouth-on-breast", label: "From behind face on soft upper front", prompt: "he stands behind her one arm around her waist, leaning over her shoulder to press his face firmly against her soft upper front through fabric while his other hand presses between her upper inner thighs", category: "hardcore-grk", placeHints: ["bedroom", "home-interior"], minPeople: 2 },
+  { id: "hc-missionary-deep-joining", label: "On back knees raised deep close press", prompt: "she lies on her back knees raised and open; he settles fully between her thighs leaning his upper body close over her lower torso to press deep passionate contact against her body with slow heavy rhythm, faces close", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-missionary-legs-on-shoulders", label: "Legs raised deep body press", prompt: "she lies back with both legs up toward his shoulders; he draws her close and presses deep rhythmic contact against her lower torso with long firm presses, soft lower curves tilted up to meet him", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-missionary-deep-hold", label: "Close hold deep grind press", prompt: "he presses fully against her lower torso and holds deep grinding slow circles through fabric, her legs wrapped around his waist pulling him tighter into that contact", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-all-fours-rear-deep-entry", label: "All fours deep crease body press", prompt: "she is on all fours looking back; he kneels behind gripping her hips with body weight close, both hands and torso pressing firm slow rhythm into the deep fabric crease of her soft lower curves", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-all-fours-soft-center-from-behind", label: "All fours waist-grip rhythm from behind", prompt: "she is on all fours; he presses closely behind her hands locked on her waist with slow rhythmic pressing movements against her lower curves, pulling her back into each firm press", category: "hardcore-grk", placeHints: ["bedroom", "sofa"], minPeople: 2 },
+  { id: "hc-prone-flat-deep-press", label: "Flat on stomach covered deep press", prompt: "she lies flat on her stomach; he covers her from behind pressing deep slow grinding contact along her lower torso, full body weight settling her into the mattress", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-cowgirl-she-sinks-deep", label: "Straddle facing pull-down settle", prompt: "he lies on his back; she straddles him facing forward and his hands lock on her waist pulling her down firmly with each slow movement so the soft lower curves press deeply against him through the fabric", category: "hardcore-grk", placeHints: ["bedroom", "sofa"], minPeople: 2 },
+  { id: "hc-reverse-cowgirl-deep", label: "Straddle away pull-down rhythm", prompt: "she straddles him facing away leaning forward; his hands locked on her waist pulling her down firmly so soft lower curves rise and fall against him through fabric with heavy rhythm", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-spooning-deep-from-behind", label: "Side-by-side from behind deep press", prompt: "they lie on their sides close together; he presses from behind with slow deep body rhythm against her lower curves, one hand on her soft upper front through fabric, her knee slightly lifted", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-standing-lift-deep", label: "Lifted to wall close body press", prompt: "he lifts her with her back to the wall, her legs wrapped around his waist as he presses tightly against her from the front with deep upward rhythm, holding her firmly while their faces stay close", category: "hardcore-grk", placeHints: ["bedroom", "home-interior", "shower"], minPeople: 2 },
+  { id: "hc-edge-of-bed-deep-thrust", label: "Edge of bed standing close press", prompt: "she sits at the edge of the bed leaning back on her hands; he stands between her open thighs pressing deep firm contact against her lower torso, her legs hooked around him", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-bent-over-desk-deep", label: "Bent forward waist-grip rhythm", prompt: "she leans forward supported on a desk or bed edge; he presses closely behind her hands gripping her waist firmly with slow rhythmic pressing movements against her lower curves", category: "hardcore-grk", placeHints: ["bedroom", "office", "mall-office"], minPeople: 2 },
+  { id: "hc-licking-inner-thighs-to-center", label: "Face along inner thighs to soft lower front", prompt: "he keeps his face close along her inner thighs until he reaches her soft lower front through thin fabric, lingering with warm devoted contact while she opens slightly wider", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-her-hand-guiding-his-mouth", label: "Her hands guiding his face lower", prompt: "she guides his head with both hands pressing his face firmly against her soft lower front through fabric, holding him there with focused heated closeness", category: "hardcore-grk", placeHints: ["bedroom", "sofa"], minPeople: 2 },
+  { id: "hc-hand-stroking-him-into-mouth", label: "Palm and face at his center brief", prompt: "her palm applies firm steady pressure on his front upper inner thighs on his center brief while her face stays close against that same area through fabric, alternating grip and close attention", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-him-licking-while-fingers-deep", label: "Face and hand at soft lower front", prompt: "his face pressed close against her soft lower front through fabric while his hand presses firmly into the upper inner thigh and lower pelvic region, fabric pulling taut under his grip as her hips lift", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-her-riding-his-mouth", label: "Hover straddle over his face", prompt: "he lies on his back; she is positioned above him supporting her weight with her arms, soft lower front close over his face in a face-to-face straddling cuddle while his hands grip her soft lower curves", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-deep-rear-crease-then-entry", label: "Crease press then close body rhythm", prompt: "first both his hands press firmly into the deep fabric crease of her soft lower curves; then he stays close behind her on all fours with slow deep body rhythm against that same crease line", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-face-down-ass-up-deep", label: "Chest down hips high crease press", prompt: "she presses her chest to the bed with hips high; he kneels behind hands spreading her soft lower curves while pressing firmly into the deep fabric crease with slow heavy body rhythm", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-lap-facing-deep-bounce", label: "In lap facing close bounce press", prompt: "she sits in his lap facing him fully pressed close; he holds her soft lower curves and lifts her in a bouncing rhythm so soft lower curves press deeply against him through fabric, soft upper fronts against his chest", category: "hardcore-grk", placeHints: ["sofa", "bedroom", "chair"], minPeople: 2 },
+  { id: "hc-shower-wall-deep-thrust", label: "Shower wall lifted close press", prompt: "hot water running; her back to the wet tiles one leg hooked around him as he presses tightly against her from the front with deep upward rhythm, faces close, wet fabric strongly indented", category: "hardcore-grk", placeHints: ["shower"], minPeople: 2 },
+  { id: "hc-slow-pullout-deep-drive", label: "Ease away then reseat deep press", prompt: "he eases slightly away from her lower torso then presses back fully against her with a deep firm stroke through fabric, repeating the long close contact while she holds him tight", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-mouth-on-him-eye-contact", label: "Face at center brief with eye contact", prompt: "she looks up into his eyes while her face stays close against the front center brief of him through fabric, keeping slow deep rhythm as he brushes her cheek", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-spread-folds-tongue-point", label: "Thumbs open soft lower front face focus", prompt: "his thumbs gently open the soft fabric area of her lower front; he keeps his face close there with precise devoted attention in tight small movements while she trembles", category: "hardcore-grk", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-double-claim-mouth-breast-hand-center", label: "Face on upper front hand on lower front", prompt: "one of his hands presses firmly on the soft upper front of her body through thin fabric while his face is pressed close against the soft lower front, claiming upper and lower at once", category: "hardcore-grk", placeHints: ["bedroom", "sofa"], minPeople: 2 },
+  { id: "hc-from-behind-hand-on-soft-center", label: "From behind hand on soft lower front", prompt: "he presses close behind her one arm around her waist his hand cupped hard against her soft lower front through fabric rubbing firmly between her upper inner thighs while his body presses into the crease of her backside", category: "hardcore-grk", placeHints: ["bedroom", "kitchen", "home-interior"], minPeople: 2 },
 
 ];
 
@@ -459,7 +465,7 @@ export function getActionsByCategory(
   opts?: { allowIntimate?: boolean }
 ): ActionItem[] {
   if (
-    (category === "intimate" || category === "hardcore") &&
+    (category === "intimate" || category === "hardcore" || category === "hardcore-grk") &&
     opts?.allowIntimate === false
   )
     return [];
@@ -479,16 +485,26 @@ export function randomEverydayOrSocialAction(): ActionItem {
 
 export function isIntimateAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "intimate" || c === "hardcore";
+  return c === "intimate" || c === "hardcore" || c === "hardcore-grk";
 }
 
+/** Original Hardcore category only — keeps direct phrasing sanitize path. */
 export function isHardcoreAction(id: string): boolean {
   return getActionById(id)?.category === "hardcore";
 }
 
-/** Romance / Intimate / Hardcore require every person 21+. */
+export function isHardcoreGrkAction(id: string): boolean {
+  return getActionById(id)?.category === "hardcore-grk";
+}
+
+/** Romance / Intimate / Hardcore / Hardcore-grk require every person 21+. */
 export function categoryRequiresAdult21(category: ActionCategoryId): boolean {
-  return category === "romance" || category === "intimate" || category === "hardcore";
+  return (
+    category === "romance" ||
+    category === "intimate" ||
+    category === "hardcore" ||
+    category === "hardcore-grk"
+  );
 }
 
 export function actionRequiresAdult21(id: string): boolean {
@@ -503,14 +519,15 @@ export const UNDER21_ALLOWED_CATEGORIES: ActionCategoryId[] = [
 ];
 
 export function categoryCounts(): Record<ActionCategoryId, number> {
-  const counts = {
+  const counts: Record<ActionCategoryId, number> = {
     everyday: 0,
     social: 0,
     physical: 0,
     romance: 0,
     intimate: 0,
     hardcore: 0,
-  } as Record<ActionCategoryId, number>;
+    "hardcore-grk": 0,
+  };
   for (const a of ACTIONS) counts[a.category] += 1;
   return counts;
 }
