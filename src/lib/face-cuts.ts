@@ -656,6 +656,25 @@ export const KNOWN_FACE_CUTS_BY_GENDER: Record<Gender, FaceCut[]> = {
   nonbinary: KNOWN_NONBINARY_FACE_CUTS,
 };
 
+function age19To20FaceCuts(gender: Gender): FaceCut[] {
+  const base = gender === "woman"
+    ? YOUNG_ADULT_WOMAN_FACE_CUTS
+    : gender === "man"
+      ? YOUNG_ADULT_MAN_FACE_CUTS
+      : YOUNG_ADULT_NONBINARY_FACE_CUTS;
+  const adultIdentity = gender === "woman"
+    ? "young adult girl"
+    : gender === "man"
+      ? "young adult man"
+      : "young adult person";
+
+  return base.map((face) => ({
+    ...face,
+    label: face.label.replace(" YA ", " 19–20 teen/young "),
+    prompt: `adult age 19 or 20 only, clearly an adult and not a minor; ${adultIdentity}; youth body, youth face, teen body, teen face, young body, young face; ${face.prompt}`,
+  }));
+}
+
 function allCutsForAge(gender: Gender, age?: string, pool?: FaceCutPool): FaceCut[] {
   const n = Number(age);
   const useKnown = pool === "known";
@@ -670,6 +689,9 @@ function allCutsForAge(gender: Gender, age?: string, pool?: FaceCutPool): FaceCu
     if (gender === "woman") return YOUNG_ADULT_WOMAN_FACE_CUTS;
     if (gender === "man") return YOUNG_ADULT_MAN_FACE_CUTS;
     return YOUNG_ADULT_NONBINARY_FACE_CUTS;
+  }
+  if (Number.isFinite(n) && (n === 19 || n === 20) && !useKnown) {
+    return age19To20FaceCuts(gender);
   }
   if (useKnown) return KNOWN_FACE_CUTS_BY_GENDER[gender];
   return FACE_CUTS_BY_GENDER[gender];
@@ -791,4 +813,3 @@ export function applyKnownFaceLocks<T extends {
 /** Hard beauty floor for any woman face prompt. */
 export const WOMAN_BEAUTY_HARD_RULE =
   "every woman must look beautiful and attractive — refined features, clear natural skin with real texture and fine pores, flattering facial harmony, not doll-like";
-
