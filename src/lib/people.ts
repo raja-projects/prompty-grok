@@ -342,6 +342,8 @@ export const YOUNG_ADULT_BODY_BY_GENDER: Record<Gender, string[]> = {
 
 const AGE_19_20_WOMAN_BODY_TYPES = [
   "youth body and youth face",
+  "small body and small face",
+  "teen body and teen face",
   ...YOUNG_ADULT_BODY_BY_GENDER.woman,
 ];
 

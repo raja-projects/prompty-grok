@@ -66,9 +66,11 @@ export const FORBIDDEN_TERMS = SOFT_FORBIDDEN;
 export const DEFAULT_NEGATIVE =
   "illustration, drawing, painting, anime, cartoon, comic, sketch, digital art, 3d render, cgi, " +
   "AI-generated appearance, synthetic image, generative-art look, fake photograph, overprocessed image, " +
-  "plastic skin, wax skin, waxy, doll-like, mannequin, porcelain doll, fake skin, airbrushed, " +
-  "overly smooth skin, glossy plastic face, uncanny valley, artificial skin, beauty filter, excessive retouching, " +
-  "repeated skin texture, smeared pores, painted hair, fused hair strands, unnatural catchlights, mismatched eye reflections, " +
+  "plastic skin, wax skin, waxy skin, wax figure, wax museum appearance, silicone skin, rubber skin, vinyl skin, " +
+  "doll-like, mannequin, porcelain doll, fake skin, airbrushed, poreless face, uniformly smooth skin, oily plastic shine, " +
+  "overly smooth skin, glossy plastic face, glassy skin, uncanny valley, artificial skin, beauty filter, excessive retouching, " +
+  "uniform specular highlights, excessive facial glow, repeated skin texture, smeared pores, painted hair, fused hair strands, " +
+  "unnatural catchlights, mismatched eye reflections, " +
   "face blush, underage, pre-teen, child, deformed, blurry, soft focus, motion blur, compression artifacts, watermark, low quality, " +
   "extra limbs, extra fingers, missing fingers, fused fingers, malformed hands, bad anatomy, impossible joints, duplicated features, " +
   "warped background, repeated background pattern, floating objects, inconsistent shadows, text overlay, logo, " +
@@ -80,8 +82,10 @@ export const DEFAULT_QUALITY_PHRASE =
   "optically sharp focus on the eyes and faces, high micro-contrast and true photographic clarity without digital oversharpening, " +
   "physically plausible exposure, lens rendering, depth of field, perspective, shadows, reflections and natural color response, " +
   "lifelike human anatomy and proportions, candid micro-expressions, natural posture and believable interaction with gravity and surroundings, " +
-  "authentic unretouched skin with unique pores, peach fuzz, fine lines, tiny blemishes and subtle uneven tonal variation, " +
-  "realistic subsurface scattering without plastic, waxy or airbrushed skin, individually resolved eyelashes, eyebrows and hair strands, " +
+  "HARD REAL-SKIN LOCK: authentic unretouched human skin, visibly non-waxy and non-plastic, with unique irregular pores clearly present across the forehead, nose, cheeks and chin, " +
+  "fine peach fuzz catching side light, tiny facial hairs, fine lines, faint blemishes, slight redness, subtle under-eye texture, natural lip texture and uneven tonal variation, " +
+  "skin must retain matte-to-natural localized highlights rather than a uniform glossy sheen; physically correct translucent subsurface scattering with real micro-shadowing around every pore, " +
+  "no smoothing, no beautification filter, no airbrushing and no porcelain finish; individually resolved eyelashes, eyebrows and hair strands, " +
   "real textile weave, seams, folds and material tension, coherent environmental detail and consistent lighting across every person, " +
   "crisp DSLR detail with gentle natural sensor grain and believable optical imperfections, clear visible female faces when women are present — " +
   "indistinguishable in appearance from an authentic professionally photographed real-life scene, not illustration, not CGI, not a 3D render, not a doll";
