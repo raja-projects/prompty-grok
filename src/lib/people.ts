@@ -511,6 +511,15 @@ export function defaultMmfPeople(): PersonFields[] {
   ];
 }
 
+export function defaultMmmfPeople(): PersonFields[] {
+  return [
+    defaultPerson({ gender: "woman", age: "24", dressId: "w-kerala-cotton-sexy", hairStyle: "Long wavy", bodyType: "Curvy" }),
+    defaultPerson({ gender: "man", age: "28", dressId: "m-tee-shorts", hairStyle: "Short neat", bodyType: "Athletic" }),
+    defaultPerson({ gender: "man", age: "34", dressId: "m-formal-undone", hairStyle: "Short neat", bodyType: "Broad-shouldered" }),
+    defaultPerson({ gender: "man", age: "39", dressId: "m-tee-shorts", hairStyle: "Side part", bodyType: "Tall lean" }),
+  ];
+}
+
 export function defaultFoursomeSwapPeople(): PersonFields[] {
   return [
     defaultPerson({

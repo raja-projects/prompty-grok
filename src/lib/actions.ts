@@ -9,6 +9,7 @@ export type ActionCategoryId =
   | "swap-own-grk"
   | "swap-cross-grk"
   | "mmf-grk"
+  | "mmmf-grk"
   | "ffm-grk"
   | "crowd-press-grk"
   | "wlw-grk";
@@ -87,6 +88,12 @@ export const ACTION_CATEGORIES: {
     id: "mmf-grk",
     label: "Two men + her (19+)",
     description: "One woman with two men — fully indirect fabric/pressure; auto 3 people",
+    restricted: true,
+  },
+  {
+    id: "mmmf-grk",
+    label: "Three men + her (19+)",
+    description: "One consenting adult woman with three adult men — intense, fully clothed, indirect fabric-and-pressure scenes; auto 4 people",
     restricted: true,
   },
   {
@@ -851,6 +858,18 @@ export const ACTIONS: ActionItem[] = [
   { id: "ffm-stacked-soft-upper", label: "Stacked soft upper fronts against him", prompt: "both women press soft upper fronts against his chest and back through fabric in a slow sandwich of closeness, mouths at his neck", category: "ffm-grk", placeHints: ["bedroom", "sofa"], minPeople: 3 },
   { id: "ffm-ease-reseat-second-holds", label: "Ease and reseat with one, second holds her", prompt: "with one woman he eases slightly then presses back fully through fabric in long strokes while the second woman holds her open and shares kisses", category: "ffm-grk", placeHints: ["bedroom"], minPeople: 3 },
 
+  // --- Three men + her (19+): fully clothed, indirect high-tension staging ---
+  { id: "mmmf-centered-four-way-hold", label: "Centered four-way hold", prompt: "one consenting adult woman age 19 or older stands at the center of three adult men in a tightly coordinated full-body hold; one anchors her waist from behind while the others close in at both sides, hands gripping outer hips, shoulders and upper back through layered clothing with deep fabric compression, braced fingers, realistic weight transfer and breathless tension; every hand remains traceable, all four adult faces remain readable, fully clothed and completely indirect non-anatomical wording", category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoFraming: "full-body" },
+  { id: "mmmf-rear-curve-three-hands", label: "Rear curve, three-hand pressure", prompt: "one consenting adult woman age 19 or older faces two adult men while the third stands close behind; camera from behind clearly frames the clothed lower curves of her backside as three firmly planted hands create separate visible hand-shaped indentations through stretched fabric at her outer hips, waist and lower-back curve; she turns her head over her shoulder so her face stays fully visible, the other adult faces remain identifiable, posture and reach stay physically plausible, fully clothed and indirect wording only", category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "back", autoFraming: "half-body" },
+  { id: "mmmf-wall-surrounded", label: "Wall-surrounded pressure", prompt: "one consenting adult woman age 19 or older braces safely against a private-room wall while three adult men surround her in intense coordinated closeness; one supports her waist, one grips an outer thigh through clothing and one holds her shoulders, producing strong stretched folds, compressed fabric and believable body response without exposed anatomy; her face and all three men's faces remain visible in a three-quarter composition, fully clothed and completely indirect", category: "mmmf-grk", placeHints: ["bedroom", "hotel", "home-interior"], minPeople: 4, autoCamera: "3/4", autoFraming: "full-body" },
+  { id: "mmmf-sofa-center-lock", label: "Sofa center-lock", prompt: "one consenting adult woman age 19 or older sits centered on a sturdy sofa between two adult men while a third leans close from behind; overlapping hands hold her waist, outer thighs and shoulders through clothing with forceful but physically credible pressure, cushions sink under shared weight, clothing bunches and pulls taut, and all four adults show intense engaged expressions; fully clothed, no exposed private anatomy and indirect language only", category: "mmmf-grk", placeHints: ["sofa", "home-interior", "hotel"], minPeople: 4, autoFraming: "full-body" },
+  { id: "mmmf-lifted-supported", label: "Lifted and fully supported", prompt: "three adult men securely support one consenting adult woman age 19 or older in a coordinated lifted pose; one bears her weight at the waist, one supports beneath an outer thigh through clothing and the third steadies her shoulders, bringing all four bodies into intense close pressure with taut fabric, visible muscle tension and realistic balance; her face remains clear over one shoulder, every limb and hand is traceable, fully clothed and indirect wording only", category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "3/4", autoFraming: "full-body" },
+  { id: "mmmf-bed-edge-surround", label: "Bed-edge surround", prompt: "one consenting adult woman age 19 or older sits securely at the edge of a firm bed as three adult men close around her from front, side and behind; their hands maintain strong visible pressure through clothing at her waist, outer hips, upper back and shoulders while she grips their arms and turns her face toward camera; mattress compression, rumpled fabric and joint angles remain realistic, fully clothed and completely indirect", category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "3/4", autoFraming: "full-body" },
+  { id: "mmmf-standing-rear-focus", label: "Standing rear-focus press", prompt: "one consenting adult woman age 19 or older stands closely surrounded by three adult men; the rear camera angle clearly shows her clothed backside under deep layered-fabric pressure from the man behind while the other two anchor her hands and waist from either side, creating strong radiating folds and believable weight shift; she turns her head fully over her shoulder so her face is unobstructed, all adult faces remain identifiable, fully clothed and indirect wording only", category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "back", autoFraming: "full-body" },
+  { id: "mmmf-kneeling-center-ring", label: "Kneeling center ring", prompt: "one consenting adult woman age 19 or older kneels safely on a padded surface while three adult men form a close ring around her; hands grip her shoulders, waist and outer hips through clothing with sustained high tension, fabric visibly compresses beneath each contact and her posture reacts naturally while every adult face remains in frame; no exposed private areas, fully clothed and completely indirect non-anatomical language", category: "mmmf-grk", placeHints: ["bedroom", "home-interior"], minPeople: 4, autoFraming: "full-body" },
+  { id: "mmmf-mirror-all-visible", label: "Mirror, every face visible", prompt: "one consenting adult woman age 19 or older stands before a full-length mirror with three adult men pressed close around her; reflected and direct views keep all four adult faces visible while hands create deep distinct pressure through layered clothing at her waist, outer hips, shoulders and clothed lower curves, with stretched folds, braced legs and realistic balance; intense but fully clothed, indirect language only", category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "3/4", autoFraming: "full-body" },
+  { id: "mmmf-crossed-arms-body-lock", label: "Crossed-arms body lock", prompt: "one consenting adult woman age 19 or older is held in a coordinated standing body lock by three adult men, with crossed forearms supporting her upper torso, waist and outer hips through clothing; the group leans together under strong controlled pressure, fabric pulls into deep folds, fingers brace visibly and faces show breathless intensity while anatomy, leverage and footing remain credible; all adults fully clothed, no explicit terminology", category: "mmmf-grk", placeHints: ["bedroom", "hotel", "home-interior"], minPeople: 4, autoCamera: "3/4", autoFraming: "full-body" },
+
   // --- Crowd press (19+): crowded stranger fabric pressure that looks casual ---
   { id: "cp-bus-board-backside", label: "Crowded bus boarding, backside fabric press", prompt: "on crowded bus steps a mid-age man stands close behind a young adult woman and presses both hands firmly into the soft lower curves of her backside to guide her inside, fabric strongly indented, both looking ahead calm as if nothing unusual. Camera from behind her back clearly shows a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. He stays close behind her. Calm ordinary expressions as if nothing unusual is happening.", category: "crowd-press-grk", placeHints: ["station", "street", "bus-last-row"], minPeople: 2, autoCamera: "back", autoFraming: "half-body"},
   { id: "cp-bus-aisle-hip", label: "Packed bus aisle, hip and soft curves press", prompt: "standing in a packed city-bus aisle, he stays close behind her with steady hip pressure and a firm hand on her soft lower curves through fabric, both facing forward with ordinary calm expressions among other riders. Camera from behind her back clearly shows a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. He stays close behind her. Calm ordinary expressions as if nothing unusual is happening.", category: "crowd-press-grk", placeHints: ["bus-last-row", "station"], minPeople: 2, autoCamera: "back", autoFraming: "half-body"},
@@ -1001,7 +1020,7 @@ export function getActionsByCategory(
   opts?: { allowIntimate?: boolean }
 ): ActionItem[] {
   if (
-    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-own-grk" || category === "swap-cross-grk" || category === "mmf-grk" || category === "ffm-grk" || category === "crowd-press-grk" || category === "wlw-grk") &&
+    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-own-grk" || category === "swap-cross-grk" || category === "mmf-grk" || category === "mmmf-grk" || category === "ffm-grk" || category === "crowd-press-grk" || category === "wlw-grk") &&
     opts?.allowIntimate === false
   )
     return [];
@@ -1021,7 +1040,7 @@ export function randomEverydayOrSocialAction(): ActionItem {
 
 export function isIntimateAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "mmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
+  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "mmf-grk" || c === "mmmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
 }
 
 /** Original Hardcore category only — keeps direct phrasing sanitize path. */
@@ -1031,7 +1050,7 @@ export function isHardcoreAction(id: string): boolean {
 
 export function isHardcoreGrkAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "mmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
+  return c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "mmf-grk" || c === "mmmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
 }
 
 /** Romance / Intimate / Hardcore / Hardcore-grk / Swap-four require every person 19+. */
@@ -1043,6 +1062,7 @@ export function categoryRequiresAdult21(category: ActionCategoryId): boolean {
     category === "hardcore-grk" ||
     category === "swap-own-grk" || category === "swap-cross-grk" ||
     category === "mmf-grk" ||
+    category === "mmmf-grk" ||
     category === "ffm-grk" ||
     category === "crowd-press-grk" ||
     category === "wlw-grk"
@@ -1072,6 +1092,7 @@ export function categoryCounts(): Record<ActionCategoryId, number> {
     "swap-own-grk": 0,
     "swap-cross-grk": 0,
     "mmf-grk": 0,
+    "mmmf-grk": 0,
     "ffm-grk": 0,
     "crowd-press-grk": 0,
     "wlw-grk": 0,
