@@ -55,7 +55,7 @@ function describePerson(p: PersonFields, index: number): string {
     `${p.hairColor} ${p.hairStyle} hair`,
     face ? `face: ${face}` : "",
     p.gender === "woman" ? "beautiful and attractive" : "",
-    `wearing ${dress}`,
+    `wearing complete outfit: ${dress}`,
     `${p.fashionVibe} vibe`,
   ]);
 }
