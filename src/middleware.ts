@@ -44,9 +44,10 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (!expectedUser || !expectedPass || expectedPass.length < 24) {
+  // Accept any non-empty user/password the operator sets (no charset/length policy).
+  if (!expectedUser || !expectedPass) {
     return new NextResponse(
-      "Site lock misconfigured: set SITE_AUTH_USER and a strong SITE_AUTH_PASSWORD (24+ chars).",
+      "Site lock misconfigured: set SITE_AUTH_USER and SITE_AUTH_PASSWORD.",
       { status: 503, headers: { "Cache-Control": "no-store" } },
     );
   }
