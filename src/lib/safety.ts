@@ -12,6 +12,7 @@ export const ALWAYS_FORBIDDEN = [
   "jailbait",
   "too young",
   "too-young",
+  "teenager",
 ] as const;
 
 /** Soft path only — intimate/romance/everyday free text */

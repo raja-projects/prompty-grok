@@ -49,6 +49,9 @@ function describePerson(p: PersonFields, index: number): string {
     `exactly ${ageNum} years old`,
     `${p.skinTone} skin tone`,
     `${p.bodyType} build`,
+    /youthful|innocent|fresh-faced|delicate|boyish/i.test(p.bodyType)
+      ? "clearly adult 21+ appearance — not underage, not teen"
+      : "",
     `${p.hairColor} ${p.hairStyle} hair`,
     face ? `face: ${face}` : "",
     p.gender === "woman" ? "beautiful and attractive" : "",

@@ -186,6 +186,7 @@ export const HAIR_BY_GENDER: Record<Gender, string[]> = {
   ],
 };
 
+/** Shared list (legacy / nonbinary fallback). */
 export const BODY_TYPES = [
   "Slim",
   "Athletic",
@@ -195,7 +196,74 @@ export const BODY_TYPES = [
   "Petite",
   "Tall lean",
   "Soft build",
+  "Youthful adult frame",
+  "Soft innocent adult look",
+  "Delicate adult build",
 ] as const;
+
+/** Gender-specific body / figure options — all adults 21+ (no teen/underage framing). */
+export const BODY_BY_GENDER: Record<Gender, string[]> = {
+  woman: [
+    "Slim",
+    "Petite",
+    "Athletic",
+    "Average",
+    "Curvy",
+    "Hourglass",
+    "Pear-shaped",
+    "Apple-soft",
+    "Tall lean",
+    "Soft build",
+    "Voluptuous",
+    "Toned fitness",
+    "Youthful adult frame",
+    "Soft innocent adult look",
+    "Delicate adult build",
+    "Graceful slender adult",
+    "Fresh-faced adult youthful",
+    "Soft feminine curves",
+    "Narrow-waist curvy",
+    "Compact petite adult",
+  ],
+  man: [
+    "Slim",
+    "Athletic",
+    "Average",
+    "Broad-shouldered",
+    "Tall lean",
+    "Muscular",
+    "Lean runner",
+    "Soft build",
+    "Stocky solid",
+    "V-taper athletic",
+    "Youthful adult frame",
+    "Soft innocent adult look",
+    "Boyish adult lean (21+)",
+    "Fresh-faced adult youthful",
+    "Lean toned",
+    "Rugged athletic",
+    "Slim-tall",
+    "Compact athletic",
+  ],
+  nonbinary: [
+    "Slim",
+    "Athletic",
+    "Average",
+    "Soft build",
+    "Tall lean",
+    "Petite",
+    "Broad-shouldered",
+    "Youthful adult frame",
+    "Soft innocent adult look",
+    "Delicate adult build",
+    "Androgynous lean",
+    "Fresh-faced adult youthful",
+  ],
+};
+
+export function bodyTypesFor(gender: Gender): string[] {
+  return BODY_BY_GENDER[gender];
+}
 
 export const FASHION_VIBES = [
   "Everyday casual",

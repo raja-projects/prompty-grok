@@ -2,7 +2,7 @@
 
 import {
   AGES,
-  BODY_TYPES,
+  bodyTypesFor,
   FASHION_VIBES,
   GENDERS,
   HAIR_BY_GENDER,
@@ -65,6 +65,8 @@ export function PersonCard({
       const hairs = HAIR_BY_GENDER[g];
       next.dressId = defaultDressId(g);
       if (!hairs.includes(next.hairStyle)) next.hairStyle = hairs[0]!;
+      const bodies = bodyTypesFor(g);
+      if (!bodies.includes(next.bodyType)) next.bodyType = bodies[0]!;
       const cuts = faceCutsFor(g);
       if (!cuts.some((c) => c.id === next.faceCutId)) {
         next.faceCutId = defaultFaceCutId(g);
@@ -153,7 +155,7 @@ export function PersonCard({
         <SelectField
           label="Body type"
           value={person.bodyType}
-          options={BODY_TYPES}
+          options={bodyTypesFor(person.gender)}
           onChange={(v) => patch({ bodyType: v })}
         />
         <SelectField
