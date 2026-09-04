@@ -305,7 +305,7 @@ export function PromptLab() {
 
       // Category chip alone does not overwrite actionId.
 
-      // Under 21: only everyday / social / physical (play)
+      // Under 19: only everyday / social / physical (play)
       if (sceneHasUnder21(next.people, next.peopleCount)) {
         if (categoryRequiresAdult21(next.actionCategory) || categoryRequiresAdult21(getActionById(next.actionId)?.category ?? "everyday")) {
           const fallback = ACTIONS.find((a) => a.category === "everyday");
@@ -389,7 +389,7 @@ export function PromptLab() {
             Scene builder
           </h1>
           <p className="mt-1 text-xs text-prompty-muted">
-            Adults 21+ · pick each control independently · prompts ready for
+            Adults 19+ · pick each control independently · prompts ready for
             Gemini, ChatGPT & Grok
           </p>
         </div>
@@ -408,7 +408,7 @@ export function PromptLab() {
         <div className="space-y-4 lg:col-span-7">
           {under21 ? (
             <p className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-              Ages 18–20: Everyday / Social / Physical (play) only. Romance, Intimate, and Hardcore need everyone 21+.
+              Age 18: Everyday / Social / Physical (play) only. Romance, Intimate, and Hardcore need everyone 19+.
             </p>
           ) : null}
 

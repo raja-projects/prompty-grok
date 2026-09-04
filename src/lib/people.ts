@@ -11,7 +11,7 @@ import {
 
 export type Gender = "woman" | "man" | "nonbinary";
 
-/** Single adult age year (21+), not a range. */
+/** Single adult age year (19+), not a range. */
 export type Age = string;
 
 export type PeopleCount = "1" | "2" | "3" | "4" | "group";
@@ -47,7 +47,7 @@ export interface PersonFields {
 }
 
 /** Individual ages for the picker — not ranges. */
-/** Ages 18–80. Under 21 only for everyday/social — Intimate/Hardcore/Romance blocked. */
+/** Ages 18–80. Under 19 only for everyday/social — Intimate/Hardcore/Romance blocked. */
 export const AGES: Age[] = Array.from({ length: 63 }, (_, i) => String(18 + i));
 
 export function ageNumber(age: Age | string | undefined): number {
@@ -56,7 +56,7 @@ export function ageNumber(age: Age | string | undefined): number {
 }
 
 export function isUnder21(age: Age | string | undefined): boolean {
-  return ageNumber(age) < 21;
+  return ageNumber(age) < 19;
 }
 
 export function sceneHasUnder21(people: PersonFields[], peopleCount: PeopleCount): boolean {
@@ -243,7 +243,7 @@ export const BODY_TYPES = [
   "Delicate adult build",
 ] as const;
 
-/** Gender-specific body / figure options — all adults 21+ (no teen/underage framing). */
+/** Gender-specific body / figure options — all adults 19+ (no teen/underage framing). */
 export const BODY_BY_GENDER: Record<Gender, string[]> = {
   woman: [
     "Slim",
@@ -280,7 +280,7 @@ export const BODY_BY_GENDER: Record<Gender, string[]> = {
     "V-taper athletic",
     "Youthful adult frame",
     "Soft innocent adult look",
-    "Boyish adult lean (21+)",
+    "Boyish adult lean (19+)",
     "Fresh-faced adult youthful",
     "Lean toned",
     "Rugged athletic",
@@ -307,7 +307,7 @@ export function bodyTypesFor(gender: Gender): string[] {
   return BODY_BY_GENDER[gender];
 }
 
-/** Young-adult (18–20) body options — NOT teen/immature wording; everyday/social only. */
+/** Young-adult (18–20) body options. */
 export const YOUNG_ADULT_BODY_BY_GENDER: Record<Gender, string[]> = {
   woman: [
     "Slim young-adult frame",
@@ -340,8 +340,21 @@ export const YOUNG_ADULT_BODY_BY_GENDER: Record<Gender, string[]> = {
   ],
 };
 
+const AGE_19_20_WOMAN_BODY_TYPES = [
+  "youth body",
+  "youth face",
+  "teen body",
+  "teen face",
+  "young body",
+  "young face",
+  "young adult girl",
+  ...YOUNG_ADULT_BODY_BY_GENDER.woman,
+];
+
 export function bodyTypesForAge(gender: Gender, age: Age | string | undefined): string[] {
-  if (isUnder21(age)) return YOUNG_ADULT_BODY_BY_GENDER[gender];
+  const n = ageNumber(age);
+  if ((n === 19 || n === 20) && gender === "woman") return AGE_19_20_WOMAN_BODY_TYPES;
+  if (isUnder21(age) || n === 19 || n === 20) return YOUNG_ADULT_BODY_BY_GENDER[gender];
   return BODY_BY_GENDER[gender];
 }
 
@@ -403,15 +416,15 @@ export function defaultPerson(overrides?: Partial<PersonFields>): PersonFields {
 }
 
 
-/** Default cast for Swap four: young-adult couple + mid-age couple (all 21+). */
+/** Default cast for Swap four: young-adult couple + mid-age couple (all 19+). */
 
-/** Default cast for Two men + her: one woman + two men (all 21+). */
+/** Default cast for Two men + her: one woman + two men (all 19+). */
 
-/** Default cast for Two women + him: two women + one man (all 21+). */
+/** Default cast for Two women + him: two women + one man (all 19+). */
 
-/** Default cast for Crowd press: young-adult woman + mid-age man (strangers, 21+). */
+/** Default cast for Crowd press: young-adult woman + mid-age man (strangers, 19+). */
 
-/** Default cast for Women together: two women (all 21+). */
+/** Default cast for Women together: two women (all 19+). */
 export function defaultWlwPeople(): PersonFields[] {
   return [
     defaultPerson({

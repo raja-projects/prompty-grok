@@ -66,8 +66,8 @@ function describePerson(p: PersonFields, index: number, regionIds?: string[]): s
     regionLock,
     `${locked.skinTone} skin tone`,
     `${locked.bodyType} build`,
-    /youthful|innocent|fresh-faced|delicate|boyish/i.test(locked.bodyType)
-      ? "clearly adult 21+ appearance — not underage, not teen"
+    /youth|teen|young|innocent|fresh-faced|delicate|boyish/i.test(locked.bodyType)
+      ? "clearly adult age 19+ appearance — not a minor"
       : "",
     `${locked.hairColor} ${locked.hairStyle} hair`,
     face ? `face: ${face}` : "",
@@ -80,7 +80,7 @@ function describePerson(p: PersonFields, index: number, regionIds?: string[]): s
 function peopleBlock(state: SceneFormState): string {
   if (state.peopleCount === "group") {
     const crowd = sanitizeText(state.crowdDescriptors) ||
-      "a diverse adult group, ages 21 and above, natural expressions";
+      "a diverse adult group, ages 19 and above, natural expressions";
     return `group of five or more adults (${crowd})`;
   }
   const n = Number(state.peopleCount);
@@ -255,7 +255,7 @@ export function createStudioDefaults(): SceneFormState {
     relationship: "couple",
     people: [woman, man],
     crowdDescriptors:
-      "mixed adult ages 21+, Kerala–Malayali inspired attire, natural candid expressions",
+      "mixed adult ages 19+, Kerala–Malayali inspired attire, natural candid expressions",
     placeId: "bedroom",
     cameraAngle: "front",
     framing: "medium",
@@ -282,7 +282,7 @@ export function createRandomizedDefaults(): SceneFormState {
     relationship,
     people: defaultPeopleForCount(peopleCount),
     crowdDescriptors:
-      "mixed adult ages 21+, Kerala–Tamil inspired attire, natural candid expressions",
+      "mixed adult ages 19+, Kerala–Tamil inspired attire, natural candid expressions",
     placeId: place.id,
     cameraAngle: cam.cameraAngle,
     framing: cam.framing,

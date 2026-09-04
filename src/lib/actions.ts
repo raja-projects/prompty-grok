@@ -61,49 +61,49 @@ export const ACTION_CATEGORIES: {
   },
   {
     id: "hardcore",
-    label: "Hardcore (21+)",
-    description: "Direct action phrasing from heated scenes — adults 21+ only",
+    label: "Hardcore (19+)",
+    description: "Direct action phrasing from heated scenes — adults 19+ only",
     restricted: true,
   },
   {
     id: "hardcore-grk",
-    label: "Hardcore-grk (21+)",
+    label: "Hardcore-grk (19+)",
     description: "Fully indirect heated poses — fabric, pressure, closeness only",
     restricted: true,
   },
   {
     id: "swap-own-grk",
-    label: "Own pairs (21+)",
+    label: "Own pairs (19+)",
     description: "Two couples each with their own partner — parallel fabric/pressure; men press women only; auto 4 people",
     restricted: true,
   },
   {
     id: "swap-cross-grk",
-    label: "Own + neighbor press (21+)",
+    label: "Own + neighbor press (19+)",
     description: "HARD RULE: man intimate with his own wife AND pressing the other person's wife — both clearly visible with fabric tension and pressing effects; poses vary, this rule always applies; men press women only; auto 4 people",
     restricted: true,
   },
   {
     id: "mmf-grk",
-    label: "Two men + her (21+)",
+    label: "Two men + her (19+)",
     description: "One woman with two men — fully indirect fabric/pressure; auto 3 people",
     restricted: true,
   },
   {
     id: "ffm-grk",
-    label: "Two women + him (21+)",
+    label: "Two women + him (19+)",
     description: "Two women with one man — fully indirect fabric/pressure; auto 3 people",
     restricted: true,
   },
   {
     id: "crowd-press-grk",
-    label: "Crowd press (21+)",
+    label: "Crowd press (19+)",
     description: "Crowded stranger fabric pressure that looks casual — soft curves only; auto YA woman + mid-age man",
     restricted: true,
   },
   {
     id: "wlw-grk",
-    label: "Women together (21+)",
+    label: "Women together (19+)",
     description: "Two women — fully indirect fabric/pressure closeness; auto 2 women",
     restricted: true,
   },
@@ -427,7 +427,7 @@ export const ACTIONS: ActionItem[] = [
   { id: "one-leg-guided-close", label: "One leg guided close", prompt: "one leg guided close for deeper face-to-face closeness", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
 
 
-  // Hardcore (21+) — exact example wording (he/she), adults only
+  // Hardcore (19+) — exact example wording (he/she), adults only
   { id: "hc-face-into-central-curve", label: "Face pressed into central curve", prompt: "leaning his face down deep into her central curve at the lower waist, hands firmly gripping her waist while her fingers tangle tightly in his hair pulling his head firmly down against her skin", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
   { id: "hc-palm-pressure-center-brief", label: "Palm pressure on center brief", prompt: "her palm applies firm steady pressure on his front upper inner thighs on his center brief, warm friction while his breathing deepens", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
   { id: "hc-grip-tighten-center", label: "Grip tightens and holds steady", prompt: "reaching down between them, palm applying firm steady pressure on his front upper inner thighs on his center brief as her grip tightens and holds him steady while he leans his head back breathing deeply", category: "hardcore", placeHints: ["bedroom", "boat-house", "park", "storeroom"], minPeople: 2 },
@@ -503,7 +503,7 @@ export const ACTIONS: ActionItem[] = [
   { id: "hc-double-claim-mouth-breast-hand-center", label: "Face on upper front hand on lower front", prompt: "one of his hands presses firmly on the soft upper front of her body through thin fabric while his face is pressed close against the soft lower front, claiming upper and lower at once", category: "hardcore-grk", placeHints: ["bedroom", "sofa"], minPeople: 2 },
   { id: "hc-from-behind-hand-on-soft-center", label: "From behind hand on soft lower front", prompt: "he presses close behind her one arm around her waist his hand cupped hard against her soft lower front through fabric rubbing firmly between her upper inner thighs while his body presses into the crease of her backside. They face each other. Camera from behind her back clearly shows his hands in a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible.", category: "hardcore-grk", placeHints: ["bedroom", "kitchen", "home-interior"], minPeople: 2, autoCamera: "back", autoFraming: "half-body"},
 
-  // --- Swap four (21+): partner exchange / watching / dual pairs — fully indirect only ---
+  // --- Swap four (19+): partner exchange / watching / dual pairs — fully indirect only ---
   { id: "sf-soft-partner-tease-circle", label: "Soft tease in a close circle", prompt: "four adults in a close circle; soft teasing touches over fabric, warm breath, and lingering eye contact building heat without rushing", category: "swap-own-grk", placeHints: ["bedroom", "home-interior", "hotel"], minPeople: 4 },
   { id: "sf-soft-cross-pair-kiss", label: "Cross-pair lingering kiss", prompt: "partners softly exchange: the younger woman shares a lingering heated kiss with the older man while the older woman shares the same with the younger man, hands resting at waists. HARD RULE: the man is in an intimate scene with his own wife and also pressing the other person's wife — both presses clearly visible with fabric tension and pressing effects", category: "swap-cross-grk", placeHints: ["bedroom", "sofa", "hotel"], minPeople: 4 },
   { id: "sf-soft-watch-partner-kiss", label: "Watching partner's close kiss", prompt: "the younger man watches from nearby as the older man shares a deep lingering kiss with the younger woman, her partner's gaze heated and steady. HARD RULE: the man is in an intimate scene with his own wife and also pressing the other person's wife — both presses clearly visible with fabric tension and pressing effects", category: "swap-cross-grk", placeHints: ["bedroom", "sofa"], minPeople: 4 },
@@ -633,7 +633,7 @@ export const ACTIONS: ActionItem[] = [
   { id: "sf-ownx-trade-free-hands", label: "Trade free hands on each neighboring backside hair", prompt: "both pairs locked with their own partners; both men trade free-hand deep presses on each neighboring woman's soft backside with strong fabric tension while drawing hair back in the same motion. They face each other. Camera from behind her back clearly shows his hands in a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. HARD RULE: the man is in an intimate scene with his own wife and also pressing the other person's wife — both presses clearly visible with fabric tension and pressing effects", category: "swap-cross-grk", placeHints: ["bedroom"], minPeople: 4, autoCamera: "back", autoFraming: "half-body" },
   { id: "sf-ownx-afterglow-still-back-hair", label: "Afterglow own tangle, still backside hair hold", prompt: "quiet afterglow; each still tangled with their own partner while one free hand keeps a deep still press on the neighboring woman's soft backside with strong fabric tension and hair drawn back, faces soft. They face each other. Camera from behind her back clearly shows his hands in a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. HARD RULE: the man is in an intimate scene with his own wife and also pressing the other person's wife — both presses clearly visible with fabric tension and pressing effects", category: "swap-cross-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "back", autoFraming: "half-body" },
 
-  // --- Swap four: distilled from user reference scenes (filter-soft, 21+ rules, no age/teen) ---
+  // --- Swap four: distilled from user reference scenes (filter-soft, 19+ rules, no age/teen) ---
   { id: "sf-ref-kitchen-cross-waist-back", label: "Kitchen cross: waist hold + neighboring backside", prompt: "private kitchen gathering; one man near the counter with the neighboring woman, one hand firm around her waist pressing deep into her side while the other deep-presses her soft lower curves of her backside with strong fabric tension; across the room the other man stands pressed close to the other neighboring woman, hand deep into soft lower-back curves, face near her neck; both women glance across with flushed knowing smiles They face each other. Camera from behind her back clearly shows his hands in a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. HARD RULE: the man is in an intimate scene with his own wife and also pressing the other person's wife — both presses clearly visible with fabric tension and pressing effects", category: "swap-cross-grk", placeHints: ["kitchen", "home-interior"], minPeople: 4, autoCamera: "back", autoFraming: "half-body" },
   { id: "sf-ref-dining-lap-side-crease", label: "Dining: sideways lap sit + standing crease press", prompt: "private dining corner; one woman sits sideways in the neighboring man's lap through fabric while his hand deep-presses soft lower curves of her backside; beside them the other man keeps an arm around the other neighboring woman, palm deep in the fabric crease of her lower back with strong bunching They face each other. Camera from behind her back clearly shows his hands in a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. HARD RULE: the man is in an intimate scene with his own wife and also pressing the other person's wife — both presses clearly visible with fabric tension and pressing effects", category: "swap-cross-grk", placeHints: ["home-interior", "hotel"], minPeople: 4, autoCamera: "back", autoFraming: "half-body" },
   { id: "sf-ref-hallway-wall-double-back", label: "Hallway wall: double backside press, glance across", prompt: "narrow dim hallway; one neighboring woman pressed to the wall as both of a man's hands deep-press soft lower curves of her backside with strong fabric indentation; next to them the other man wraps the other neighboring woman's waist, palm flat on her lower back and side; both women look down the hall toward each other, flushed They face each other. Camera from behind her back clearly shows his hands in a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. HARD RULE: the man is in an intimate scene with his own wife and also pressing the other person's wife — both presses clearly visible with fabric tension and pressing effects", category: "swap-cross-grk", placeHints: ["home-interior", "hotel"], minPeople: 4, autoCamera: "back", autoFraming: "half-body" },
@@ -690,7 +690,7 @@ export const ACTIONS: ActionItem[] = [
   { id: "sf-ref-cross-rear-hug-swap", label: "Cross rear hug: each man behind neighboring woman", prompt: "living room partner-cross; each man wraps arms tightly around the neighboring woman from behind, palms deep into soft lower curves of her backside with strong fabric indentation; intense focus They face each other. Camera from behind her back clearly shows his hands in a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. HARD RULE: the man is in an intimate scene with his own wife and also pressing the other person's wife — both presses clearly visible with fabric tension and pressing effects", category: "swap-cross-grk", placeHints: ["sofa", "home-interior", "kitchen"], minPeople: 4, autoCamera: "back", autoFraming: "half-body" },
   { id: "sf-ref-corridor-cross-rear", label: "Corridor: both cross rear hugs deep backside", prompt: "narrow corridor; each man pressed to the neighboring woman in a heavy rear hug, hands pushing deep into soft lower curves; fabric deformation, intense shared focus They face each other. Camera from behind her back clearly shows his hands in a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. HARD RULE: the man is in an intimate scene with his own wife and also pressing the other person's wife — both presses clearly visible with fabric tension and pressing effects", category: "swap-cross-grk", placeHints: ["home-interior", "hotel"], minPeople: 4, autoCamera: "back", autoFraming: "half-body" },
 
-  // --- Two men + her (21+): 1 woman, 2 men — fully indirect fabric/pressure only ---
+  // --- Two men + her (19+): 1 woman, 2 men — fully indirect fabric/pressure only ---
   { id: "mmf-soft-between-both", label: "Soft between both men", prompt: "she stands between both men; soft teasing hands on her waist and soft upper front through fabric, warm breath on both sides of her neck", category: "mmf-grk", placeHints: ["bedroom", "home-interior", "hotel"], minPeople: 3 },
   { id: "mmf-soft-kiss-one-held-other", label: "Kissing one while the other holds her", prompt: "she shares a lingering heated kiss with one man while the other presses close behind, hands firm on her hips through fabric", category: "mmf-grk", placeHints: ["bedroom", "sofa"], minPeople: 3 },
   { id: "mmf-soft-lap-and-kneel", label: "In one lap, other kneeling close", prompt: "she sits in one man's lap in a quiet heated hold through fabric while the other kneels close, hands exploring her soft thighs", category: "mmf-grk", placeHints: ["sofa", "bedroom"], minPeople: 3 },
@@ -735,7 +735,7 @@ export const ACTIONS: ActionItem[] = [
   { id: "mmf-double-hip-claim", label: "Both men claiming her hips", prompt: "both men lock hands on her hips from front and behind, pulling her into overlapping fabric-pressure rhythms while she gasps softly between them", category: "mmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 3 },
   { id: "mmf-night-long-rotate", label: "Night-long rotate attention", prompt: "through the night both men rotate who takes deep shared rhythm through fabric with her and who gives devoted face and hand attention at soft upper and lower fronts", category: "mmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 3 },
 
-  // --- Two women + him (21+): 2 women, 1 man — fully indirect fabric/pressure only ---
+  // --- Two women + him (19+): 2 women, 1 man — fully indirect fabric/pressure only ---
   { id: "ffm-soft-between-both", label: "Him between both women, soft tease", prompt: "he stands between both women; soft teasing hands on his chest and waist through fabric, warm breath on both sides of his neck", category: "ffm-grk", placeHints: ["bedroom", "home-interior", "hotel"], minPeople: 3 },
   { id: "ffm-soft-kiss-one-held-other", label: "Kissing one while the other holds him", prompt: "he shares a lingering heated kiss with one woman while the other presses close behind him, hands firm on his hips through fabric", category: "ffm-grk", placeHints: ["bedroom", "sofa"], minPeople: 3 },
   { id: "ffm-soft-lap-and-kneel", label: "One in his lap, other kneeling close", prompt: "one woman sits in his lap in a quiet heated hold through fabric while the other kneels close, hands exploring along his thighs", category: "ffm-grk", placeHints: ["sofa", "bedroom"], minPeople: 3 },
@@ -780,7 +780,7 @@ export const ACTIONS: ActionItem[] = [
   { id: "ffm-stacked-soft-upper", label: "Stacked soft upper fronts against him", prompt: "both women press soft upper fronts against his chest and back through fabric in a slow sandwich of closeness, mouths at his neck", category: "ffm-grk", placeHints: ["bedroom", "sofa"], minPeople: 3 },
   { id: "ffm-ease-reseat-second-holds", label: "Ease and reseat with one, second holds her", prompt: "with one woman he eases slightly then presses back fully through fabric in long strokes while the second woman holds her open and shares kisses", category: "ffm-grk", placeHints: ["bedroom"], minPeople: 3 },
 
-  // --- Crowd press (21+): crowded stranger fabric pressure that looks casual ---
+  // --- Crowd press (19+): crowded stranger fabric pressure that looks casual ---
   { id: "cp-bus-board-backside", label: "Crowded bus boarding, backside fabric press", prompt: "on crowded bus steps a mid-age man stands close behind a young adult woman and presses both hands firmly into the soft lower curves of her backside to guide her inside, fabric strongly indented, both looking ahead calm as if nothing unusual. Camera from behind her back clearly shows a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. He stays close behind her. Calm ordinary expressions as if nothing unusual is happening.", category: "crowd-press-grk", placeHints: ["station", "street", "bus-last-row"], minPeople: 2, autoCamera: "back", autoFraming: "half-body"},
   { id: "cp-bus-aisle-hip", label: "Packed bus aisle, hip and soft curves press", prompt: "standing in a packed city-bus aisle, he stays close behind her with steady hip pressure and a firm hand on her soft lower curves through fabric, both facing forward with ordinary calm expressions among other riders. Camera from behind her back clearly shows a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. He stays close behind her. Calm ordinary expressions as if nothing unusual is happening.", category: "crowd-press-grk", placeHints: ["bus-last-row", "station"], minPeople: 2, autoCamera: "back", autoFraming: "half-body"},
   { id: "cp-bus-seat-arm-upper", label: "Crowded bus seat, arm across soft upper front", prompt: "sitting very close on a crowded bus bench, his arm wraps naturally around her as if steadying himself, hand resting low on the soft upper front of her body over thin fabric with clear indentation, both looking out the window casually", category: "crowd-press-grk", placeHints: ["bus-last-row", "station"], minPeople: 2 },
@@ -863,7 +863,7 @@ export const ACTIONS: ActionItem[] = [
   { id: "cp-village-bus-wooden", label: "Village bus wooden seats, soft curves along the ride", prompt: "on a packed village bus with wooden seats from rear toward front benches; throughout the ride he keeps intentional fabric pressure on soft backside and soft upper front, both riding with sleepy calm faces as if nothing unusual. Camera from behind her back clearly shows a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. He stays close behind her. Calm ordinary expressions as if nothing unusual is happening.", category: "crowd-press-grk", placeHints: ["bus-last-row", "street", "village-path"], minPeople: 2, autoCamera: "back", autoFraming: "half-body"},
   { id: "cp-queue-vaccine-camp", label: "Outdoor camp queue, soft backside still hold", prompt: "long outdoor public-camp queue under tents; he stands close behind with a still firm hold on soft backside through fabric for a long wait, both facing forward with patient blank faces. Camera from behind her back clearly shows a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. He stays close behind her. Calm ordinary expressions as if nothing unusual is happening.", category: "crowd-press-grk", placeHints: ["street", "festival-fair", "market"], minPeople: 2, autoCamera: "back", autoFraming: "half-body"},
 
-  // --- Women together (21+): two women — fully indirect fabric/pressure only ---
+  // --- Women together (19+): two women — fully indirect fabric/pressure only ---
   { id: "wlw-soft-forehead-touch", label: "Foreheads touching soft", prompt: "two women with foreheads gently touching, soft smiles, hands resting at each other's waists through fabric", category: "wlw-grk", placeHints: ["bedroom", "balcony", "hotel"], minPeople: 2 },
   { id: "wlw-soft-lingering-kiss", label: "Lingering heated kiss", prompt: "two women sharing a lingering heated kiss, soft upper fronts pressed close through fabric, fingers in each other's hair", category: "wlw-grk", placeHints: ["bedroom", "sofa", "hotel"], minPeople: 2 },
   { id: "wlw-soft-neck-kiss", label: "Kiss along the neck", prompt: "one woman kisses slowly along the other's neck while hands rest at soft upper front through thin fabric", category: "wlw-grk", placeHints: ["bedroom", "sofa"], minPeople: 2 },
@@ -949,7 +949,7 @@ export function isHardcoreGrkAction(id: string): boolean {
   return c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "mmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
 }
 
-/** Romance / Intimate / Hardcore / Hardcore-grk / Swap-four require every person 21+. */
+/** Romance / Intimate / Hardcore / Hardcore-grk / Swap-four require every person 19+. */
 export function categoryRequiresAdult21(category: ActionCategoryId): boolean {
   return (
     category === "romance" ||
