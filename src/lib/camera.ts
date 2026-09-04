@@ -37,7 +37,7 @@ export type TimeOfDay =
 
 export const CAMERA_ANGLES: { id: CameraAngle; label: string; prompt: string }[] = [
   { id: "front", label: "Front", prompt: "front-facing camera angle" },
-  { id: "back", label: "Back", prompt: "shot from behind, any woman turns her head to show her face clearly" },
+  { id: "back", label: "Back", prompt: "shot from behind her back with clear view of soft lower curves and strong fabric tension, she turns her head over her shoulder so her face is clearly visible" },
   { id: "side", label: "Side", prompt: "side profile angle" },
   { id: "3/4", label: "3/4", prompt: "three-quarter angle" },
   { id: "over-shoulder", label: "Over-shoulder", prompt: "over-the-shoulder framing, any woman\'s face still visible in frame" },

@@ -271,10 +271,15 @@ export function PromptLab() {
         }
       }
 
-      // actionId may update category label for display, but never touch place/camera/people.
+      // actionId updates category; backside-press actions also auto-set camera/framing/place.
       if (partial.actionId) {
         const action = getActionById(partial.actionId);
-        if (action) next.actionCategory = action.category;
+        if (action) {
+          next.actionCategory = action.category;
+          if (action.autoCamera) next.cameraAngle = action.autoCamera;
+          if (action.autoFraming) next.framing = action.autoFraming;
+          if (action.placeHints?.length) next.placeId = action.placeHints[0]!;
+        }
       }
 
       // Category chip alone does not overwrite actionId.
