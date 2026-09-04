@@ -65,17 +65,26 @@ export const FORBIDDEN_TERMS = SOFT_FORBIDDEN;
 
 export const DEFAULT_NEGATIVE =
   "illustration, drawing, painting, anime, cartoon, comic, sketch, digital art, 3d render, cgi, " +
+  "AI-generated appearance, synthetic image, generative-art look, fake photograph, overprocessed image, " +
   "plastic skin, wax skin, waxy, doll-like, mannequin, porcelain doll, fake skin, airbrushed, " +
-  "overly smooth skin, glossy plastic face, uncanny valley, artificial skin, beauty filter, " +
-  "face blush, underage, pre-teen, child, deformed, blurry, watermark, low quality, " +
-  "extra limbs, bad anatomy, text overlay, logo, " +
+  "overly smooth skin, glossy plastic face, uncanny valley, artificial skin, beauty filter, excessive retouching, " +
+  "repeated skin texture, smeared pores, painted hair, fused hair strands, unnatural catchlights, mismatched eye reflections, " +
+  "face blush, underage, pre-teen, child, deformed, blurry, soft focus, motion blur, compression artifacts, watermark, low quality, " +
+  "extra limbs, extra fingers, missing fingers, fused fingers, malformed hands, bad anatomy, impossible joints, duplicated features, " +
+  "warped background, repeated background pattern, floating objects, inconsistent shadows, text overlay, logo, " +
   "female face hidden, woman face obscured, back of head only, faceless woman, " +
   "cropped female face, woman looking fully away with no visible face";
 
 export const DEFAULT_QUALITY_PHRASE =
-  "real photograph, shot on camera, photorealistic documentary realism, natural skin with visible pores and fine texture, " +
-  "realistic subsurface skin, no plastic or wax finish, authentic lighting, sharp focus, natural colors, " +
-  "high clarity, crisp detail, clear visible female faces when women are present — not illustration, not CGI, not doll";
+  "genuine high-resolution full-frame DSLR photograph of real human people, captured through a professional prime lens, " +
+  "optically sharp focus on the eyes and faces, high micro-contrast and true photographic clarity without digital oversharpening, " +
+  "physically plausible exposure, lens rendering, depth of field, perspective, shadows, reflections and natural color response, " +
+  "lifelike human anatomy and proportions, candid micro-expressions, natural posture and believable interaction with gravity and surroundings, " +
+  "authentic unretouched skin with unique pores, peach fuzz, fine lines, tiny blemishes and subtle uneven tonal variation, " +
+  "realistic subsurface scattering without plastic, waxy or airbrushed skin, individually resolved eyelashes, eyebrows and hair strands, " +
+  "real textile weave, seams, folds and material tension, coherent environmental detail and consistent lighting across every person, " +
+  "crisp DSLR detail with gentle natural sensor grain and believable optical imperfections, clear visible female faces when women are present — " +
+  "indistinguishable in appearance from an authentic professionally photographed real-life scene, not illustration, not CGI, not a 3D render, not a doll";
 
 export type SanitizeMode = "soft" | "hardcore";
 
