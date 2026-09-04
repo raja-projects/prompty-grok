@@ -167,6 +167,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
 
   const short = sanitizeText(
     clean([
+      "real photograph shot on camera",
       people,
       rel,
       regions ? `appearance cues: ${regions}` : "",
@@ -177,7 +178,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       `${state.timeOfDay} lighting`,
       camera,
       quality,
-      state.mode === "video" ? "cinematic motion, natural movement" : "",
+      state.mode === "video" ? "natural camera motion, real movement" : "still real photo",
       notes,
     ])
 , sanitizeMode);
