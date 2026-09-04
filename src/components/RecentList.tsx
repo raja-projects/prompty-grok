@@ -48,7 +48,7 @@ export function RecentList({
                 onClick={() => onReuse(item)}
                 className="rounded-lg border border-prompty-border px-3 py-1.5 text-xs text-prompty-muted hover:text-white"
               >
-                Reuse subject
+                Reuse mode
               </button>
             </div>
           </li>

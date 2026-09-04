@@ -10,11 +10,13 @@ export function Header() {
             <h1 className="font-display text-lg font-bold tracking-tight text-white sm:text-xl">
               Prompty
             </h1>
-            <p className="text-xs text-prompty-muted">Prompt lab for image &amp; video AI</p>
+            <p className="text-xs text-prompty-muted">
+              Photoreal people scene prompts · 18+
+            </p>
           </div>
         </div>
         <p className="hidden text-right text-xs text-prompty-muted sm:block">
-          Client-side assembly · No generation APIs · One-click copy
+          Soft language · Kerala–Tamil defaults · One-click copy
         </p>
       </div>
     </header>

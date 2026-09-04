@@ -1,55 +1,47 @@
+import type { ActionCategoryId } from "./actions";
+import type {
+  AspectRatio,
+  CameraAngle,
+  Framing,
+  TimeOfDay,
+} from "./camera";
+import type {
+  PeopleCount,
+  PersonFields,
+  Relationship,
+} from "./people";
+
 export type Mode = "image" | "video";
 
-export type AspectRatio =
-  | "1:1"
-  | "16:9"
-  | "9:16"
-  | "4:3"
-  | "3:4"
-  | "21:9"
-  | "3:2"
-  | "2:3";
+export type { AspectRatio, CameraAngle, Framing, TimeOfDay };
+export type { PeopleCount, PersonFields, Relationship, ActionCategoryId };
 
-export type QualityTag =
-  | "high detail"
-  | "8k"
-  | "raw"
-  | "cinematic"
-  | "photorealistic"
-  | "sharp focus"
-  | "masterpiece"
-  | "trending";
-
-export interface PromptFormState {
+export interface SceneFormState {
   mode: Mode;
-  subject: string;
-  style: string;
-  customStyle: string;
-  camera: string;
-  lighting: string;
-  composition: string;
-  motion: string;
-  cameraMove: string;
-  duration: string;
+  actionCategory: ActionCategoryId;
+  actionId: string;
+  regionIds: string[];
+  peopleCount: PeopleCount;
+  relationship: Relationship;
+  people: PersonFields[];
+  /** Simplified descriptors when peopleCount === "group" */
+  crowdDescriptors: string;
+  placeId: string;
+  cameraAngle: CameraAngle;
+  framing: Framing;
   aspectRatio: AspectRatio;
-  qualityTags: QualityTag[];
+  timeOfDay: TimeOfDay;
+  extraNotes: string;
   negativePrompt: string;
-  target: string;
 }
+
+/** @deprecated kept for storage compatibility aliases */
+export type PromptFormState = SceneFormState;
 
 export interface BuiltPrompts {
   short: string;
   detailed: string;
   negative: string;
-}
-
-export interface Template {
-  id: string;
-  name: string;
-  description: string;
-  mode: Mode;
-  icon: string;
-  state: Partial<PromptFormState>;
 }
 
 export interface RecentPrompt {
@@ -59,4 +51,13 @@ export interface RecentPrompt {
   subject: string;
   short: string;
   detailed: string;
+}
+
+export interface Template {
+  id: string;
+  name: string;
+  description: string;
+  mode: Mode;
+  icon: string;
+  state: Partial<SceneFormState>;
 }

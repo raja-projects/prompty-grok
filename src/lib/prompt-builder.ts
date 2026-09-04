@@ -1,4 +1,24 @@
-import type { BuiltPrompts, PromptFormState } from "./types";
+import { getActionById, isIntimateAction, randomEverydayOrSocialAction } from "./actions";
+import {
+  CAMERA_ANGLES,
+  FRAMINGS,
+  TIMES_OF_DAY,
+  randomCameraDefaults,
+} from "./camera";
+import {
+  DEFAULT_REGION_IDS,
+  defaultPeopleForCount,
+  regionCues,
+  relationshipBlocksIntimate,
+  type PersonFields,
+} from "./people";
+import { getPlaceById, randomPlace } from "./places";
+import {
+  DEFAULT_NEGATIVE,
+  DEFAULT_QUALITY_PHRASE,
+  sanitizeText,
+} from "./safety";
+import type { BuiltPrompts, SceneFormState } from "./types";
 
 function clean(parts: Array<string | undefined | null | false>): string {
   return parts
@@ -16,129 +36,158 @@ function sentence(parts: Array<string | undefined | null | false>): string {
   return /[.!?]$/.test(text) ? text : `${text}.`;
 }
 
-function resolveStyle(state: PromptFormState): string {
-  if (state.style === "Custom" || state.style === "") {
-    return state.customStyle.trim();
-  }
-  if (state.customStyle.trim()) {
-    return `${state.style}, ${state.customStyle.trim()}`;
-  }
-  return state.style;
-}
-
-function qualityClause(state: PromptFormState): string {
-  return state.qualityTags.length ? state.qualityTags.join(", ") : "";
-}
-
-function aspectClause(state: PromptFormState): string {
-  return state.aspectRatio ? `aspect ratio ${state.aspectRatio}` : "";
-}
-
-function targetHint(state: PromptFormState): string {
-  if (!state.target || state.target === "Generic") return "";
-  if (state.mode === "image") {
-    switch (state.target) {
-      case "Midjourney":
-        return `optimized for Midjourney (--ar ${state.aspectRatio.replace(":", ":")})`;
-      case "Flux":
-        return "Flux-friendly natural language phrasing";
-      case "DALL·E":
-        return "clear DALL·E-style descriptive phrasing";
-      case "Stable Diffusion":
-        return "Stable Diffusion tag-friendly wording";
-      default:
-        return "";
-    }
-  }
-  switch (state.target) {
-    case "Runway":
-      return "Runway Gen video motion cues";
-    case "Kling":
-      return "Kling motion-aware phrasing";
-    case "Luma":
-      return "Luma Dream Machine cinematic motion";
-    case "Sora-style":
-      return "Sora-style continuous camera storytelling";
-    default:
-      return "";
-  }
-}
-
-export function buildPrompts(state: PromptFormState): BuiltPrompts {
-  const style = resolveStyle(state);
-  const quality = qualityClause(state);
-  const aspect = aspectClause(state);
-  const target = targetHint(state);
-
-  if (state.mode === "image") {
-    const short = clean([
-      state.subject,
-      style,
-      state.camera,
-      state.lighting,
-      aspect,
-      quality,
-    ]);
-
-    const detailed = sentence([
-      state.subject,
-      style ? `Style: ${style}` : "",
-      state.camera ? `Camera: ${state.camera}` : "",
-      state.lighting ? `Lighting: ${state.lighting}` : "",
-      state.composition ? `Composition: ${state.composition}` : "",
-      aspect ? `Framing: ${aspect}` : "",
-      quality ? `Quality: ${quality}` : "",
-      target ? `Notes: ${target}` : "",
-    ]);
-
-    return {
-      short,
-      detailed,
-      negative: state.negativePrompt.trim(),
-    };
-  }
-
-  const short = clean([
-    state.subject,
-    style,
-    state.motion,
-    state.cameraMove,
-    state.duration ? `${state.duration} clip` : "",
-    aspect,
-    quality,
+function describePerson(p: PersonFields, index: number): string {
+  const label = `person ${index + 1}`;
+  return clean([
+    `${label}: ${p.gender}`,
+    `age ${p.ageBand}`,
+    `${p.skinTone} skin tone`,
+    `${p.bodyType} build`,
+    `${p.hairColor} ${p.hairStyle} hair`,
+    `wearing ${p.dress}`,
+    `${p.fashionVibe} vibe`,
   ]);
+}
 
-  const detailed = sentence([
-    state.subject,
-    style ? `Style: ${style}` : "",
-    state.motion ? `Motion: ${state.motion}` : "",
-    state.cameraMove ? `Camera move: ${state.cameraMove}` : "",
-    state.duration ? `Duration: ${state.duration}` : "",
-    aspect ? `Framing: ${aspect}` : "",
-    quality ? `Quality: ${quality}` : "",
-    target ? `Notes: ${target}` : "",
-  ]);
+function peopleBlock(state: SceneFormState): string {
+  if (state.peopleCount === "group") {
+    const crowd = sanitizeText(state.crowdDescriptors) ||
+      "a diverse adult group, ages 18 and above, natural expressions";
+    return `group of five or more adults (${crowd})`;
+  }
+  const n = Number(state.peopleCount);
+  const listed = state.people
+    .slice(0, n)
+    .map((p, i) => describePerson(p, i))
+    .join("; ");
+  return listed || `${n} adult${n > 1 ? "s" : ""}`;
+}
 
+function relationshipPhrase(state: SceneFormState): string {
+  if (state.peopleCount === "1") return "";
+  return `${state.relationship} relationship`;
+}
+
+function lightingFor(state: SceneFormState): string {
+  return TIMES_OF_DAY.find((t) => t.id === state.timeOfDay)?.lighting ?? "";
+}
+
+function cameraPhrase(state: SceneFormState): string {
+  const angle =
+    CAMERA_ANGLES.find((a) => a.id === state.cameraAngle)?.prompt ?? "";
+  const framing =
+    FRAMINGS.find((f) => f.id === state.framing)?.prompt ?? "";
+  return clean([angle, framing, `aspect ratio ${state.aspectRatio}`]);
+}
+
+function enforceRelationshipSafety(state: SceneFormState): SceneFormState {
+  const blocked = relationshipBlocksIntimate(state.relationship);
+  if (!blocked) return state;
+  if (!isIntimateAction(state.actionId)) return state;
+  const fallback = randomEverydayOrSocialAction();
   return {
-    short,
-    detailed,
-    negative: state.negativePrompt.trim(),
+    ...state,
+    actionCategory: fallback.category,
+    actionId: fallback.id,
   };
 }
 
-export const DEFAULT_FORM: PromptFormState = {
+export function buildPrompts(raw: SceneFormState): BuiltPrompts {
+  const state = enforceRelationshipSafety(raw);
+  const action = getActionById(state.actionId);
+  const place = getPlaceById(state.placeId);
+  const actionText = action?.prompt ?? "posed naturally";
+  const placeText = place?.prompt ?? "an everyday setting";
+  const regions = regionCues(state.regionIds);
+  const people = peopleBlock(state);
+  const rel = relationshipPhrase(state);
+  const lighting = lightingFor(state);
+  const camera = cameraPhrase(state);
+  const notes = sanitizeText(state.extraNotes);
+  const quality = DEFAULT_QUALITY_PHRASE;
+
+  const short = sanitizeText(
+    clean([
+      people,
+      rel,
+      regions ? `appearance cues: ${regions}` : "",
+      actionText,
+      `at ${placeText}`,
+      `${state.timeOfDay} lighting`,
+      camera,
+      quality,
+      state.mode === "video" ? "cinematic motion, natural movement" : "",
+      notes,
+    ])
+  );
+
+  const detailed = sanitizeText(
+    sentence([
+      `Photorealistic real photograph of ${people}`,
+      rel ? `They share a ${rel}` : "",
+      regions ? `Cultural/appearance cues: ${regions}` : "",
+      `Action: ${actionText}`,
+      `Setting: ${placeText}`,
+      `Time: ${state.timeOfDay} with ${lighting}`,
+      `Camera: ${camera}`,
+      `Quality: ${quality}`,
+      state.mode === "video"
+        ? "Motion: natural continuous movement suitable for short video"
+        : "Still image with documentary realism",
+      notes ? `Notes: ${notes}` : "",
+    ])
+  );
+
+  const negative = sanitizeText(
+    state.negativePrompt.trim() || DEFAULT_NEGATIVE
+  );
+
+  return { short, detailed, negative };
+}
+
+export function createRandomizedDefaults(): SceneFormState {
+  const action = randomEverydayOrSocialAction();
+  const cam = randomCameraDefaults();
+  const place = randomPlace(action.placeHints);
+  const peopleCount = Math.random() < 0.65 ? "2" : "1";
+  const relationship = peopleCount === "2" ? "couple" : "friends";
+
+  return {
+    mode: "image",
+    actionCategory: action.category,
+    actionId: action.id,
+    regionIds: [...DEFAULT_REGION_IDS],
+    peopleCount,
+    relationship,
+    people: defaultPeopleForCount(peopleCount),
+    crowdDescriptors:
+      "mixed adult ages 18+, Kerala–Tamil inspired attire, natural candid expressions",
+    placeId: place.id,
+    cameraAngle: cam.cameraAngle,
+    framing: cam.framing,
+    aspectRatio: cam.aspectRatio,
+    timeOfDay: cam.timeOfDay,
+    extraNotes: "",
+    negativePrompt: DEFAULT_NEGATIVE,
+  };
+}
+
+/** Static seed used until client hydration randomizes */
+export const DEFAULT_FORM: SceneFormState = {
   mode: "image",
-  subject: "",
-  style: "Cinematic",
-  customStyle: "",
-  camera: "35mm lens",
-  lighting: "Soft natural light",
-  composition: "Rule of thirds",
-  motion: "Slow cinematic push-in",
-  cameraMove: "Dolly in",
-  duration: "5 seconds",
-  aspectRatio: "16:9",
-  qualityTags: ["high detail", "cinematic"],
-  negativePrompt: "",
-  target: "Midjourney",
+  actionCategory: "everyday",
+  actionId: "walking",
+  regionIds: [...DEFAULT_REGION_IDS],
+  peopleCount: "2",
+  relationship: "couple",
+  people: defaultPeopleForCount("2"),
+  crowdDescriptors:
+    "mixed adult ages 18+, Kerala–Tamil inspired attire, natural candid expressions",
+  placeId: "beach-kerala",
+  cameraAngle: "3/4",
+  framing: "full-body",
+  aspectRatio: "3:4",
+  timeOfDay: "evening",
+  extraNotes: "",
+  negativePrompt: DEFAULT_NEGATIVE,
 };

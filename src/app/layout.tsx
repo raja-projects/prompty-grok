@@ -19,9 +19,9 @@ const display = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Prompty — Image & Video Prompt Lab",
+  title: "Prompty — People Scene Prompt Lab",
   description:
-    "Craft high-quality prompts for Midjourney, Flux, DALL·E, Stable Diffusion, Runway, Kling, Luma, and Sora-style generators.",
+    "Build photorealistic adult people scene prompts with soft romance language, Kerala–Tamil defaults, camera and lighting controls.",
   applicationName: "Prompty",
   icons: { icon: "/favicon.svg" },
 };
