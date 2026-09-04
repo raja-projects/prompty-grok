@@ -69,6 +69,7 @@ export function PersonCard({
   onSelectFavorite,
   onSaveFavorite,
   saveLabel = "Save favorite",
+  allowUnder19 = false,
 }: {
   index: number;
   person: PersonFields;
@@ -78,11 +79,13 @@ export function PersonCard({
   onSelectFavorite: (favorite: FavoritePerson) => void;
   onSaveFavorite: () => void;
   saveLabel?: string;
+  allowUnder19?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const isWoman = person.gender === "woman";
+  const isMinor = Number(person.age) < 19;
   const pool: "general" | "known" =
-    isWoman && (person.faceCutPool === "known" || isKnownFaceId(person.faceCutId))
+    isWoman && !isMinor && (person.faceCutPool === "known" || isKnownFaceId(person.faceCutId))
       ? "known"
       : "general";
   const knownLocked = isWoman && pool === "known";
@@ -105,6 +108,10 @@ export function PersonCard({
 
   function patch(partial: Partial<PersonFields>) {
     let next: PersonFields = { ...person, ...partial };
+
+    if (Number(next.age) < 19) {
+      next.faceCutPool = "general";
+    }
 
     if (partial.gender && partial.gender !== person.gender) {
       const g = partial.gender as Gender;
@@ -211,7 +218,7 @@ export function PersonCard({
           </div>
         </label>
 
-        {isWoman ? (
+        {isWoman && !isMinor ? (
           <label className="block space-y-1 sm:col-span-2">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
               Face source
@@ -270,7 +277,7 @@ export function PersonCard({
         <SelectField
           label="Age (exact year)"
           value={display.age}
-          options={AGES}
+          options={allowUnder19 ? AGES : AGES.filter((age) => Number(age) >= 19)}
           disabled={knownLocked}
           onChange={(v) => patch({ age: v })}
         />

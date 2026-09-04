@@ -23,6 +23,7 @@ import {
   defaultFoursomeSwapPeople,
   defaultMmfPeople,
   defaultMmmfPeople,
+  defaultFiveCouplesPeople,
   defaultFfmPeople,
   defaultCrowdPressPeople,
   defaultWlwPeople,
@@ -206,6 +207,16 @@ export function PromptLab() {
     setForm((prev) => {
       const next: SceneFormState = { ...prev, ...partial };
 
+      // Minor ages are available only in the three safe, non-romantic categories.
+      if (partial.actionCategory && categoryRequiresAdult21(partial.actionCategory)) {
+        next.people = next.people.map((person) =>
+          Number(person.age) < 19 ? { ...person, age: "19" } : person
+        );
+        next.groupPeople = (next.groupPeople ?? []).map((person) =>
+          Number(person.age) < 19 ? { ...person, age: "19" } : person
+        );
+      }
+
       if (partial.peopleCount && partial.peopleCount !== prev.peopleCount) {
         next.people = adjustPeopleCount(prev.people, partial.peopleCount);
         // Do not force relationship change.
@@ -266,6 +277,7 @@ export function PromptLab() {
         next.peopleCount = "group";
         next.relationship = "friends";
         next.crowdDescriptors = "exactly five established adult couples, ten consenting adults age 19+, dressed for a stylish private couples party, every face distinct and visible";
+        next.groupPeople = defaultFiveCouplesPeople();
         const first = ACTIONS.find((a) => a.category === "five-couples-games");
         if (first) {
           next.actionId = first.id;
@@ -409,6 +421,15 @@ export function PromptLab() {
     } else {
       setFavoritePeople(saveFavoritePerson(name, person));
     }
+  }
+
+  function saveGroupPersonAsFavorite(person: SceneFormState["people"][number], index: number) {
+    const editingId = editingFavoriteIds[index];
+    const current = favoritePeople.find((favorite) => favorite.id === editingId);
+    const name = window.prompt(editingId ? "Update this favorite person's name" : "Name this favorite person", current?.name ?? `Couple member ${index + 1}`);
+    if (name === null) return;
+    setFavoritePeople(editingId ? updateFavoritePerson(editingId, name, person) : saveFavoritePerson(name, person));
+    if (editingId) setEditingFavoriteIds((ids) => Object.fromEntries(Object.entries(ids).filter(([slot]) => Number(slot) !== index)));
   }
 
   const visibleCategories = ACTION_CATEGORIES.filter((c) => {
@@ -601,15 +622,19 @@ export function PromptLab() {
             hint="Pick saved people from each dropdown; edit details only when needed"
           >
             <div className="grid gap-3 sm:grid-cols-2">
-              <SoftSelect
-                label="People count"
-                value={form.peopleCount}
-                options={PEOPLE_COUNTS.map((p) => ({
-                  id: p.id,
-                  label: p.label,
-                }))}
-                onChange={(id) => patch({ peopleCount: id as PeopleCount })}
-              />
+              {form.actionCategory === "five-couples-games" ? (
+                <label className="block">
+                  <FieldLabel>People count</FieldLabel>
+                  <div className="rounded-xl border border-prompty-accent2/30 bg-prompty-accent2/10 px-3 py-2.5 text-sm text-white">10 people · 5 couples</div>
+                </label>
+              ) : (
+                <SoftSelect
+                  label="People count"
+                  value={form.peopleCount}
+                  options={PEOPLE_COUNTS.map((p) => ({ id: p.id, label: p.label }))}
+                  onChange={(id) => patch({ peopleCount: id as PeopleCount })}
+                />
+              )}
               {form.peopleCount !== "1" ? (
                 <SoftSelect
                   label="Relationship"
@@ -665,6 +690,47 @@ export function PromptLab() {
 
             {form.peopleCount === "group" ? (
               <div className="space-y-3">
+                {form.actionCategory === "five-couples-games" ? (
+                  <div className="space-y-4">
+                    <div className="rounded-xl border border-prompty-accent2/25 bg-prompty-accent2/10 px-3 py-2 text-xs text-prompty-accent2">
+                      Enter all five couples separately. Each person can also be loaded from or saved to favorites.
+                    </div>
+                    {Array.from({ length: 5 }, (_, coupleIndex) => (
+                      <section key={coupleIndex} className="rounded-2xl border border-prompty-border bg-prompty-bg/35 p-3">
+                        <h4 className="mb-3 text-sm font-semibold text-white">Couple {coupleIndex + 1}</h4>
+                        <div className="grid gap-3 xl:grid-cols-2">
+                          {[coupleIndex * 2, coupleIndex * 2 + 1].map((personIndex) => {
+                            const person = (form.groupPeople ?? [])[personIndex];
+                            if (!person) return null;
+                            return (
+                              <PersonCard
+                                key={personIndex}
+                                index={personIndex}
+                                person={person}
+                                regionIds={form.regionIds}
+                                favoritePeople={favoritePeople}
+                                onSelectFavorite={(favorite) => {
+                                  const groupPeople = [...(form.groupPeople ?? [])];
+                                  groupPeople[personIndex] = { ...favorite.person };
+                                  patch({ groupPeople });
+                                  setEditingFavoriteIds((ids) => ({ ...ids, [personIndex]: favorite.id }));
+                                }}
+                                onSaveFavorite={() => saveGroupPersonAsFavorite(person, personIndex)}
+                                saveLabel={editingFavoriteIds[personIndex] ? "Update favorite" : "Save favorite"}
+                                allowUnder19={false}
+                                onChange={(updated) => {
+                                  const groupPeople = [...(form.groupPeople ?? [])];
+                                  groupPeople[personIndex] = updated;
+                                  patch({ groupPeople });
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
+                ) : <>
                 <div>
                   <FieldLabel>Favorite people in this group</FieldLabel>
                   {favoritePeople.length ? (
@@ -710,6 +776,7 @@ export function PromptLab() {
                     className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
                   />
                 </label>
+                </>}
               </div>
             ) : (
               <>
@@ -738,6 +805,7 @@ export function PromptLab() {
                       }}
                       onSaveFavorite={() => savePersonAsFavorite(person, i)}
                       saveLabel={editingFavoriteIds[i] ? "Update favorite" : "Save favorite"}
+                      allowUnder19={["everyday", "social", "physical"].includes(form.actionCategory)}
                       onChange={(p) => {
                         const people = [...form.people];
                         people[i] = p;

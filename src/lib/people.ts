@@ -47,8 +47,8 @@ export interface PersonFields {
 }
 
 /** Individual ages for the picker — not ranges. */
-/** Ages 18–80. Under 19 only for everyday/social — Intimate/Hardcore/Romance blocked. */
-export const AGES: Age[] = Array.from({ length: 63 }, (_, i) => String(18 + i));
+/** Ages 10–80. Ages under 19 are exposed only for everyday/social/physical scenes. */
+export const AGES: Age[] = Array.from({ length: 71 }, (_, i) => String(10 + i));
 
 export function ageNumber(age: Age | string | undefined): number {
   const n = Number(age);
@@ -340,6 +340,18 @@ export const YOUNG_ADULT_BODY_BY_GENDER: Record<Gender, string[]> = {
   ],
 };
 
+export const PRETEEN_BODY_BY_GENDER: Record<Gender, string[]> = {
+  woman: ["Age-appropriate average child build", "Slim child build", "Active child build", "Sturdy child build", "Tall-for-age child build"],
+  man: ["Age-appropriate average child build", "Slim child build", "Active child build", "Sturdy child build", "Tall-for-age child build"],
+  nonbinary: ["Age-appropriate average child build", "Slim child build", "Active child build", "Sturdy child build", "Tall-for-age child build"],
+};
+
+export const TEEN_BODY_BY_GENDER: Record<Gender, string[]> = {
+  woman: ["Age-appropriate average teen build", "Slim teen build", "Athletic teen build", "Soft teen build", "Tall lean teen build"],
+  man: ["Age-appropriate average teen build", "Slim teen build", "Athletic teen build", "Stocky teen build", "Tall lean teen build"],
+  nonbinary: ["Age-appropriate average teen build", "Slim teen build", "Athletic teen build", "Soft teen build", "Tall lean teen build"],
+};
+
 const AGE_19_20_WOMAN_BODY_TYPES = [
   "youth body and youth face",
   "small body and small face",
@@ -349,6 +361,8 @@ const AGE_19_20_WOMAN_BODY_TYPES = [
 
 export function bodyTypesForAge(gender: Gender, age: Age | string | undefined): string[] {
   const n = ageNumber(age);
+  if (n >= 10 && n <= 12) return PRETEEN_BODY_BY_GENDER[gender];
+  if (n >= 13 && n <= 18) return TEEN_BODY_BY_GENDER[gender];
   if ((n === 19 || n === 20) && gender === "woman") return AGE_19_20_WOMAN_BODY_TYPES;
   if (isUnder21(age) || n === 19 || n === 20) return YOUNG_ADULT_BODY_BY_GENDER[gender];
   return BODY_BY_GENDER[gender];
@@ -518,6 +532,25 @@ export function defaultMmmfPeople(): PersonFields[] {
     defaultPerson({ gender: "man", age: "34", dressId: "m-formal-undone", hairStyle: "Short neat", bodyType: "Broad-shouldered" }),
     defaultPerson({ gender: "man", age: "39", dressId: "m-tee-shorts", hairStyle: "Side part", bodyType: "Tall lean" }),
   ];
+}
+
+export function defaultFiveCouplesPeople(): PersonFields[] {
+  return Array.from({ length: 10 }, (_, index) => {
+    const isWoman = index % 2 === 0;
+    return defaultPerson({
+      gender: isWoman ? "woman" : "man",
+      age: String(23 + index * 2),
+      dressId: isWoman
+        ? index % 4 === 0
+          ? "w-kerala-cotton-sexy"
+          : "w-skinfit-jeans-tiny-blouse"
+        : index % 4 === 1
+          ? "m-tee-shorts"
+          : "m-formal-undone",
+      hairStyle: isWoman ? "Long wavy" : index % 4 === 1 ? "Short neat" : "Side part",
+      bodyType: isWoman ? (index % 4 === 0 ? "Curvy" : "Slim") : (index % 4 === 1 ? "Athletic" : "Broad-shouldered"),
+    });
+  });
 }
 
 export function defaultFoursomeSwapPeople(): PersonFields[] {

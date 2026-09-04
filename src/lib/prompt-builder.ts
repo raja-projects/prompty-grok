@@ -71,7 +71,11 @@ function describePerson(p: PersonFields, index: number, regionIds?: string[]): s
       : "",
     `${locked.hairColor} ${locked.hairStyle} hair`,
     face ? `face: ${face}` : "",
-    locked.gender === "woman" ? "beautiful and attractive" : "",
+    locked.gender === "woman"
+      ? Number(ageNum) < 19
+        ? "age-appropriate natural appearance, no adult styling"
+        : "beautiful and attractive"
+      : "",
     `wearing complete outfit: ${dress}`,
     `${locked.fashionVibe} vibe`,
   ]);
@@ -125,6 +129,9 @@ function femaleFaceVisibleCue(state: SceneFormState): string {
 
 function femaleBeautyCue(state: SceneFormState): string {
   if (!sceneHasWoman(state)) return "";
+  if (state.peopleCount !== "group" && state.people.some((person) => person.gender === "woman" && Number(person.age) < 19)) {
+    return "age-appropriate natural appearance with no adult glamour or sexualization";
+  }
   return "she looks beautiful and attractive";
 }
 

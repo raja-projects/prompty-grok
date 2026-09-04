@@ -675,20 +675,24 @@ function age19To20FaceCuts(gender: Gender): FaceCut[] {
   }));
 }
 
+function minorFaceCuts(gender: Gender, age: number): FaceCut[] {
+  const base = FACE_CUTS_BY_GENDER[gender];
+  const band = age <= 12 ? "pre-teen" : "teen";
+  const identity = gender === "woman" ? "girl" : gender === "man" ? "boy" : "young person";
+  const shapes = ["oval", "soft round", "gentle square", "heart-shaped", "long oval", "soft diamond"];
+  return base.map((face, index) => ({
+    id: `${band}-${face.id}`,
+    label: `${age <= 12 ? "Pre-teen" : "Teen"} ${identity} · ${face.label.replace(/^#[0-9]+\s*/, "")}`,
+    regionIds: face.regionIds,
+    prompt: `clearly ${age} years old, age-appropriate ${band} ${identity}, natural ${shapes[index % shapes.length]} face, youthful facial proportions, natural brows and eyes, healthy everyday appearance, realistic unretouched skin, no makeup styling, no adult glamour, no sexualization`,
+  }));
+}
+
 function allCutsForAge(gender: Gender, age?: string, pool?: FaceCutPool): FaceCut[] {
   const n = Number(age);
   const useKnown = pool === "known";
   if (Number.isFinite(n) && n < 19) {
-    // Known celebrity library is 19+ framing; under 19 stays on YA general cuts
-    if (useKnown) {
-      // fall back to YA general — no celebrity pool for under 19
-      if (gender === "woman") return YOUNG_ADULT_WOMAN_FACE_CUTS;
-      if (gender === "man") return YOUNG_ADULT_MAN_FACE_CUTS;
-      return YOUNG_ADULT_NONBINARY_FACE_CUTS;
-    }
-    if (gender === "woman") return YOUNG_ADULT_WOMAN_FACE_CUTS;
-    if (gender === "man") return YOUNG_ADULT_MAN_FACE_CUTS;
-    return YOUNG_ADULT_NONBINARY_FACE_CUTS;
+    return minorFaceCuts(gender, n);
   }
   if (Number.isFinite(n) && (n === 19 || n === 20) && !useKnown) {
     return age19To20FaceCuts(gender);
@@ -743,6 +747,12 @@ export function getFaceCut(
     ...YOUNG_ADULT_WOMAN_FACE_CUTS,
     ...YOUNG_ADULT_MAN_FACE_CUTS,
     ...YOUNG_ADULT_NONBINARY_FACE_CUTS,
+    ...minorFaceCuts("woman", 12),
+    ...minorFaceCuts("woman", 16),
+    ...minorFaceCuts("man", 12),
+    ...minorFaceCuts("man", 16),
+    ...minorFaceCuts("nonbinary", 12),
+    ...minorFaceCuts("nonbinary", 16),
   ];
   const hit = pools.find((f) => f.id === id);
   if (hit) return hit;
