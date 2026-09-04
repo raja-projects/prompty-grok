@@ -64,10 +64,12 @@ export const FORBIDDEN_TERMS = SOFT_FORBIDDEN;
 
 export const DEFAULT_NEGATIVE =
   "face blush, underage, pre-teen, child, deformed, blurry, watermark, low quality, " +
-  "extra limbs, bad anatomy, text overlay, logo";
+  "extra limbs, bad anatomy, text overlay, logo, " +
+  "female face hidden, woman face obscured, back of head only, faceless woman, " +
+  "cropped female face, woman looking fully away with no visible face";
 
 export const DEFAULT_QUALITY_PHRASE =
-  "photorealistic, high clarity, real photograph look, sharp focus, natural skin texture, natural colors, crisp detail";
+  "photorealistic, high clarity, real photograph look, sharp focus, natural skin texture, natural colors, crisp detail, clear visible female faces when women are present";
 
 export type SanitizeMode = "soft" | "hardcore";
 

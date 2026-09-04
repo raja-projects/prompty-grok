@@ -72,6 +72,32 @@ function lightingFor(state: SceneFormState): string {
   return TIMES_OF_DAY.find((t) => t.id === state.timeOfDay)?.lighting ?? "";
 }
 
+
+function sceneHasWoman(state: SceneFormState): boolean {
+  if (state.peopleCount === "group") return true;
+  const n = Number(state.peopleCount);
+  return state.people.slice(0, n).some((p) => p.gender === "woman");
+}
+
+/** Hard rule: every woman/female face stays visible in any angle or pose. */
+function femaleFaceVisibleCue(state: SceneFormState): string {
+  if (!sceneHasWoman(state)) return "";
+  const rear =
+    state.cameraAngle === "back" || state.cameraAngle === "over-shoulder";
+  const base =
+    "HARD RULE: every woman's face must be clearly visible in frame — never hide, crop out, or show only the back of a female head";
+  if (rear) {
+    return (
+      base +
+      "; even from a back or over-shoulder angle, she turns her head over her shoulder (or looks back) so her face is readable somewhere in the shot"
+    );
+  }
+  return (
+    base +
+    "; in any pose or angle she turns or angles enough that her face remains visible"
+  );
+}
+
 function cameraPhrase(state: SceneFormState): string {
   const angle =
     CAMERA_ANGLES.find((a) => a.id === state.cameraAngle)?.prompt ?? "";
@@ -111,6 +137,8 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
         ? "Solo adult self-touch only if the selected action is explicitly a solo self-touch action"
         : "";
 
+  const faceVisibleCue = femaleFaceVisibleCue(state);
+
   const notes = sanitizeText(state.extraNotes, sanitizeMode);
   const quality = DEFAULT_QUALITY_PHRASE;
 
@@ -121,6 +149,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       regions ? `appearance cues: ${regions}` : "",
       actionText,
       partnerAgencyCue,
+      faceVisibleCue,
       `at ${placeText}`,
       `${state.timeOfDay} lighting`,
       camera,
@@ -138,6 +167,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       `Action: ${actionText}${partnerAgencyCue ? `. ${partnerAgencyCue}` : ""}`,
       `Setting: ${placeText}`,
       `Time: ${state.timeOfDay} with ${lighting}`,
+      faceVisibleCue ? `Face visibility: ${faceVisibleCue}` : "",
       `Camera: ${camera}`,
       `Quality: ${quality}`,
       state.mode === "video"
