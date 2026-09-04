@@ -3,7 +3,8 @@ export type ActionCategoryId =
   | "social"
   | "physical"
   | "romance"
-  | "intimate";
+  | "intimate"
+  | "hardcore";
 
 export interface ActionItem {
   id: string;
@@ -45,7 +46,13 @@ export const ACTION_CATEGORIES: {
   {
     id: "intimate",
     label: "Intimate (intense)",
-    description: "Soft → hard scenes in indirect wording only — no explicit terms",
+    description: "Heated closeness with softer phrasing",
+    restricted: true,
+  },
+  {
+    id: "hardcore",
+    label: "Hardcore (21+)",
+    description: "Direct action phrasing from heated scenes — adults 21+ only",
     restricted: true,
   },
 ];
@@ -324,13 +331,95 @@ export const ACTIONS: ActionItem[] = [
   { id: "navel-to-lower-trail", label: "Navel-to-lower kiss trail", prompt: "a kiss trail from the navel traveling lower with heated patience", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
   { id: "underarm-to-chest-path", label: "Underarm to chest path", prompt: "mouth traveling from soft underarm to sensitive chest peaks", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
 
+
+  // Intimate — classic positions & acts as soft euphemisms ONLY (no banned terms)
+  { id: "face-to-face-on-bedding", label: "Face-to-face on soft bedding", prompt: "face-to-face on soft bedding in a close shared rhythm", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "classic-cover-closeness", label: "Classic cover closeness", prompt: "classic cover closeness, bodies aligned face to face", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "kneeling-forward-hold", label: "Kneeling-forward heated hold", prompt: "kneeling forward in a heated hold from behind", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "on-all-fours-closeness", label: "On all fours closeness", prompt: "on all fours with a close heated hold from behind", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "bent-forward-shared-rhythm", label: "Bent-forward shared rhythm", prompt: "bent forward into a deep shared rhythm of closeness", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "seated-over-devoted-mouth", label: "Seated over a devoted mouth", prompt: "seated over a devoted mouth in private heated attention", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "straddled-above-waiting-mouth", label: "Straddled above a waiting mouth", prompt: "straddled above a waiting mouth with gentle guided closeness", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "nested-side-lying-closeness", label: "Nested side-lying closeness", prompt: "nested close side by side in a quiet heated rhythm", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "curled-close-from-behind", label: "Curled close from behind", prompt: "curled close from behind in soft heated intimacy", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "side-lying-shared-rhythm", label: "Side-lying shared rhythm", prompt: "side-lying together in a slow shared rhythm", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "astride-rising-rhythm", label: "Astride in a rising rhythm", prompt: "seated astride in a rising and falling shared rhythm", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "riding-from-above", label: "Guiding rhythm from above", prompt: "guiding the shared rhythm from above while seated astride", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "reversed-astride-hold", label: "Reversed astride hold", prompt: "reversed astride hold facing away in a heated rhythm", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "lifted-in-arms-rhythm", label: "Lifted in arms shared rhythm", prompt: "lifted into strong arms in a standing shared rhythm", category: "intimate", placeHints: ["bedroom", "home-interior", "hotel"], minPeople: 2 },
+  { id: "held-aloft-closeness", label: "Held aloft in closeness", prompt: "held aloft against a partner in intense shared closeness", category: "intimate", placeHints: ["bedroom", "home-interior"], minPeople: 2 },
+  { id: "carried-to-wall-heat", label: "Carried into wall heat", prompt: "carried and pressed into wall-side heated closeness", category: "intimate", placeHints: ["home-interior", "hotel"], minPeople: 2 },
+  { id: "wall-pressed-shared-rhythm", label: "Wall-pressed shared rhythm", prompt: "pressed to the wall in a heated shared rhythm", category: "intimate", placeHints: ["home-interior", "bedroom", "hotel"], minPeople: 2 },
+  { id: "standing-wall-embrace-heat", label: "Standing wall embrace heat", prompt: "standing wall embrace turning into heated shared rhythm", category: "intimate", placeHints: ["home-interior", "hotel"], minPeople: 2 },
+  { id: "joined-at-rear-warmth", label: "Joined at private rear warmth", prompt: "joined carefully at private rear warmth with full consent", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "deep-rear-shared-rhythm", label: "Deep rear shared rhythm", prompt: "a deep careful shared rhythm at private rear warmth", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "taken-into-waiting-mouth", label: "Taken into a waiting mouth", prompt: "heated length taken into a waiting mouth with slow rhythm", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "mouth-claimed-with-rhythm", label: "Mouth claimed with rhythm", prompt: "a willing mouth claimed with a careful heated rhythm", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "guided-face-to-hardness", label: "Guided face to heated hardness", prompt: "gently guided face-to-face with heated hardness", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "holding-while-mouth-receives", label: "Holding while mouth receives", prompt: "hands holding softly while a devoted mouth receives", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "self-touch-intimate-warmth", label: "Self-touch of intimate warmth", prompt: "alone exploring intimate warmth with skilled fingers", category: "intimate", placeHints: ["bedroom"], minPeople: 1 },
+  { id: "woman-self-caress-private", label: "Private self-caress", prompt: "a private self-caress of intimate warmth with half-lidded eyes", category: "intimate", placeHints: ["bedroom"], minPeople: 1 },
+  { id: "fingers-self-rhythm", label: "Fingers in a private rhythm", prompt: "fingers moving in a private self-focused rhythm", category: "intimate", placeHints: ["bedroom"], minPeople: 1 },
+  { id: "self-stroke-heated-length", label: "Self-stroke of heated length", prompt: "alone stroking heated length with a steady hand", category: "intimate", placeHints: ["bedroom"], minPeople: 1 },
+  { id: "man-private-self-hold", label: "Private self-hold on hardness", prompt: "a private self-hold working heated hardness slowly", category: "intimate", placeHints: ["bedroom"], minPeople: 1 },
+  { id: "watched-self-touch", label: "Watched private self-touch", prompt: "private self-touch while held in a partner's heated gaze", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "mutual-self-touch-close", label: "Mutual self-touch up close", prompt: "mutual self-touch while pressed close together", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "deep-tongue-entwine", label: "Deep intertwining tongue kiss", prompt: "a deep kiss with tongues intertwining slowly", category: "intimate", placeHints: ["bedroom", "balcony", "home-interior"], minPeople: 2 },
+  { id: "deep-open-mouth-kiss", label: "Deep open-mouth kiss", prompt: "a deep open-mouth kiss full of quiet hunger", category: "intimate", placeHints: ["bedroom", "home-interior"], minPeople: 2 },
+  { id: "breath-stealing-kiss", label: "Breath-stealing deep kiss", prompt: "a breath-stealing deep kiss that lingers", category: "intimate", placeHints: ["bedroom", "wall"], minPeople: 2 },
+  { id: "kiss-until-dizzy", label: "Kissing until dizzy", prompt: "kissing deeply until both feel dizzy with closeness", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "lap-facing-shared-rhythm", label: "Lap-facing shared rhythm", prompt: "facing each other in a lap hold with shared rhythm", category: "intimate", placeHints: ["sofa", "bedroom"], minPeople: 2 },
+  { id: "edge-of-bed-standing", label: "Edge-of-bedding standing heat", prompt: "at the edge of the bedding in standing heated closeness", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "prone-soft-cover", label: "Prone soft cover closeness", prompt: "lying prone under soft cover in a close heated rhythm", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "lotus-close-hold", label: "Seated lotus-close hold", prompt: "seated wrapped close face-to-face in a slow shared rhythm", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "one-leg-guided-close", label: "One leg guided close", prompt: "one leg guided close for deeper face-to-face closeness", category: "intimate", placeHints: ["bedroom"], minPeople: 2 },
+
+
+  // Hardcore (21+) — direct action phrasing from user scene examples (adults only)
+  { id: "hc-face-into-central-curve", label: "Face pressed into central curve", prompt: "leaning his face down deep into her central curve at the lower waist, hands firmly gripping her waist while her fingers tangle tightly in his hair pulling his head firmly down against her skin", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-palm-pressure-center-brief", label: "Palm pressure on center brief", prompt: "her palm applies firm steady pressure on his front upper inner thighs on his center brief, warm friction while his breathing deepens", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-grip-tighten-center", label: "Grip tightens and holds steady", prompt: "reaching down between them, palm applying firm steady pressure on his front upper inner thighs on his center brief as her grip tightens and holds him steady while he leans his head back breathing deeply", category: "hardcore", placeHints: ["bedroom", "boat-house", "park", "storeroom"], minPeople: 2 },
+  { id: "hc-hands-into-inner-thigh-shorts", label: "Hands deep into upper inner thigh of shorts", prompt: "kneeling slightly behind her while she rests her hands on a desk, driving his hands deep into the upper inner thigh and lower pelvic region of her light track shorts, fabric pulling taut with intense material strain creating a sharp outline of his gripping hands", category: "hardcore", placeHints: ["mall-office", "office"], minPeople: 2 },
+  { id: "hc-hand-into-shorts-front-band", label: "Hand into lower front center band", prompt: "standing closely behind her as she leans against the wall, driving his hand firmly into the lower front center band of her track shorts, soft fabric pulling taut under his unyielding squeeze creating a sharp outline", category: "hardcore", placeHints: ["mall-corridor", "home-interior"], minPeople: 2 },
+  { id: "hc-leg-lifted-wall-chest-press", label: "Leg lifted to wall with chest press", prompt: "she stands with her back against the wall, one leg lifted; he presses tightly against her from the front, one hand under her thigh and the other pressing her breast, her face showing a hot expression looking at him", category: "hardcore", placeHints: ["bedroom", "home-interior"], minPeople: 2 },
+  { id: "hc-hands-deep-into-backside", label: "Hands deep into soft lower backside", prompt: "pressing both hands firmly and deeply into the soft lower curves of her backside while his body stays tightly against hers, fabric strongly indented", category: "hardcore", placeHints: ["bedroom", "pool", "beach-kerala", "waterfall"], minPeople: 2 },
+  { id: "hc-thigh-catch-between-legs", label: "Catching inner thigh between thighs", prompt: "she catches his inner thigh in between her thighs and reaches to the top with her hand while he presses both hands firmly into the soft lower curves of her backside", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-face-into-backside-crease", label: "Face pressed into backside fabric crease", prompt: "she is bent forward with hands on the sofa; he kneels low behind her with his face pressed tightly into the soft fabric crease of her backside, mouth moving slowly against the fabric", category: "hardcore", placeHints: ["sofa", "bedroom"], minPeople: 2 },
+  { id: "hc-self-press-lower-front-uniform", label: "Self-press soft lower front through fabric", prompt: "one hand pressing the soft lower front of his body through the uniform fabric in an urgent holding manner while eyes locked on her", category: "hardcore", placeHints: ["kitchen"], minPeople: 1 },
+  { id: "hc-kneeling-between-raised-knees", label: "Kneeling between raised knees", prompt: "she lies flat on her back across the bed with knees raised; he kneels directly between her legs, leaning his upper body close over her lower torso to press deep passionate contact against her body", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-straddle-away-pull-down", label: "Straddling away pulled down firmly", prompt: "she is straddling him facing away leaning forward; his hands locked on her waist pulling her down firmly with each slow movement so the soft lower curves press deeply against him through the fabric", category: "hardcore", placeHints: ["sofa", "bedroom"], minPeople: 2 },
+  { id: "hc-bent-forward-waist-grip-rhythm", label: "Bent forward waist grip rhythm", prompt: "she leans forward supported on the bed; he presses closely behind her, hands gripping her waist firmly with slow rhythmic pressing movements against her lower curves", category: "hardcore", placeHints: ["bedroom", "sofa"], minPeople: 2 },
+  { id: "hc-all-fours-hands-in-crease", label: "On all fours hands into fabric crease", prompt: "she is on all fours on the bed, head turned back looking at him; both his hands press firmly and exactly into the deep fabric crease of her soft lower curves, body weight close behind her", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-pool-straddle-backside-grip", label: "Pool straddle backside grip", prompt: "she straddles his waist in the water, rear profile to camera; he wraps his arms around her lower waist planting his hands deep into the soft flesh of her lower backside, stretching wet fabric into a heavy distinct indentation", category: "hardcore", placeHints: ["pool"], minPeople: 2 },
+  { id: "hc-hover-straddle-face-close", label: "Hover straddle faces close", prompt: "he lies on his back; she is positioned above him supporting her weight with her arms, torso leaning toward his bringing their faces very close in a face-to-face straddling cuddle", category: "hardcore", placeHints: ["bedroom"], minPeople: 2 },
+  { id: "hc-bus-crowd-backside-push", label: "Crowd boarding backside press", prompt: "standing on crowded bus steps; he stands close behind her and presses his hands firmly into the soft lower curves of her backside to guide her inside, fabric strongly indented, casual as if nothing unusual", category: "hardcore", placeHints: ["station", "street"], minPeople: 2 },
+  { id: "hc-face-lower-front-saree-plus-crease", label: "Face at soft lower front plus crease grip", prompt: "she leans back against the fridge; his face is pressed close against the soft lower front through thin saree fabric while one hand presses firmly into the deep fabric crease of her soft lower curves", category: "hardcore", placeHints: ["kitchen"], minPeople: 2 },
+  { id: "hc-waterfall-backside-grip", label: "Waterfall backside grip", prompt: "standing under a private waterfall; he presses both hands firmly into the soft lower curves of her backside while his body stays tightly against hers, wet fabric strongly indented", category: "hardcore", placeHints: ["waterfall"], minPeople: 2 },
+  { id: "hc-neck-kiss-hard-backside", label: "Neck kiss with hard backside press", prompt: "he presses his hand hard into the soft lower curves of her backside holding the pressure firmly while kissing her wet neck, thin wet fabric deeply indented outlining soft lower curves", category: "hardcore", placeHints: ["beach-kerala", "pond"], minPeople: 2 },
+  { id: "hc-upper-front-and-lower-face", label: "Hand on soft upper front face at lower", prompt: "one of his hands presses firmly on the soft upper front of her body through thin fabric while his face is pressed close against the soft lower front", category: "hardcore", placeHints: ["beach-kerala", "bedroom"], minPeople: 2 },
+  { id: "hc-lap-both-hands-upper-front", label: "In lap both hands on soft upper front", prompt: "she sits in his lap; he presses both hands firmly and deeply into her soft upper front through thin fabric while she leans back against him", category: "hardcore", placeHints: ["theater", "sofa"], minPeople: 2 },
+  { id: "hc-cupped-under-curve-breast", label: "Cupped under-curve of breast", prompt: "his hand is firmly cupped and pressing inward applying deep constant pressure against the soft under-curve and side of her breast, fabric tension highly defined revealing the firm indentation of his grip", category: "hardcore", placeHints: ["theater", "home-interior"], minPeople: 2 },
+  { id: "hc-backside-crease-neck-brush", label: "Backside crease grip neck brush", prompt: "standing close behind her, one hand pressing firmly into the deep fabric crease of her backside while his lips brush her neck", category: "hardcore", placeHints: ["beach-kerala", "street"], minPeople: 2 },
+  { id: "hc-locked-backside-heavy-pressure", label: "Locked backside heavy pressure", prompt: "his hand locked firmly on her backside, fingers digging in with heavy pressure into the full soft curves of her buttocks, tight fabric deeply indented and stretched around his hand", category: "hardcore", placeHints: ["street", "park"], minPeople: 2 },
+  { id: "hc-walking-chest-grip", label: "Walking with chest grip", prompt: "walking close together, his arm draped around her, hand locked firmly on her chest with fingers digging heavy pressure into the full soft curve of her breast, fabric deeply indented while both look ahead as if nothing is happening", category: "hardcore", placeHints: ["village-path", "street"], minPeople: 2 },
+  { id: "hc-casual-arm-low-upper-front", label: "Casual arm low on upper front", prompt: "walking close, his arm wraps naturally around her back, hand resting low on the front of her upper body over the soft rounded shape, tight fabric stretching smoothly under his hand looking like a casual protective hold", category: "hardcore", placeHints: ["village-path"], minPeople: 2 },
+  { id: "hc-window-deep-upper-front", label: "Window pose deep upper front press", prompt: "standing close near a window, he behind her, one hand on her waist, the other pressed firmly and deeply into the soft upper front of her body so thin blouse fabric is clearly indented stretched and wrinkled under his palm", category: "hardcore", placeHints: ["home-interior"], minPeople: 2 },
+  { id: "hc-facing-camera-upper-front", label: "Facing camera soft upper front press", prompt: "standing very close facing the camera, his hand clearly placed on the soft upper front of her body over her blouse pressing firmly so the fabric shows natural indentation, calm ordinary expressions", category: "hardcore", placeHints: ["village-path", "street"], minPeople: 2 },
+  { id: "hc-auto-rickshaw-upper-front", label: "Auto-rickshaw upper front press", prompt: "sitting very close beside her in an auto rickshaw, his hand pressed firmly and deeply into the soft upper front of her body, fabric of her top clearly indented and stretched under his palm", category: "hardcore", placeHints: ["auto-rickshaw", "street"], minPeople: 2 },
+  { id: "hc-mouth-against-soft-lower-front", label: "Mouth against soft lower front through fabric", prompt: "his face pressed close against the soft lower front through thin fabric with devoted heated attention", category: "hardcore", placeHints: ["kitchen", "bedroom"], minPeople: 2 },
+  { id: "hc-fabric-indent-backside-both-hands", label: "Both hands fabric-indent backside", prompt: "both hands gripping the center of her backside with strong fabric tension and heavy indentation mapping his gripping force", category: "hardcore", placeHints: ["pool", "bedroom"], minPeople: 2 },
+
 ];
 
 export function getActionsByCategory(
   category: ActionCategoryId,
   opts?: { allowIntimate?: boolean }
 ): ActionItem[] {
-  if (category === "intimate" && opts?.allowIntimate === false) return [];
+  if (
+    (category === "intimate" || category === "hardcore") &&
+    opts?.allowIntimate === false
+  )
+    return [];
   return ACTIONS.filter((a) => a.category === category);
 }
 
@@ -346,7 +435,12 @@ export function randomEverydayOrSocialAction(): ActionItem {
 }
 
 export function isIntimateAction(id: string): boolean {
-  return getActionById(id)?.category === "intimate";
+  const c = getActionById(id)?.category;
+  return c === "intimate" || c === "hardcore";
+}
+
+export function isHardcoreAction(id: string): boolean {
+  return getActionById(id)?.category === "hardcore";
 }
 
 export function categoryCounts(): Record<ActionCategoryId, number> {
@@ -356,6 +450,7 @@ export function categoryCounts(): Record<ActionCategoryId, number> {
     physical: 0,
     romance: 0,
     intimate: 0,
+    hardcore: 0,
   } as Record<ActionCategoryId, number>;
   for (const a of ACTIONS) counts[a.category] += 1;
   return counts;

@@ -1,4 +1,4 @@
-import { getActionById, isIntimateAction, randomEverydayOrSocialAction } from "./actions";
+import { getActionById, isHardcoreAction, isIntimateAction, randomEverydayOrSocialAction } from "./actions";
 import {
   CAMERA_ANGLES,
   FRAMINGS,
@@ -52,7 +52,7 @@ function describePerson(p: PersonFields, index: number): string {
 function peopleBlock(state: SceneFormState): string {
   if (state.peopleCount === "group") {
     const crowd = sanitizeText(state.crowdDescriptors) ||
-      "a diverse adult group, ages 18 and above, natural expressions";
+      "a diverse adult group, ages 21 and above, natural expressions";
     return `group of five or more adults (${crowd})`;
   }
   const n = Number(state.peopleCount);
@@ -103,7 +103,8 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
   const rel = relationshipPhrase(state);
   const lighting = lightingFor(state);
   const camera = cameraPhrase(state);
-  const notes = sanitizeText(state.extraNotes);
+  const sanitizeMode = isHardcoreAction(state.actionId) ? "hardcore" : "soft";
+  const notes = sanitizeText(state.extraNotes, sanitizeMode);
   const quality = DEFAULT_QUALITY_PHRASE;
 
   const short = sanitizeText(
@@ -119,7 +120,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       state.mode === "video" ? "cinematic motion, natural movement" : "",
       notes,
     ])
-  );
+, sanitizeMode);
 
   const detailed = sanitizeText(
     sentence([
@@ -136,11 +137,11 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
         : "Still image with documentary realism",
       notes ? `Notes: ${notes}` : "",
     ])
-  );
+, sanitizeMode);
 
   const negative = sanitizeText(
     state.negativePrompt.trim() || DEFAULT_NEGATIVE
-  );
+, "soft");
 
   return { short, detailed, negative };
 }
@@ -161,7 +162,7 @@ export function createRandomizedDefaults(): SceneFormState {
     relationship,
     people: defaultPeopleForCount(peopleCount),
     crowdDescriptors:
-      "mixed adult ages 18+, Kerala–Tamil inspired attire, natural candid expressions",
+      "mixed adult ages 21+, Kerala–Tamil inspired attire, natural candid expressions",
     placeId: place.id,
     cameraAngle: cam.cameraAngle,
     framing: cam.framing,
@@ -182,7 +183,7 @@ export const DEFAULT_FORM: SceneFormState = {
   relationship: "couple",
   people: defaultPeopleForCount("2"),
   crowdDescriptors:
-    "mixed adult ages 18+, Kerala–Tamil inspired attire, natural candid expressions",
+    "mixed adult ages 21+, Kerala–Tamil inspired attire, natural candid expressions",
   placeId: "beach-kerala",
   cameraAngle: "3/4",
   framing: "full-body",

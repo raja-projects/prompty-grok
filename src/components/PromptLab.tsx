@@ -124,12 +124,12 @@ export function PromptLab() {
   }
 
   const visibleCategories = ACTION_CATEGORIES.filter(
-    (c) => !(c.id === "intimate" && intimateBlocked)
+    (c) => !((c.id === "intimate" || c.id === "hardcore") && intimateBlocked)
   );
 
   const filteredActions = ACTIONS.filter((a) => {
     if (a.category !== form.actionCategory) return false;
-    if (a.category === "intimate" && intimateBlocked) return false;
+    if ((a.category === "intimate" || a.category === "hardcore") && intimateBlocked) return false;
     if (actionQuery.trim()) {
       const q = actionQuery.toLowerCase();
       return (
@@ -160,7 +160,7 @@ export function PromptLab() {
             people prompts
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-prompty-muted sm:text-base">
-            Adults 18+ only. Soft romance language. Kerala + Tamil defaults with
+            Adults 21+ only. Hardcore uses direct action phrasing. Kerala + Tamil defaults with
             rich action, attire, camera, and lighting controls — assembled in
             your browser.
           </p>
@@ -213,7 +213,7 @@ export function PromptLab() {
                     const first = ACTIONS.find(
                       (a) =>
                         a.category === c.id &&
-                        !(c.id === "intimate" && intimateBlocked)
+                        !((c.id === "intimate" || c.id === "hardcore") && intimateBlocked)
                     );
                     patch({
                       actionCategory: c.id as ActionCategoryId,
@@ -351,7 +351,7 @@ export function PromptLab() {
                   onChange={(e) =>
                     patch({ crowdDescriptors: e.target.value })
                   }
-                  placeholder="e.g. mixed adults 18+, festive attire, candid smiles…"
+                  placeholder="e.g. mixed adults 21+, festive attire, candid smiles…"
                   className="w-full resize-y rounded-2xl border border-prompty-border bg-prompty-bg px-4 py-3 text-sm text-white outline-none ring-prompty-accent placeholder:text-prompty-muted/50 focus:ring-2"
                 />
               </div>

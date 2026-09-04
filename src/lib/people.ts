@@ -1,7 +1,7 @@
 export type Gender = "woman" | "man" | "nonbinary";
 
 export type AgeBand =
-  | "18–22"
+  | "21–24"
   | "23–27"
   | "28–32"
   | "33–40"
@@ -38,7 +38,7 @@ export interface PersonFields {
 }
 
 export const AGE_BANDS: AgeBand[] = [
-  "18–22",
+  "21–24",
   "23–27",
   "28–32",
   "33–40",
@@ -319,7 +319,7 @@ export function defaultPeopleForCount(count: PeopleCount): PersonFields[] {
         gender: "woman",
         dress: "Salwar kameez",
         hairStyle: "Ponytail",
-        ageBand: "18–22",
+        ageBand: "21–24",
       }),
     ];
   }

@@ -34,6 +34,16 @@ export const PLACES: PlaceItem[] = [
   { id: "airport", label: "Airport arrivals", prompt: "an airport arrivals hall" },
   { id: "monsoon-street", label: "Monsoon street", prompt: "a rain-washed street during monsoon" },
   { id: "hotel", label: "Hotel room (tasteful)", prompt: "a tasteful hotel room with soft lamps and neat bedding" },
+  { id: "boat-house", label: "Boat house", prompt: "inside a quiet boat house" },
+  { id: "storeroom", label: "House storeroom", prompt: "a middle-class house storeroom" },
+  { id: "mall-office", label: "Mall manager office", prompt: "a manager's office inside a shopping mall" },
+  { id: "mall-corridor", label: "Mall security corridor", prompt: "a quiet empty security screening corridor inside a shopping mall" },
+  { id: "theater", label: "Movie theater", prompt: "inside a dim movie theater" },
+  { id: "auto-rickshaw", label: "Auto rickshaw", prompt: "inside a crowded auto rickshaw" },
+  { id: "waterfall", label: "Private waterfall", prompt: "under a private waterfall with flowing water" },
+  { id: "pond", label: "Quiet pond corner", prompt: "a quiet corner of a pond area" },
+  { id: "village-path", label: "Village dirt path", prompt: "a red dirt village path under coconut trees" },
+  { id: "festival-fair", label: "Festival fairground", prompt: "a tightly packed local festival fairground in the evening" },
 ];
 
 export function getPlaceById(id: string): PlaceItem | undefined {
