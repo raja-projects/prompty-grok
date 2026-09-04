@@ -397,14 +397,10 @@ export function regionCues(ids: string[]): string {
   return selected.map((r) => r.cues).join("; ");
 }
 
+/** Only swaps faceCutId — hair, body, dress, skin stay unchanged. */
 export function reshuffleFaceCuts(people: PersonFields[]): PersonFields[] {
   return people.map((p) => ({
     ...p,
     faceCutId: randomFaceCutId(p.gender, p.faceCutId),
-    hairColor: HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)]!,
-    skinTone: SKIN_TONES[Math.floor(Math.random() * SKIN_TONES.length)]!,
-    hairStyle: HAIR_BY_GENDER[p.gender][
-      Math.floor(Math.random() * HAIR_BY_GENDER[p.gender].length)
-    ]!,
   }));
 }
