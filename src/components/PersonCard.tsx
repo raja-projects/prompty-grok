@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import {
   AGES,
   bodyTypesForAge,
@@ -75,6 +77,7 @@ export function PersonCard({
   onSelectFavorite: (person: PersonFields) => void;
   onSaveFavorite: () => void;
 }) {
+  const [expanded, setExpanded] = useState(false);
   const isWoman = person.gender === "woman";
   const pool: "general" | "known" =
     isWoman && (person.faceCutPool === "known" || isKnownFaceId(person.faceCutId))
@@ -150,7 +153,7 @@ export function PersonCard({
 
   return (
     <div className="rounded-2xl border border-prompty-border bg-prompty-bg/60 p-4">
-      <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+      <div className="flex flex-wrap items-end justify-between gap-2">
         <label className="min-w-48 flex-1">
           <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
             Person {index + 1} · choose favorite
@@ -177,7 +180,13 @@ export function PersonCard({
           Save favorite
         </button>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="mt-3 flex items-center justify-between rounded-xl bg-prompty-elevated/60 px-3 py-2 text-xs text-prompty-muted">
+        <span>{display.gender} · {display.age} · {display.bodyType} · {display.hairStyle}</span>
+        <button type="button" onClick={() => setExpanded((value) => !value)} className="font-medium text-prompty-accent2 hover:text-white">
+          {expanded ? "Close details" : "Edit details"}
+        </button>
+      </div>
+      {expanded ? <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className="block space-y-1 sm:col-span-2">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
             Gender
@@ -321,7 +330,7 @@ export function PersonCard({
           disabled={knownLocked}
           onChange={(v) => patch({ skinTone: v })}
         />
-      </div>
+      </div> : null}
     </div>
   );
 }

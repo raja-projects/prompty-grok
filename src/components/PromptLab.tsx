@@ -185,6 +185,7 @@ export function PromptLab() {
   const [savedFlash, setSavedFlash] = useState(false);
   const [actionQuery, setActionQuery] = useState("");
   const [favoritePeople, setFavoritePeople] = useState<FavoritePerson[]>([]);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   useEffect(() => {
     setRecent(loadRecent());
@@ -394,18 +395,30 @@ export function PromptLab() {
   const regionOptions = REGIONS.map((r) => ({ id: r.id, label: r.label }));
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-3 rounded-2xl border border-prompty-border bg-prompty-surface/60 p-5 sm:flex-row sm:items-center sm:justify-between">
+    <div className="min-h-screen lg:grid lg:grid-cols-[210px_minmax(0,1fr)]">
+      <aside className="hidden border-r border-prompty-border bg-prompty-surface/80 p-3 lg:flex lg:flex-col">
+        <div className="flex items-center gap-3 px-2 py-4 font-display text-lg font-bold text-white">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-[#ff8a70] via-prompty-accent to-prompty-accent2 shadow-glow-sm">✦</span>
+          Prompty
+        </div>
+        <nav className="mt-3 space-y-1 text-sm">
+          <a href="#create" className="flex items-center gap-3 rounded-xl bg-prompty-elevated px-3 py-3 font-medium text-white"><span className="text-prompty-accent2">✦</span>Create</a>
+          <a href="#people" className="flex items-center gap-3 rounded-xl px-3 py-3 text-prompty-muted transition hover:bg-prompty-elevated hover:text-white"><span>♙</span>Favorite people</a>
+          <a href="#recent" className="flex items-center gap-3 rounded-xl px-3 py-3 text-prompty-muted transition hover:bg-prompty-elevated hover:text-white"><span>◷</span>Recent prompts</a>
+        </nav>
+        <p className="mt-auto border-t border-prompty-border px-2 pt-4 text-[10px] leading-relaxed text-prompty-muted">Private prompt studio<br />Image and video scenes</p>
+      </aside>
+      <div className="space-y-6 px-4 py-5 sm:px-6 lg:px-7">
+      <header id="create" className="flex flex-col gap-4 py-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-prompty-accent2">
-            Prompty
+            Command studio
           </p>
           <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">
-            Scene builder
+            What do you want to create?
           </h1>
           <p className="mt-1 text-xs text-prompty-muted">
-            Adults 19+ · pick each control independently · prompts ready for
-            Gemini, ChatGPT & Grok
+            Start with the essentials. Open details only when you need them.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -419,6 +432,25 @@ export function PromptLab() {
         </div>
       </header>
 
+      <label className="block rounded-2xl border border-prompty-border bg-prompty-surface p-4 shadow-glow-sm">
+        <FieldLabel>Describe the action in your own words</FieldLabel>
+        <div className="flex items-center gap-3">
+          <span className="text-prompty-accent2">✦</span>
+          <input
+            value={form.customActionPrompt}
+            onChange={(e) => patch({ customActionPrompt: e.target.value, useCustomActionPrompt: Boolean(e.target.value.trim()) })}
+            placeholder="e.g. A couple embracing in a quiet bedroom"
+            className="w-full bg-transparent text-base text-white outline-none placeholder:text-prompty-muted/50"
+          />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="rounded-lg border border-prompty-accent2/30 bg-prompty-accent2/10 px-2.5 py-1 text-[10px] font-medium capitalize text-prompty-accent2">{form.mode}</span>
+          <span className="rounded-lg border border-prompty-border bg-prompty-elevated px-2.5 py-1 text-[10px] text-prompty-muted">{form.peopleCount === "group" ? "Group" : `${form.peopleCount} people`}</span>
+          <span className="rounded-lg border border-prompty-border bg-prompty-elevated px-2.5 py-1 text-[10px] text-prompty-muted">{PLACES.find((p) => p.id === form.placeId)?.label}</span>
+          <span className="rounded-lg border border-prompty-border bg-prompty-elevated px-2.5 py-1 text-[10px] text-prompty-muted">{form.aspectRatio}</span>
+        </div>
+      </label>
+
       <div className="grid gap-5 lg:grid-cols-12">
         <div className="space-y-4 lg:col-span-7">
           {under21 ? (
@@ -430,83 +462,50 @@ export function PromptLab() {
           <Section
             step={1}
             title="Action"
-            hint="Auto people: Swap four=4; MMF/FFM=3; Crowd=2 strangers; Women together=2."
+            hint="Choose a preset, or type directly in the command box above"
           >
-            <ChipRow
-              label="Category"
-              options={visibleCategories.map((c) => ({
-                id: c.id,
-                label: c.label,
-              }))}
-              value={form.actionCategory}
-              onChange={(id) =>
-                patch({ actionCategory: id as ActionCategoryId })
-              }
-            />
-            <input
-              type="search"
-              value={actionQuery}
-              onChange={(e) => setActionQuery(e.target.value)}
-              placeholder="Search actions…"
-              className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent placeholder:text-prompty-muted/50 focus:ring-2"
-            />
-            <div className="max-h-56 space-y-1 overflow-y-auto rounded-xl border border-prompty-border bg-prompty-bg/50 p-2">
-              {filteredActions.length === 0 ? (
-                <p className="p-3 text-xs text-prompty-muted">No actions match.</p>
-              ) : (
-                filteredActions.map((a) => {
-                  const active = form.actionId === a.id;
-                  return (
-                    <button
-                      key={a.id}
-                      type="button"
-                      onClick={() => patch({ actionId: a.id })}
-                      className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition ${
-                        active
-                          ? "bg-prompty-accent/25 text-white"
-                          : "text-prompty-muted hover:bg-prompty-elevated hover:text-white"
-                      }`}
-                    >
-                      {a.label}
-                    </button>
-                  );
-                })
-              )}
-            </div>
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-white">
-              <input
-                type="checkbox"
-                checked={form.useCustomActionPrompt}
-                onChange={(e) =>
-                  patch({ useCustomActionPrompt: e.target.checked })
-                }
-                className="h-4 w-4 rounded border-prompty-border bg-prompty-bg accent-prompty-accent"
+            <div className="grid gap-3 sm:grid-cols-2">
+              <SoftSelect
+                label="Category"
+                options={visibleCategories.map((c) => ({ id: c.id, label: c.label }))}
+                value={form.actionCategory}
+                onChange={(id) => {
+                  const first = ACTIONS.find((action) => action.category === id);
+                  patch({ actionCategory: id as ActionCategoryId, ...(first ? { actionId: first.id } : {}) });
+                }}
               />
-              Use custom action prompt
-            </label>
-            {form.useCustomActionPrompt ? (
-              <label className="block">
-                <FieldLabel>Custom action prompt</FieldLabel>
-                <textarea
-                  value={form.customActionPrompt}
-                  onChange={(e) =>
-                    patch({ customActionPrompt: e.target.value })
-                  }
-                  rows={3}
-                  placeholder="Describe the action to use instead of the selected preset…"
-                  className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent placeholder:text-prompty-muted/50 focus:ring-2"
-                />
-                <span className="mt-1 block text-[11px] text-prompty-muted">
-                  When enabled and filled, this replaces the selected action text in the generated prompts.
-                </span>
-              </label>
+              <SoftSelect
+                label="Action preset"
+                options={filteredActions.map((action) => ({ id: action.id, label: action.label }))}
+                value={form.actionId}
+                onChange={(id) => patch({ actionId: id, useCustomActionPrompt: false })}
+              />
+              <SoftSelect
+                label="Place"
+                value={form.placeId}
+                options={PLACES.map((place) => ({ id: place.id, label: place.label }))}
+                onChange={(id) => patch({ placeId: id })}
+              />
+              <SoftSelect
+                label="Lighting"
+                value={form.timeOfDay}
+                options={TIMES_OF_DAY.map((time) => ({ id: time.id, label: time.label }))}
+                onChange={(id) => patch({ timeOfDay: id as SceneFormState["timeOfDay"] })}
+              />
+            </div>
+            {form.useCustomActionPrompt && form.customActionPrompt.trim() ? (
+              <div className="flex items-center justify-between rounded-xl border border-prompty-accent2/25 bg-prompty-accent2/10 px-3 py-2 text-xs text-prompty-accent2">
+                <span>Custom action is overriding the preset</span>
+                <button type="button" onClick={() => patch({ useCustomActionPrompt: false, customActionPrompt: "" })} className="font-semibold hover:text-white">Use preset</button>
+              </div>
             ) : null}
           </Section>
 
+          <div id="people">
           <Section
             step={2}
-            title="People"
-            hint="Count only adds/removes slots — existing faces & attire stay"
+            title="Favorite cast"
+            hint="Pick saved people from each dropdown; edit details only when needed"
           >
             <div className="grid gap-3 sm:grid-cols-2">
               <SoftSelect
@@ -673,7 +672,17 @@ export function PromptLab() {
               </>
             )}
           </Section>
+          </div>
 
+          <button
+            type="button"
+            onClick={() => setShowAdvanced((value) => !value)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-prompty-border bg-prompty-surface/40 px-4 py-3 text-xs font-medium text-prompty-muted transition hover:border-prompty-accent2/40 hover:text-white"
+          >
+            <span>⚙</span>{showAdvanced ? "Hide advanced controls" : "Advanced controls · place, camera, framing & notes"}
+          </button>
+
+          {showAdvanced ? <>
           <Section step={3} title="Place & camera">
             <div className="grid gap-3 sm:grid-cols-2">
               <SoftSelect
@@ -748,6 +757,7 @@ export function PromptLab() {
               />
             </label>
           </Section>
+          </> : null}
         </div>
 
         <aside className="space-y-4 lg:col-span-5 lg:sticky lg:top-4 lg:self-start">
@@ -795,14 +805,17 @@ export function PromptLab() {
         </aside>
       </div>
 
-      <RecentList
-        items={recent}
-        onClear={() => {
-          clearRecent();
-          setRecent([]);
-        }}
-        onReuse={(item) => patch({ mode: item.mode })}
-      />
+      <div id="recent">
+        <RecentList
+          items={recent}
+          onClear={() => {
+            clearRecent();
+            setRecent([]);
+          }}
+          onReuse={(item) => patch({ mode: item.mode })}
+        />
+      </div>
+      </div>
     </div>
   );
 }
