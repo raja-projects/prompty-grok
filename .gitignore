@@ -1,0 +1,14 @@
+/.next/
+/out/
+/build
+/coverage
+.DS_Store
+*.pem
+.vercel
+*.tsbuildinfo
+.idea
+.vscode
+/node_modules
+.env.local
+.env.development.local
+.env.production.local
