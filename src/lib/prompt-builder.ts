@@ -12,10 +12,7 @@ import {
   relationshipBlocksIntimate,
   type PersonFields,
 } from "./people";
-import {
-  getFaceCut,
-  WOMAN_BEAUTY_HARD_RULE,
-} from "./face-cuts";
+import { getFaceCut } from "./face-cuts";
 import { getPlaceById, randomPlace } from "./places";
 import {
   DEFAULT_NEGATIVE,
@@ -50,7 +47,7 @@ function describePerson(p: PersonFields, index: number): string {
     `${p.bodyType} build`,
     `${p.hairColor} ${p.hairStyle} hair`,
     face ? `face: ${face}` : "",
-    p.gender === "woman" ? WOMAN_BEAUTY_HARD_RULE : "",
+    p.gender === "woman" ? "beautiful and attractive" : "",
     `wearing ${p.dress}`,
     `${p.fashionVibe} vibe`,
   ]);
@@ -86,28 +83,20 @@ function sceneHasWoman(state: SceneFormState): boolean {
   return state.people.slice(0, n).some((p) => p.gender === "woman");
 }
 
-/** Hard rule: every woman/female face stays visible in any angle or pose. */
+/** Keep her face readable in any angle or pose. */
 function femaleFaceVisibleCue(state: SceneFormState): string {
   if (!sceneHasWoman(state)) return "";
   const rear =
     state.cameraAngle === "back" || state.cameraAngle === "over-shoulder";
-  const base =
-    "HARD RULE: every woman's face must be clearly visible in frame — never hide, crop out, or show only the back of a female head";
   if (rear) {
-    return (
-      base +
-      "; even from a back or over-shoulder angle, she turns her head over her shoulder (or looks back) so her face is readable somewhere in the shot"
-    );
+    return "her face stays clearly visible — even from behind she turns her head over her shoulder so you can see her face";
   }
-  return (
-    base +
-    "; in any pose or angle she turns or angles enough that her face remains visible"
-  );
+  return "her face stays clearly visible in frame";
 }
 
 function femaleBeautyCue(state: SceneFormState): string {
   if (!sceneHasWoman(state)) return "";
-  return WOMAN_BEAUTY_HARD_RULE;
+  return "she looks beautiful and attractive";
 }
 
 function cameraPhrase(state: SceneFormState): string {
@@ -142,12 +131,6 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
   const lighting = lightingFor(state);
   const camera = cameraPhrase(state);
   const sanitizeMode = isHardcoreAction(state.actionId) ? "hardcore" : "soft";
-  const partnerAgencyCue =
-    isIntimateAction(state.actionId) && state.peopleCount !== "1"
-      ? "Clear partner agency: one adult partner performs the touching/grabbing/pressing on the other adult partner's body — never self-touch on their own chest, backside, or center unless the chosen action is explicitly labeled solo self-touch"
-      : isIntimateAction(state.actionId) && state.peopleCount === "1"
-        ? "Solo adult self-touch only if the selected action is explicitly a solo self-touch action"
-        : "";
 
   const faceVisibleCue = femaleFaceVisibleCue(state);
   const beautyCue = femaleBeautyCue(state);
@@ -161,7 +144,6 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       rel,
       regions ? `appearance cues: ${regions}` : "",
       actionText,
-      partnerAgencyCue,
       faceVisibleCue,
       beautyCue,
       `at ${placeText}`,
@@ -178,7 +160,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       `Photorealistic real photograph of ${people}`,
       rel ? `They share a ${rel}` : "",
       regions ? `Cultural/appearance cues: ${regions}` : "",
-      `Action: ${actionText}${partnerAgencyCue ? `. ${partnerAgencyCue}` : ""}`,
+      `Action: ${actionText}`,
       `Setting: ${placeText}`,
       `Time: ${state.timeOfDay} with ${lighting}`,
       faceVisibleCue ? `Face visibility: ${faceVisibleCue}` : "",
