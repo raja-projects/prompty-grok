@@ -8,6 +8,7 @@ import {
 import {
   DEFAULT_REGION_IDS,
   defaultPeopleForCount,
+  defaultPerson,
   regionCues,
   relationshipBlocksIntimate,
   type PersonFields,
@@ -184,6 +185,49 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
   return { short, detailed, negative };
 }
 
+
+/** Fixed studio defaults — used on load and Reset. Independent fields. */
+export function createStudioDefaults(): SceneFormState {
+  const woman = defaultPerson({
+    gender: "woman",
+    age: "21",
+    hairStyle: "Ponytail",
+    dressId: "w-saree-low-hip-chiffon",
+    bodyType: "Petite",
+    fashionVibe: "Everyday casual",
+    hairColor: "Natural black",
+    skinTone: "Fair warm",
+  });
+  const man = defaultPerson({
+    gender: "man",
+    age: "34",
+    hairStyle: "Short neat",
+    dressId: "m-tee-shorts",
+    bodyType: "Tall lean",
+    fashionVibe: "Everyday casual",
+    hairColor: "Natural black",
+    skinTone: "Medium wheatish",
+  });
+  return {
+    mode: "image",
+    actionCategory: "hardcore",
+    actionId: "hc-face-into-central-curve",
+    regionIds: ["kerala"],
+    peopleCount: "2",
+    relationship: "couple",
+    people: [woman, man],
+    crowdDescriptors:
+      "mixed adult ages 21+, Kerala–Malayali inspired attire, natural candid expressions",
+    placeId: "bedroom",
+    cameraAngle: "front",
+    framing: "medium",
+    aspectRatio: "1:1",
+    timeOfDay: "day",
+    extraNotes: "",
+    negativePrompt: DEFAULT_NEGATIVE,
+  };
+}
+
 export function createRandomizedDefaults(): SceneFormState {
   const action = randomEverydayOrSocialAction();
   const cam = randomCameraDefaults();
@@ -211,22 +255,5 @@ export function createRandomizedDefaults(): SceneFormState {
   };
 }
 
-/** Static seed used until client hydration randomizes */
-export const DEFAULT_FORM: SceneFormState = {
-  mode: "image",
-  actionCategory: "everyday",
-  actionId: "walking",
-  regionIds: [...DEFAULT_REGION_IDS],
-  peopleCount: "2",
-  relationship: "couple",
-  people: defaultPeopleForCount("2"),
-  crowdDescriptors:
-    "mixed adult ages 21+, Kerala–Tamil inspired attire, natural candid expressions",
-  placeId: "beach-kerala",
-  cameraAngle: "3/4",
-  framing: "full-body",
-  aspectRatio: "3:4",
-  timeOfDay: "evening",
-  extraNotes: "",
-  negativePrompt: DEFAULT_NEGATIVE,
-};
+/** Static seed = studio defaults (no randomize on load). */
+export const DEFAULT_FORM: SceneFormState = createStudioDefaults();

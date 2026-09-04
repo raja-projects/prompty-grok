@@ -162,7 +162,6 @@ export const HAIR_BY_GENDER: Record<Gender, string[]> = {
     "Half-up style",
     "Jasmine-adorned braid",
     "Loose open hair",
-    "Pixie cut",
   ],
   man: [
     "Short neat",

@@ -18,27 +18,150 @@ import {
   PEOPLE_COUNTS,
   REGIONS,
   RELATIONSHIPS,
-  defaultPeopleForCount,
+  defaultPerson,
   relationshipBlocksIntimate,
   reshuffleFaceCuts,
   type PeopleCount,
   type Relationship,
 } from "@/lib/people";
-import { PLACES, getPlaceById, randomPlace } from "@/lib/places";
+import { PLACES } from "@/lib/places";
 import {
   buildPrompts,
   createRandomizedDefaults,
+  createStudioDefaults,
   DEFAULT_FORM,
 } from "@/lib/prompt-builder";
-import { DEFAULT_NEGATIVE } from "@/lib/safety";
 import { clearRecent, loadRecent, saveRecent } from "@/lib/storage";
 import type { Mode, RecentPrompt, SceneFormState } from "@/lib/types";
-import { ChipGroup } from "./ChipGroup";
 import { CopyButton } from "./CopyButton";
 import { ModeToggle } from "./ModeToggle";
 import { PersonCard } from "./PersonCard";
 import { RecentList } from "./RecentList";
-import { TemplateGallery } from "./TemplateGallery";
+
+function Section({
+  step,
+  title,
+  hint,
+  children,
+}: {
+  step: number;
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-2xl border border-prompty-border bg-prompty-surface/70 p-4 sm:p-5">
+      <div className="mb-4 flex items-start gap-3">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-prompty-accent/25 text-xs font-bold text-white">
+          {step}
+        </span>
+        <div>
+          <h3 className="text-sm font-semibold text-white">{title}</h3>
+          {hint ? (
+            <p className="mt-0.5 text-[11px] text-prompty-muted">{hint}</p>
+          ) : null}
+        </div>
+      </div>
+      <div className="space-y-4">{children}</div>
+    </section>
+  );
+}
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
+      {children}
+    </span>
+  );
+}
+
+function SoftSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: { id: string; label: string }[];
+  onChange: (id: string) => void;
+}) {
+  return (
+    <label className="block">
+      <FieldLabel>{label}</FieldLabel>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2.5 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
+      >
+        {options.map((o) => (
+          <option key={o.id} value={o.id}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function ChipRow({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: { id: string; label: string }[];
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  return (
+    <div>
+      <FieldLabel>{label}</FieldLabel>
+      <div className="flex flex-wrap gap-1.5">
+        {options.map((o) => {
+          const active = value === o.id;
+          return (
+            <button
+              key={o.id}
+              type="button"
+              onClick={() => onChange(o.id)}
+              className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
+                active
+                  ? "border-prompty-accent bg-prompty-accent/30 text-white"
+                  : "border-prompty-border bg-prompty-bg text-prompty-muted hover:text-white"
+              }`}
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Grow/shrink people list without wiping existing person cards. */
+function adjustPeopleCount(
+  people: SceneFormState["people"],
+  count: PeopleCount
+): SceneFormState["people"] {
+  if (count === "group") return people;
+  const n = Number(count);
+  if (people.length === n) return people;
+  if (people.length > n) return people.slice(0, n);
+  const next = [...people];
+  while (next.length < n) {
+    const i = next.length;
+    next.push(
+      defaultPerson({
+        gender: i % 2 === 0 ? "woman" : "man",
+        age: i % 2 === 0 ? "21" : "34",
+      })
+    );
+  }
+  return next;
+}
 
 export function PromptLab() {
   const [form, setForm] = useState<SceneFormState>(DEFAULT_FORM);
@@ -49,60 +172,44 @@ export function PromptLab() {
 
   useEffect(() => {
     setRecent(loadRecent());
-    setForm(createRandomizedDefaults());
+    setForm(createStudioDefaults());
     setHydrated(true);
   }, []);
 
   const intimateBlocked = relationshipBlocksIntimate(form.relationship);
-
   const prompts = useMemo(() => buildPrompts(form), [form]);
 
+  /** Patch one field at a time — never cascade-reset unrelated selections. */
   function patch(partial: Partial<SceneFormState>) {
     setForm((prev) => {
       const next: SceneFormState = { ...prev, ...partial };
 
       if (partial.peopleCount && partial.peopleCount !== prev.peopleCount) {
-        if (partial.peopleCount !== "group") {
-          next.people = defaultPeopleForCount(partial.peopleCount);
-        }
-        if (partial.peopleCount === "1") {
-          next.relationship = "friends";
-        }
+        next.people = adjustPeopleCount(prev.people, partial.peopleCount);
+        // Do not force relationship change.
       }
 
+      // Safety only: sibling/parent cannot keep intimate/hardcore selected.
       if (partial.relationship) {
         const blocked = relationshipBlocksIntimate(partial.relationship);
         if (blocked && isIntimateAction(next.actionId)) {
-          const fallback = ACTIONS.find((a) => a.category === "everyday")!;
-          next.actionCategory = fallback.category;
-          next.actionId = fallback.id;
-        }
-      }
-
-      if (partial.actionId) {
-        const action = getActionById(partial.actionId);
-        if (action) {
-          next.actionCategory = action.category;
-          if (
-            action.placeHints?.length &&
-            (!partial.placeId || partial.placeId === prev.placeId)
-          ) {
-            const suggested = randomPlace(action.placeHints);
-            next.placeId = suggested.id;
+          const fallback = ACTIONS.find((a) => a.category === "everyday");
+          if (fallback) {
+            next.actionCategory = fallback.category;
+            next.actionId = fallback.id;
           }
         }
       }
 
-      if (partial.mode && partial.mode !== prev.mode && !partial.aspectRatio) {
-        // keep aspect
+      // actionId may update category label for display, but never touch place/camera/people.
+      if (partial.actionId) {
+        const action = getActionById(partial.actionId);
+        if (action) next.actionCategory = action.category;
       }
 
+      // Category chip alone does not overwrite actionId.
       return next;
     });
-  }
-
-  function onModeChange(mode: Mode) {
-    patch({ mode });
   }
 
   function persist() {
@@ -119,20 +226,20 @@ export function PromptLab() {
     window.setTimeout(() => setSavedFlash(false), 1400);
   }
 
-  function resetRandom() {
+  function resetDefaults() {
+    setForm(createStudioDefaults());
+    setActionQuery("");
+  }
+
+  function randomizeAll() {
     setForm(createRandomizedDefaults());
     setActionQuery("");
   }
 
   function changeFacesOnly() {
     setForm((prev) => {
-      if (prev.peopleCount === "group") {
-        return prev;
-      }
-      return {
-        ...prev,
-        people: reshuffleFaceCuts(prev.people),
-      };
+      if (prev.peopleCount === "group") return prev;
+      return { ...prev, people: reshuffleFaceCuts(prev.people) };
     });
   }
 
@@ -142,12 +249,15 @@ export function PromptLab() {
 
   const filteredActions = ACTIONS.filter((a) => {
     if (a.category !== form.actionCategory) return false;
-    if ((a.category === "intimate" || a.category === "hardcore") && intimateBlocked) return false;
+    if (
+      (a.category === "intimate" || a.category === "hardcore") &&
+      intimateBlocked
+    )
+      return false;
     if (actionQuery.trim()) {
       const q = actionQuery.toLowerCase();
       return (
-        a.label.toLowerCase().includes(q) ||
-        a.prompt.toLowerCase().includes(q)
+        a.label.toLowerCase().includes(q) || a.prompt.toLowerCase().includes(q)
       );
     }
     return true;
@@ -156,101 +266,52 @@ export function PromptLab() {
   const personSlots =
     form.peopleCount === "group" ? 0 : Number(form.peopleCount);
 
+  const regionOptions = REGIONS.map((r) => ({ id: r.id, label: r.label }));
+
   return (
-    <div className="space-y-10">
-      <section className="relative overflow-hidden rounded-3xl border border-prompty-border bg-prompty-surface/60 p-6 shadow-glow sm:p-8">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-prompty-accent/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-prompty-accent2/10 blur-3xl" />
-        <div className="relative space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-prompty-accent2">
-            People scene prompt lab
+    <div className="space-y-6">
+      <header className="flex flex-col gap-3 rounded-2xl border border-prompty-border bg-prompty-surface/60 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-prompty-accent2">
+            Prompty
           </p>
-          <h2 className="max-w-2xl font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Build{" "}
-            <span className="bg-gradient-to-r from-prompty-accent to-prompty-accent2 bg-clip-text text-transparent">
-              photorealistic
-            </span>{" "}
-            people prompts
-          </h2>
-          <p className="max-w-2xl text-sm leading-relaxed text-prompty-muted sm:text-base">
-            Adults 21+ only. Hardcore uses direct action phrasing. Kerala + Tamil defaults with
-            rich action, attire, camera, and lighting controls — assembled in
-            your browser.
+          <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">
+            Scene builder
+          </h1>
+          <p className="mt-1 text-xs text-prompty-muted">
+            Adults 21+ · pick each control independently · prompts ready for
+            Gemini, ChatGPT & Grok
           </p>
-          <div className="flex flex-wrap items-center gap-3">
-            <ModeToggle mode={form.mode} onChange={onModeChange} />
-            {!hydrated ? (
-              <span className="text-xs text-prompty-muted">Loading defaults…</span>
-            ) : null}
-          </div>
         </div>
-      </section>
+        <div className="flex flex-wrap items-center gap-2">
+          <ModeToggle
+            mode={form.mode}
+            onChange={(mode: Mode) => patch({ mode })}
+          />
+          {!hydrated ? (
+            <span className="text-xs text-prompty-muted">Loading…</span>
+          ) : null}
+        </div>
+      </header>
 
-      <TemplateGallery
-        mode={form.mode}
-        onApply={(partial) => {
-          setForm((prev) => {
-            const merged = { ...prev, ...partial };
-            if (partial.peopleCount) {
-              merged.people = defaultPeopleForCount(partial.peopleCount);
-            } else if (!merged.people.length) {
-              merged.people = defaultPeopleForCount(merged.peopleCount);
-            }
-            if (!merged.negativePrompt) {
-              merged.negativePrompt = DEFAULT_NEGATIVE;
-            }
-            if (
-              relationshipBlocksIntimate(merged.relationship) &&
-              isIntimateAction(merged.actionId)
-            ) {
-              const fb = ACTIONS.find((a) => a.category === "everyday")!;
-              merged.actionCategory = fb.category;
-              merged.actionId = fb.id;
-            }
-            return merged;
-          });
-        }}
-      />
-
-      <div className="grid gap-6 lg:grid-cols-5">
-        <div className="space-y-6 rounded-3xl border border-prompty-border bg-prompty-surface/80 p-5 sm:p-6 lg:col-span-3">
-          {/* A. Actions */}
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold text-white">Action</h3>
-            <div className="flex flex-wrap gap-2">
-              {visibleCategories.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => {
-                    const first = ACTIONS.find(
-                      (a) =>
-                        a.category === c.id &&
-                        !((c.id === "intimate" || c.id === "hardcore") && intimateBlocked)
-                    );
-                    patch({
-                      actionCategory: c.id as ActionCategoryId,
-                      ...(first ? { actionId: first.id } : {}),
-                    });
-                    setActionQuery("");
-                  }}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                    form.actionCategory === c.id
-                      ? "border-prompty-accent bg-prompty-accent/25 text-white"
-                      : "border-prompty-border bg-prompty-elevated text-prompty-muted hover:text-white"
-                  }`}
-                  title={c.description}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-            {intimateBlocked ? (
-              <p className="text-[11px] text-prompty-warn">
-                Intimate category hidden for siblings / parent–child
-                relationships.
-              </p>
-            ) : null}
+      <div className="grid gap-5 lg:grid-cols-12">
+        <div className="space-y-4 lg:col-span-7">
+          <Section
+            step={1}
+            title="Action"
+            hint="Changing category only filters the list — it won’t reset place or people"
+          >
+            <ChipRow
+              label="Category"
+              options={visibleCategories.map((c) => ({
+                id: c.id,
+                label: c.label,
+              }))}
+              value={form.actionCategory}
+              onChange={(id) =>
+                patch({ actionCategory: id as ActionCategoryId })
+              }
+            />
             <input
               type="search"
               value={actionQuery}
@@ -258,299 +319,250 @@ export function PromptLab() {
               placeholder="Search actions…"
               className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent placeholder:text-prompty-muted/50 focus:ring-2"
             />
-            <div className="max-h-44 overflow-y-auto rounded-2xl border border-prompty-border bg-prompty-bg/50 p-2">
-              <div className="flex flex-wrap gap-2">
-                {filteredActions.map((a) => {
+            <div className="max-h-56 space-y-1 overflow-y-auto rounded-xl border border-prompty-border bg-prompty-bg/50 p-2">
+              {filteredActions.length === 0 ? (
+                <p className="p-3 text-xs text-prompty-muted">No actions match.</p>
+              ) : (
+                filteredActions.map((a) => {
                   const active = form.actionId === a.id;
                   return (
                     <button
                       key={a.id}
                       type="button"
                       onClick={() => patch({ actionId: a.id })}
-                      className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                      className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition ${
                         active
-                          ? "border-prompty-accent2 bg-prompty-accent2/20 text-white"
-                          : "border-prompty-border bg-prompty-elevated text-prompty-muted hover:text-white"
+                          ? "bg-prompty-accent/25 text-white"
+                          : "text-prompty-muted hover:bg-prompty-elevated hover:text-white"
                       }`}
                     >
                       {a.label}
                     </button>
                   );
-                })}
-                {!filteredActions.length ? (
-                  <p className="px-2 py-1 text-xs text-prompty-muted">
-                    No actions match.
-                  </p>
-                ) : null}
-              </div>
+                })
+              )}
             </div>
-          </section>
+          </Section>
 
-          {/* B. Regions */}
-          <section className="space-y-2">
-            <h3 className="text-sm font-semibold text-white">
-              People region{" "}
-              <span className="font-normal text-prompty-muted">
-                (multi-select)
-              </span>
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {REGIONS.map((r) => {
-                const active = form.regionIds.includes(r.id);
-                return (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => {
-                      const ids = active
-                        ? form.regionIds.filter((id) => id !== r.id)
-                        : [...form.regionIds, r.id];
-                      patch({
-                        regionIds: ids.length ? ids : ["kerala"],
-                      });
-                    }}
-                    className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                      active
-                        ? "border-prompty-accent bg-prompty-accent/25 text-white"
-                        : "border-prompty-border bg-prompty-elevated text-prompty-muted hover:text-white"
-                    }`}
-                    title={r.cues}
-                  >
-                    {r.label}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          {/* C. Count + relationship + people */}
-          <section className="space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold text-white">People</h3>
-              {form.peopleCount !== "group" ? (
-                <button
-                  type="button"
-                  onClick={changeFacesOnly}
-                  className="rounded-full border border-prompty-border px-2.5 py-1 text-[11px] font-medium text-prompty-muted hover:border-prompty-accent/50 hover:text-white"
-                >
-                  Change faces
-                </button>
+          <Section
+            step={2}
+            title="People"
+            hint="Count only adds/removes slots — existing faces & attire stay"
+          >
+            <div className="grid gap-3 sm:grid-cols-2">
+              <SoftSelect
+                label="People count"
+                value={form.peopleCount}
+                options={PEOPLE_COUNTS.map((p) => ({
+                  id: p.id,
+                  label: p.label,
+                }))}
+                onChange={(id) => patch({ peopleCount: id as PeopleCount })}
+              />
+              {form.peopleCount !== "1" ? (
+                <SoftSelect
+                  label="Relationship"
+                  value={form.relationship}
+                  options={RELATIONSHIPS.map((r) => ({
+                    id: r.id,
+                    label: r.label,
+                  }))}
+                  onChange={(id) =>
+                    patch({ relationship: id as Relationship })
+                  }
+                />
               ) : null}
             </div>
-            <ChipGroup
-              label="How many"
-              options={PEOPLE_COUNTS.map((p) => p.label)}
-              value={
-                PEOPLE_COUNTS.find((p) => p.id === form.peopleCount)?.label ??
-                "2 people"
-              }
-              onChange={(label) => {
-                const found = PEOPLE_COUNTS.find((p) => p.label === label);
-                if (found) patch({ peopleCount: found.id as PeopleCount });
-              }}
-            />
-            {form.peopleCount !== "1" ? (
-              <ChipGroup
-                label="Relationship"
-                options={RELATIONSHIPS.map((r) => r.label)}
-                value={
-                  RELATIONSHIPS.find((r) => r.id === form.relationship)
-                    ?.label ?? "Couple"
-                }
-                onChange={(label) => {
-                  const found = RELATIONSHIPS.find((r) => r.label === label);
-                  if (found) patch({ relationship: found.id as Relationship });
-                }}
-              />
-            ) : null}
+
+            <div>
+              <FieldLabel>Region look</FieldLabel>
+              <div className="flex flex-wrap gap-1.5">
+                {regionOptions.map((r) => {
+                  const active = form.regionIds.includes(r.id);
+                  return (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => {
+                        const has = form.regionIds.includes(r.id);
+                        const regionIds = has
+                          ? form.regionIds.filter((x) => x !== r.id)
+                          : [...form.regionIds, r.id];
+                        patch({
+                          regionIds: regionIds.length ? regionIds : ["kerala"],
+                        });
+                      }}
+                      className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
+                        active
+                          ? "border-prompty-accent2 bg-prompty-accent2/20 text-white"
+                          : "border-prompty-border bg-prompty-bg text-prompty-muted hover:text-white"
+                      }`}
+                    >
+                      {r.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             {form.peopleCount === "group" ? (
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-prompty-muted">
-                  Crowd descriptors
-                </label>
+              <label className="block">
+                <FieldLabel>Crowd notes</FieldLabel>
                 <textarea
-                  rows={3}
                   value={form.crowdDescriptors}
-                  onChange={(e) =>
-                    patch({ crowdDescriptors: e.target.value })
-                  }
-                  placeholder="e.g. mixed adults 21+, festive attire, candid smiles…"
-                  className="w-full resize-y rounded-2xl border border-prompty-border bg-prompty-bg px-4 py-3 text-sm text-white outline-none ring-prompty-accent placeholder:text-prompty-muted/50 focus:ring-2"
+                  onChange={(e) => patch({ crowdDescriptors: e.target.value })}
+                  rows={3}
+                  className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
                 />
-              </div>
+              </label>
             ) : (
-              <div className="space-y-3">
-                {form.people.slice(0, personSlots).map((person, i) => (
-                  <PersonCard
-                    key={i}
-                    index={i}
-                    person={person}
-                    onChange={(p) => {
-                      const people = [...form.people];
-                      people[i] = p;
-                      patch({ people });
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
-
-          {/* D. Setting */}
-          <section className="space-y-2">
-            <h3 className="text-sm font-semibold text-white">Setting / where</h3>
-            <p className="text-[11px] text-prompty-muted">
-              Current: {getPlaceById(form.placeId)?.label ?? form.placeId}
-            </p>
-            <div className="flex max-h-36 flex-wrap gap-2 overflow-y-auto rounded-2xl border border-prompty-border bg-prompty-bg/50 p-2">
-              {PLACES.map((p) => {
-                const active = form.placeId === p.id;
-                return (
+              <>
+                <div className="flex flex-wrap gap-2">
                   <button
-                    key={p.id}
                     type="button"
-                    onClick={() => patch({ placeId: p.id })}
-                    className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                      active
-                        ? "border-prompty-accent bg-prompty-accent/25 text-white"
-                        : "border-prompty-border bg-prompty-elevated text-prompty-muted hover:text-white"
-                    }`}
+                    onClick={changeFacesOnly}
+                    className="rounded-xl border border-prompty-border px-3 py-2 text-xs font-medium text-prompty-muted hover:text-white"
                   >
-                    {p.label}
+                    Change faces only
                   </button>
-                );
-              })}
+                </div>
+                <div className="space-y-3">
+                  {form.people.slice(0, personSlots).map((person, i) => (
+                    <PersonCard
+                      key={i}
+                      index={i}
+                      person={person}
+                      onChange={(p) => {
+                        const people = [...form.people];
+                        people[i] = p;
+                        patch({ people });
+                      }}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </Section>
+
+          <Section step={3} title="Place & camera">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <SoftSelect
+                label="Place"
+                value={form.placeId}
+                options={PLACES.map((p) => ({ id: p.id, label: p.label }))}
+                onChange={(id) => patch({ placeId: id })}
+              />
+              <SoftSelect
+                label="Time of day"
+                value={form.timeOfDay}
+                options={TIMES_OF_DAY.map((t) => ({
+                  id: t.id,
+                  label: t.label,
+                }))}
+                onChange={(id) =>
+                  patch({
+                    timeOfDay: id as SceneFormState["timeOfDay"],
+                  })
+                }
+              />
+              <SoftSelect
+                label="Camera angle"
+                value={form.cameraAngle}
+                options={CAMERA_ANGLES.map((c) => ({
+                  id: c.id,
+                  label: c.label,
+                }))}
+                onChange={(id) =>
+                  patch({
+                    cameraAngle: id as SceneFormState["cameraAngle"],
+                  })
+                }
+              />
+              <SoftSelect
+                label="Framing"
+                value={form.framing}
+                options={FRAMINGS.map((f) => ({ id: f.id, label: f.label }))}
+                onChange={(id) =>
+                  patch({ framing: id as SceneFormState["framing"] })
+                }
+              />
             </div>
-          </section>
-
-          {/* E. Camera */}
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold text-white">Camera</h3>
-            <ChipGroup
-              label="Angle"
-              options={CAMERA_ANGLES.map((a) => a.label)}
-              value={
-                CAMERA_ANGLES.find((a) => a.id === form.cameraAngle)?.label ??
-                "3/4"
-              }
-              onChange={(label) => {
-                const found = CAMERA_ANGLES.find((a) => a.label === label);
-                if (found) patch({ cameraAngle: found.id });
-              }}
-            />
-            <ChipGroup
-              label="Framing"
-              options={FRAMINGS.map((f) => f.label)}
-              value={
-                FRAMINGS.find((f) => f.id === form.framing)?.label ??
-                "Full body"
-              }
-              onChange={(label) => {
-                const found = FRAMINGS.find((f) => f.label === label);
-                if (found) patch({ framing: found.id });
-              }}
-            />
-            <ChipGroup
+            <ChipRow
               label="Aspect ratio"
-              options={ASPECT_RATIOS}
+              options={ASPECT_RATIOS.map((r) => ({ id: r, label: r }))}
               value={form.aspectRatio}
-              onChange={(v) =>
-                patch({
-                  aspectRatio: v as SceneFormState["aspectRatio"],
-                })
+              onChange={(id) =>
+                patch({ aspectRatio: id as SceneFormState["aspectRatio"] })
               }
             />
-          </section>
+          </Section>
 
-          {/* F. Time */}
-          <section className="space-y-2">
-            <ChipGroup
-              label="Time of day"
-              options={TIMES_OF_DAY.map((t) => t.label)}
-              value={
-                TIMES_OF_DAY.find((t) => t.id === form.timeOfDay)?.label ??
-                "Evening"
-              }
-              onChange={(label) => {
-                const found = TIMES_OF_DAY.find((t) => t.label === label);
-                if (found) patch({ timeOfDay: found.id });
-              }}
-            />
-            <p className="text-[11px] text-prompty-muted">
-              Lighting:{" "}
-              {TIMES_OF_DAY.find((t) => t.id === form.timeOfDay)?.lighting}
-            </p>
-          </section>
-
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-prompty-muted">
-              Extra notes (optional)
+          <Section step={4} title="Notes">
+            <label className="block">
+              <FieldLabel>Extra notes</FieldLabel>
+              <textarea
+                value={form.extraNotes}
+                onChange={(e) => patch({ extraNotes: e.target.value })}
+                rows={2}
+                placeholder="Optional extras…"
+                className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent placeholder:text-prompty-muted/50 focus:ring-2"
+              />
             </label>
-            <textarea
-              rows={2}
-              value={form.extraNotes}
-              onChange={(e) => patch({ extraNotes: e.target.value })}
-              placeholder="Mood, props, weather…"
-              className="w-full resize-y rounded-2xl border border-prompty-border bg-prompty-bg px-4 py-3 text-sm text-white outline-none ring-prompty-accent placeholder:text-prompty-muted/50 focus:ring-2"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-prompty-muted">
-              Negative prompt
+            <label className="block">
+              <FieldLabel>Negative prompt</FieldLabel>
+              <textarea
+                value={form.negativePrompt}
+                onChange={(e) => patch({ negativePrompt: e.target.value })}
+                rows={2}
+                className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
+              />
             </label>
-            <textarea
-              rows={3}
-              value={form.negativePrompt}
-              onChange={(e) => patch({ negativePrompt: e.target.value })}
-              className="w-full resize-y rounded-2xl border border-prompty-border bg-prompty-bg px-4 py-3 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
-            />
-          </div>
+          </Section>
         </div>
 
-        <div className="space-y-4 lg:col-span-2">
-          <OutputCard
-            title="Short prompt"
-            subtitle="Compact · paste-friendly"
-            text={prompts.short}
-          />
-          <OutputCard
-            title="Detailed prompt"
-            subtitle="Structured · richer control"
-            text={prompts.detailed}
-          />
-          <OutputCard
-            title="Negative prompt"
-            subtitle="Default exclusions applied"
-            text={prompts.negative}
-          />
-
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={persist}
-              disabled={!prompts.short.trim()}
-              className="rounded-xl bg-gradient-to-r from-prompty-accent to-prompty-glow px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {savedFlash ? "Saved to recent ✓" : "Save to recent"}
-            </button>
-            <button
-              type="button"
-              onClick={resetRandom}
-              className="rounded-xl border border-prompty-border px-4 py-2.5 text-sm text-prompty-muted hover:text-white"
-            >
-              Randomize
-            </button>
-            <button
-              type="button"
-              onClick={changeFacesOnly}
-              className="rounded-xl border border-prompty-accent/50 px-4 py-2.5 text-sm text-prompty-accent2 hover:text-white"
-            >
-              Change faces
-            </button>
+        <aside className="space-y-4 lg:col-span-5 lg:sticky lg:top-4 lg:self-start">
+          <div className="rounded-2xl border border-prompty-border bg-prompty-surface/80 p-4 shadow-glow-sm">
+            <h3 className="mb-3 text-sm font-semibold text-white">
+              Live prompts
+            </h3>
+            <div className="space-y-3">
+              <OutputCard title="Short" text={prompts.short} />
+              <OutputCard title="Detailed" text={prompts.detailed} />
+              <OutputCard title="Negative" text={prompts.negative} />
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={persist}
+                disabled={!prompts.short.trim()}
+                className="rounded-xl bg-gradient-to-r from-prompty-accent to-prompty-glow px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm disabled:opacity-40"
+              >
+                {savedFlash ? "Saved ✓" : "Save"}
+              </button>
+              <button
+                type="button"
+                onClick={resetDefaults}
+                className="rounded-xl border border-prompty-border px-4 py-2.5 text-sm text-prompty-muted hover:text-white"
+              >
+                Reset defaults
+              </button>
+              <button
+                type="button"
+                onClick={changeFacesOnly}
+                className="rounded-xl border border-prompty-border px-4 py-2.5 text-sm text-prompty-muted hover:text-white"
+              >
+                Change faces
+              </button>
+              <button
+                type="button"
+                onClick={randomizeAll}
+                className="rounded-xl border border-prompty-border px-4 py-2.5 text-sm text-prompty-muted hover:text-white"
+              >
+                Randomize
+              </button>
+            </div>
           </div>
-        </div>
+        </aside>
       </div>
 
       <RecentList
@@ -565,26 +577,15 @@ export function PromptLab() {
   );
 }
 
-function OutputCard({
-  title,
-  subtitle,
-  text,
-}: {
-  title: string;
-  subtitle: string;
-  text: string;
-}) {
+function OutputCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-prompty-border bg-prompty-bg/80 p-4">
-      <div className="mb-3 flex items-start justify-between gap-3">
-        <div>
-          <h3 className="text-sm font-semibold text-white">{title}</h3>
-          <p className="text-[11px] text-prompty-muted">{subtitle}</p>
-        </div>
+    <div className="rounded-xl border border-prompty-border bg-prompty-bg/80 p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <h4 className="text-xs font-semibold text-white">{title}</h4>
         <CopyButton text={text} />
       </div>
-      <pre className="max-h-56 overflow-auto whitespace-pre-wrap break-words rounded-xl bg-prompty-elevated/60 p-3 font-mono text-xs leading-relaxed text-white/90">
-        {text.trim() || "Your assembled prompt will appear here…"}
+      <pre className="max-h-36 overflow-auto whitespace-pre-wrap break-words font-mono text-[11px] leading-relaxed text-white/85">
+        {text.trim() || "…"}
       </pre>
     </div>
   );
