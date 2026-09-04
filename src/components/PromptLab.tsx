@@ -47,6 +47,7 @@ import {
   loadRecent,
   saveFavoritePerson,
   saveRecent,
+  updateFavoritePerson,
 } from "@/lib/storage";
 import type { FavoritePerson, Mode, RecentPrompt, SceneFormState } from "@/lib/types";
 import { CopyButton } from "./CopyButton";
@@ -187,6 +188,7 @@ export function PromptLab() {
   const [actionQuery, setActionQuery] = useState("");
   const [favoritePeople, setFavoritePeople] = useState<FavoritePerson[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [editingFavoriteIds, setEditingFavoriteIds] = useState<Record<number, string>>({});
 
   useEffect(() => {
     setRecent(loadRecent());
@@ -377,9 +379,23 @@ export function PromptLab() {
   }
 
   function savePersonAsFavorite(person: SceneFormState["people"][number], index: number) {
-    const name = window.prompt("Name this favorite person", `Person ${index + 1}`);
+    const editingId = editingFavoriteIds[index];
+    const current = favoritePeople.find((favorite) => favorite.id === editingId);
+    const name = window.prompt(
+      editingId ? "Update this favorite person's name" : "Name this favorite person",
+      current?.name ?? `Person ${index + 1}`
+    );
     if (name === null) return;
-    setFavoritePeople(saveFavoritePerson(name, person));
+    if (editingId) {
+      setFavoritePeople(updateFavoritePerson(editingId, name, person));
+      setEditingFavoriteIds((ids) => {
+        const next = { ...ids };
+        delete next[index];
+        return next;
+      });
+    } else {
+      setFavoritePeople(saveFavoritePerson(name, person));
+    }
   }
 
   const visibleCategories = ACTION_CATEGORIES.filter((c) => {
@@ -490,12 +506,6 @@ export function PromptLab() {
                 }}
               />
               <SoftSelect
-                label="Action preset"
-                options={filteredActions.map((action) => ({ id: action.id, label: action.label }))}
-                value={form.actionId}
-                onChange={(id) => patch({ actionId: id, useCustomActionPrompt: false })}
-              />
-              <SoftSelect
                 label="Place"
                 value={form.placeId}
                 options={PLACES.map((place) => ({ id: place.id, label: place.label }))}
@@ -507,6 +517,61 @@ export function PromptLab() {
                 options={TIMES_OF_DAY.map((time) => ({ id: time.id, label: time.label }))}
                 onChange={(id) => patch({ timeOfDay: id as SceneFormState["timeOfDay"] })}
               />
+            </div>
+            <div>
+              <div className="mb-2 flex items-end justify-between gap-3">
+                <label className="block flex-1">
+                  <FieldLabel>Find an action preset</FieldLabel>
+                  <input
+                    type="search"
+                    value={actionQuery}
+                    onChange={(e) => setActionQuery(e.target.value)}
+                    placeholder="Search this category…"
+                    className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent placeholder:text-prompty-muted/50 focus:ring-2"
+                  />
+                </label>
+                <span className="pb-2 text-[10px] text-prompty-muted">{filteredActions.length} options</span>
+              </div>
+              <div className="max-h-60 space-y-1 overflow-y-auto rounded-xl border border-prompty-border bg-prompty-bg/50 p-2">
+                {filteredActions.length ? filteredActions.map((action) => {
+                  const active = form.actionId === action.id && !form.useCustomActionPrompt;
+                  return (
+                    <button
+                      key={action.id}
+                      type="button"
+                      onClick={() => patch({ actionId: action.id, useCustomActionPrompt: false })}
+                      className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition ${active ? "bg-prompty-accent/25 text-white" : "text-prompty-muted hover:bg-prompty-elevated hover:text-white"}`}
+                    >
+                      <span className={`h-2 w-2 shrink-0 rounded-full ${active ? "bg-prompty-accent2 shadow-[0_0_10px_rgba(100,207,197,.7)]" : "bg-prompty-border"}`} />
+                      <span className="flex-1">{action.label}</span>
+                      {active ? <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-accent2">Current</span> : null}
+                    </button>
+                  );
+                }) : <p className="p-3 text-xs text-prompty-muted">No matching actions.</p>}
+              </div>
+            </div>
+            <div>
+              <button
+                type="button"
+                aria-pressed={form.useCustomActionPrompt}
+                onClick={() => patch({ useCustomActionPrompt: !form.useCustomActionPrompt })}
+                className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${form.useCustomActionPrompt ? "border-prompty-accent2/50 bg-prompty-accent2/15 text-white" : "border-prompty-border bg-prompty-bg text-prompty-muted hover:text-white"}`}
+              >
+                + Custom action
+              </button>
+              {form.useCustomActionPrompt ? (
+                <label className="mt-3 block">
+                  <FieldLabel>Custom action prompt</FieldLabel>
+                  <textarea
+                    value={form.customActionPrompt}
+                    onChange={(e) => patch({ customActionPrompt: e.target.value })}
+                    rows={3}
+                    autoFocus
+                    placeholder="Describe exactly what should happen instead of using the selected preset…"
+                    className="w-full rounded-xl border border-prompty-accent2/35 bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent2 placeholder:text-prompty-muted/50 focus:ring-2"
+                  />
+                </label>
+              ) : null}
             </div>
             {form.useCustomActionPrompt && form.customActionPrompt.trim() ? (
               <div className="flex items-center justify-between rounded-xl border border-prompty-accent2/25 bg-prompty-accent2/10 px-3 py-2 text-xs text-prompty-accent2">
@@ -654,10 +719,12 @@ export function PromptLab() {
                       favoritePeople={favoritePeople}
                       onSelectFavorite={(favorite) => {
                         const people = [...form.people];
-                        people[i] = favorite;
+                        people[i] = { ...favorite.person };
+                        setEditingFavoriteIds((ids) => ({ ...ids, [i]: favorite.id }));
                         patch({ people });
                       }}
                       onSaveFavorite={() => savePersonAsFavorite(person, i)}
+                      saveLabel={editingFavoriteIds[i] ? "Update favorite" : "Save favorite"}
                       onChange={(p) => {
                         const people = [...form.people];
                         people[i] = p;
@@ -671,15 +738,27 @@ export function PromptLab() {
                     <FieldLabel>Manage favorite people</FieldLabel>
                     <div className="flex flex-wrap gap-2">
                       {favoritePeople.map((favorite) => (
-                        <button
-                          key={favorite.id}
-                          type="button"
-                          title={`Delete ${favorite.name}`}
-                          onClick={() => setFavoritePeople(deleteFavoritePerson(favorite.id))}
-                          className="rounded-lg border border-prompty-border px-2.5 py-1.5 text-xs text-prompty-muted hover:border-red-400/50 hover:text-red-200"
-                        >
-                          {favorite.name} ×
-                        </button>
+                        <div key={favorite.id} className="flex items-center gap-1 rounded-lg border border-prompty-border bg-prompty-bg p-1 pl-2.5 text-xs">
+                          <span className="mr-1 text-white">{favorite.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const people = [...form.people];
+                              people[0] = { ...favorite.person };
+                              patch({ peopleCount: form.peopleCount === "group" ? "1" : form.peopleCount, people });
+                              setEditingFavoriteIds((ids) => ({ ...ids, 0: favorite.id }));
+                            }}
+                            className="rounded-md px-2 py-1 text-prompty-accent2 hover:bg-prompty-elevated hover:text-white"
+                          >Edit</button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFavoritePeople(deleteFavoritePerson(favorite.id));
+                              setEditingFavoriteIds((ids) => Object.fromEntries(Object.entries(ids).filter(([, id]) => id !== favorite.id)));
+                            }}
+                            className="rounded-md px-2 py-1 text-prompty-muted hover:bg-red-500/10 hover:text-red-200"
+                          >Delete</button>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -762,28 +841,19 @@ export function PromptLab() {
                 className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent placeholder:text-prompty-muted/50 focus:ring-2"
               />
             </label>
-            <label className="block">
-              <FieldLabel>Negative prompt</FieldLabel>
-              <textarea
-                value={form.negativePrompt}
-                onChange={(e) => patch({ negativePrompt: e.target.value })}
-                rows={2}
-                className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
-              />
-            </label>
           </Section>
           </> : null}
         </div>
 
         <aside className="space-y-4 lg:col-span-5 lg:sticky lg:top-4 lg:self-start">
           <div className="rounded-2xl border border-prompty-border bg-prompty-surface/80 p-4 shadow-glow-sm">
-            <h3 className="mb-3 text-sm font-semibold text-white">
-              Live prompts
-            </h3>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-white">Live prompts</h3>
+              <button type="button" onClick={changeFacesOnly} className="rounded-lg border border-prompty-border px-2.5 py-1.5 text-xs text-prompty-muted transition hover:border-prompty-accent2/40 hover:text-white">Change faces</button>
+            </div>
             <div className="space-y-3">
               <OutputCard title="Short" text={prompts.short} />
               <OutputCard title="Detailed" text={prompts.detailed} />
-              <OutputCard title="Negative" text={prompts.negative} />
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <button
@@ -800,13 +870,6 @@ export function PromptLab() {
                 className="rounded-xl border border-prompty-border px-4 py-2.5 text-sm text-prompty-muted hover:text-white"
               >
                 Reset defaults
-              </button>
-              <button
-                type="button"
-                onClick={changeFacesOnly}
-                className="rounded-xl border border-prompty-border px-4 py-2.5 text-sm text-prompty-muted hover:text-white"
-              >
-                Change faces
               </button>
               <button
                 type="button"

@@ -64,3 +64,13 @@ export function deleteFavoritePerson(id: string): FavoritePerson[] {
   window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
   return list;
 }
+
+export function updateFavoritePerson(id: string, name: string, person: PersonFields): FavoritePerson[] {
+  const list = loadFavoritePeople().map((favorite) =>
+    favorite.id === id
+      ? { ...favorite, name: name.trim() || favorite.name, person: { ...person } }
+      : favorite
+  );
+  window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
+  return list;
+}

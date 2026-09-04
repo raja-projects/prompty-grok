@@ -68,14 +68,16 @@ export function PersonCard({
   favoritePeople,
   onSelectFavorite,
   onSaveFavorite,
+  saveLabel = "Save favorite",
 }: {
   index: number;
   person: PersonFields;
   regionIds: string[];
   onChange: (p: PersonFields) => void;
   favoritePeople: FavoritePerson[];
-  onSelectFavorite: (person: PersonFields) => void;
+  onSelectFavorite: (favorite: FavoritePerson) => void;
   onSaveFavorite: () => void;
+  saveLabel?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const isWoman = person.gender === "woman";
@@ -162,7 +164,7 @@ export function PersonCard({
             value=""
             onChange={(e) => {
               const favorite = favoritePeople.find((item) => item.id === e.target.value);
-              if (favorite) onSelectFavorite({ ...favorite.person });
+              if (favorite) onSelectFavorite(favorite);
             }}
             className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
           >
@@ -177,7 +179,7 @@ export function PersonCard({
           onClick={onSaveFavorite}
           className="rounded-xl border border-prompty-border px-3 py-2 text-xs font-medium text-prompty-muted hover:text-white"
         >
-          Save favorite
+          {saveLabel}
         </button>
       </div>
       <div className="mt-3 flex items-center justify-between rounded-xl bg-prompty-elevated/60 px-3 py-2 text-xs text-prompty-muted">
