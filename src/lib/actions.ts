@@ -8,6 +8,7 @@ export type ActionCategoryId =
   | "hardcore-grk"
   | "swap-own-grk"
   | "swap-cross-grk"
+  | "gf-exchange-grk"
   | "mmf-grk"
   | "mmmf-grk"
   | "ffm-grk"
@@ -91,6 +92,12 @@ export const ACTION_CATEGORIES: {
     restricted: true,
   },
   {
+    id: "gf-exchange-grk",
+    label: "Girlfriend exchange (19+)",
+    description: "Two consenting adult couples sharing mutual interest at secluded public spots — simultaneous own-partner and other-partner affection; auto 4 people",
+    restricted: true,
+  },
+  {
     id: "mmmf-grk",
     label: "Three men + her (19+)",
     description: "One consenting adult woman with three adult men — intense, fully clothed, indirect fabric-and-pressure scenes; auto 4 people",
@@ -150,6 +157,41 @@ const MMMF_MORE_ACTIONS: ActionItem[] = [
   { id: "mmmf-kneeling-dress-fold-lock", label: "Kneeling dress-fold lock", prompt: `she kneels upright in a fully covering dress while the men kneel close around her, separate palms pressing into fabric at waist, outer hips and upper back as she turns between kisses. ${MMMF_INDIRECT_LOCK}`, category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "3/4", autoFraming: "full-body" },
   { id: "mmmf-rear-embrace-side-kisses", label: "Rear embrace, side kisses", prompt: `one man holds her from behind with both hands visibly compressing her dress at the hips while two men kiss her from either side; she turns back enough for a clear full-face view. ${MMMF_INDIRECT_LOCK}`, category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "back", autoFraming: "half-body" },
 ];
+
+const GF_EXCHANGE_LOCK = "HARD CONSENT AND COMPOSITION LOCK: two established adult couples, everyone age 19 or older, openly aware of and enthusiastically participating in the shared exchange; each man keeps one unmistakable affectionate connection with his own girlfriend while simultaneously sharing a separate visible, fully clothed affectionate contact with the other girlfriend. Keep clothing completely in place and use indirect non-anatomical language; show distinct hands, believable reach and balance, all four faces identifiable, and a quiet secluded public moment with no bystanders visible.";
+
+const GF_EXCHANGE_SPOTS = [
+  { id: "theater-back-row", label: "Empty theater back row" },
+  { id: "park-gazebo", label: "Secluded park gazebo" },
+  { id: "tourist-fort-alcove", label: "Quiet fort alcove" },
+  { id: "mall-parking-corner", label: "Quiet parking corner" },
+  { id: "rooftop-corner-night", label: "Rooftop corner at night" },
+  { id: "library-stack-aisle", label: "Hidden library aisle" },
+  { id: "garden-hedge-nook", label: "Garden hedge nook" },
+  { id: "bridge-pillar-shadow", label: "Bridge-pillar shadow" },
+  { id: "backwaters-jetty-end", label: "Empty jetty end" },
+  { id: "beach-fishing-boat-gap", label: "Gap between fishing boats" },
+] as const;
+
+const GF_EXCHANGE_MOMENTS = [
+  { id: "cross-waist", label: "Cross-waist pull", text: "both couples stand close in a four-person diamond; each man keeps his own girlfriend's hand linked while his free arm draws the other girlfriend closer at the covered waist, creating crossed lines of fabric tension and exchanged smiles" },
+  { id: "shared-kisses", label: "Alternating shared kisses", text: "the couples remain paired shoulder-to-shoulder while each woman leans across for an exchanged cheek or mouth kiss, their own partners keeping a visible hand at the shoulder or waist and the other partner maintaining a second gentle hold" },
+  { id: "rear-hip", label: "Rear hip-pressure exchange", text: "both women face inward toward their own partners while the neighboring men stand diagonally behind, palms visibly pressing through clothing at outer hips and lower-back curves; each woman turns her face over her shoulder so every expression remains readable" },
+  { id: "seated-cross-hold", label: "Seated cross-hold", text: "the two couples sit closely on the same bench or ledge, each man holding his own girlfriend at the shoulder while reaching across to the other girlfriend's covered outer hip, with overlapping but fully traceable arms and playful mutual eye contact" },
+  { id: "four-way-embrace", label: "Four-way close embrace", text: "all four adults lean into a compact shared embrace, each original couple preserving a hand-linked connection while the exchanged hands settle firmly over clothing at opposite waists, shoulders and outer hips, fabric bunching naturally under the pressure" },
+] as const;
+
+const GF_EXCHANGE_ACTIONS: ActionItem[] = GF_EXCHANGE_SPOTS.flatMap((spot) =>
+  GF_EXCHANGE_MOMENTS.map((moment) => ({
+    id: `gfx-${spot.id}-${moment.id}`,
+    label: `${moment.label} · ${spot.label}`,
+    prompt: `${moment.text}. ${GF_EXCHANGE_LOCK}`,
+    category: "gf-exchange-grk" as const,
+    placeHints: [spot.id],
+    minPeople: 4,
+    ...(moment.id === "rear-hip" ? { autoCamera: "back" as const, autoFraming: "full-body" as const } : { autoCamera: "3/4" as const, autoFraming: "full-body" as const }),
+  }))
+);
 
 export const ACTIONS: ActionItem[] = [
   // Everyday / posture
@@ -917,6 +959,7 @@ export const ACTIONS: ActionItem[] = [
   { id: "mmmf-side-lying-layered", label: "Side-lying layered embrace", prompt: "one consenting adult woman age 19 or older lies fully dressed on her side across a wide bed while three adult men arrange in a staggered layered embrace around her; one supports her head and shoulders, one holds her waist and one presses close along her clothed lower curves, with realistic mattress compression, bent limbs and visible hands; her face remains unobstructed in profile and all adults remain identifiable, indirect language only", category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "3/4", autoFraming: "full-body" },
   { id: "mmmf-dress-hem-pressure-lock", label: "Fitted-dress pressure lock", prompt: "one consenting adult woman age 19 or older remains fully covered in a fitted knee-length dress while three adult men surround her in a high-tension standing pose; hands grip over the dress at her waist, outer hips, shoulder blades and lower-back curve, visibly stretching the fabric into deep directional folds without lifting the hem or exposing anatomy; her turned face and all three men's faces remain clear, realistic balance and indirect wording only", category: "mmmf-grk", placeHints: ["bedroom", "hotel"], minPeople: 4, autoCamera: "3/4", autoFraming: "full-body" },
   ...MMMF_MORE_ACTIONS,
+  ...GF_EXCHANGE_ACTIONS,
 
   // --- Crowd press (19+): crowded stranger fabric pressure that looks casual ---
   { id: "cp-bus-board-backside", label: "Crowded bus boarding, backside fabric press", prompt: "on crowded bus steps a mid-age man stands close behind a young adult woman and presses both hands firmly into the soft lower curves of her backside to guide her inside, fabric strongly indented, both looking ahead calm as if nothing unusual. Camera from behind her back clearly shows a deep press into the soft lower curves of her backside with strong fabric tension and deep stretched indentation. She turns her head over her shoulder so her face is clearly visible. He stays close behind her. Calm ordinary expressions as if nothing unusual is happening.", category: "crowd-press-grk", placeHints: ["station", "street", "bus-last-row"], minPeople: 2, autoCamera: "back", autoFraming: "half-body"},
@@ -1068,7 +1111,7 @@ export function getActionsByCategory(
   opts?: { allowIntimate?: boolean }
 ): ActionItem[] {
   if (
-    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-own-grk" || category === "swap-cross-grk" || category === "mmf-grk" || category === "mmmf-grk" || category === "ffm-grk" || category === "crowd-press-grk" || category === "wlw-grk") &&
+    (category === "intimate" || category === "hardcore" || category === "hardcore-grk" || category === "swap-own-grk" || category === "swap-cross-grk" || category === "gf-exchange-grk" || category === "mmf-grk" || category === "mmmf-grk" || category === "ffm-grk" || category === "crowd-press-grk" || category === "wlw-grk") &&
     opts?.allowIntimate === false
   )
     return [];
@@ -1088,7 +1131,7 @@ export function randomEverydayOrSocialAction(): ActionItem {
 
 export function isIntimateAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "mmf-grk" || c === "mmmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
+  return c === "intimate" || c === "hardcore" || c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "gf-exchange-grk" || c === "mmf-grk" || c === "mmmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
 }
 
 /** Original Hardcore category only — keeps direct phrasing sanitize path. */
@@ -1098,7 +1141,7 @@ export function isHardcoreAction(id: string): boolean {
 
 export function isHardcoreGrkAction(id: string): boolean {
   const c = getActionById(id)?.category;
-  return c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "mmf-grk" || c === "mmmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
+  return c === "hardcore-grk" || c === "swap-own-grk" || c === "swap-cross-grk" || c === "gf-exchange-grk" || c === "mmf-grk" || c === "mmmf-grk" || c === "ffm-grk" || c === "crowd-press-grk" || c === "wlw-grk";
 }
 
 /** Romance / Intimate / Hardcore / Hardcore-grk / Swap-four require every person 19+. */
@@ -1109,6 +1152,7 @@ export function categoryRequiresAdult21(category: ActionCategoryId): boolean {
     category === "hardcore" ||
     category === "hardcore-grk" ||
     category === "swap-own-grk" || category === "swap-cross-grk" ||
+    category === "gf-exchange-grk" ||
     category === "mmf-grk" ||
     category === "mmmf-grk" ||
     category === "ffm-grk" ||
@@ -1139,6 +1183,7 @@ export function categoryCounts(): Record<ActionCategoryId, number> {
     "hardcore-grk": 0,
     "swap-own-grk": 0,
     "swap-cross-grk": 0,
+    "gf-exchange-grk": 0,
     "mmf-grk": 0,
     "mmmf-grk": 0,
     "ffm-grk": 0,
