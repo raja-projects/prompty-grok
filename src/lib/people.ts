@@ -410,6 +410,27 @@ export function defaultPerson(overrides?: Partial<PersonFields>): PersonFields {
 /** Default cast for Two women + him: two women + one man (all 21+). */
 
 /** Default cast for Crowd press: young-adult woman + mid-age man (strangers, 21+). */
+
+/** Default cast for Women together: two women (all 21+). */
+export function defaultWlwPeople(): PersonFields[] {
+  return [
+    defaultPerson({
+      gender: "woman",
+      age: "24",
+      dressId: "w-kerala-cotton-sexy",
+      hairStyle: "Long wavy",
+      bodyType: "Slim",
+    }),
+    defaultPerson({
+      gender: "woman",
+      age: "27",
+      dressId: "w-skinfit-jeans-tiny-blouse",
+      hairStyle: "Long wavy",
+      bodyType: "Curvy",
+    }),
+  ];
+}
+
 export function defaultCrowdPressPeople(): PersonFields[] {
   return [
     defaultPerson({
