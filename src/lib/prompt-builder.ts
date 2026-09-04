@@ -104,6 +104,13 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
   const lighting = lightingFor(state);
   const camera = cameraPhrase(state);
   const sanitizeMode = isHardcoreAction(state.actionId) ? "hardcore" : "soft";
+  const partnerAgencyCue =
+    isIntimateAction(state.actionId) && state.peopleCount !== "1"
+      ? "Clear partner agency: one adult partner performs the touching/grabbing/pressing on the other adult partner's body — never self-touch on their own chest, backside, or center unless the chosen action is explicitly labeled solo self-touch"
+      : isIntimateAction(state.actionId) && state.peopleCount === "1"
+        ? "Solo adult self-touch only if the selected action is explicitly a solo self-touch action"
+        : "";
+
   const notes = sanitizeText(state.extraNotes, sanitizeMode);
   const quality = DEFAULT_QUALITY_PHRASE;
 
@@ -113,6 +120,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       rel,
       regions ? `appearance cues: ${regions}` : "",
       actionText,
+      partnerAgencyCue,
       `at ${placeText}`,
       `${state.timeOfDay} lighting`,
       camera,
@@ -127,7 +135,7 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
       `Photorealistic real photograph of ${people}`,
       rel ? `They share a ${rel}` : "",
       regions ? `Cultural/appearance cues: ${regions}` : "",
-      `Action: ${actionText}`,
+      `Action: ${actionText}${partnerAgencyCue ? `. ${partnerAgencyCue}` : ""}`,
       `Setting: ${placeText}`,
       `Time: ${state.timeOfDay} with ${lighting}`,
       `Camera: ${camera}`,
