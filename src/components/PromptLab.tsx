@@ -22,6 +22,7 @@ import {
   defaultPerson,
   defaultFoursomeSwapPeople,
   defaultMmfPeople,
+  defaultFfmPeople,
   relationshipBlocksIntimate,
   reshuffleFaceCuts,
   applyRegionLook,
@@ -227,6 +228,22 @@ export function PromptLab() {
         }
       }
 
+      // Two women + him: force 3 people = 2 women + 1 man
+      if (partial.actionCategory === "ffm-grk") {
+        next.peopleCount = "3";
+        next.people = defaultFfmPeople();
+        if (!relationshipBlocksIntimate("friends")) {
+          next.relationship = "friends";
+        }
+        const first =
+          ACTIONS.find((a) => a.category === "ffm-grk") ??
+          getActionById(next.actionId);
+        if (first && getActionById(next.actionId)?.category !== "ffm-grk") {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+        }
+      }
+
       // Safety only: sibling/parent cannot keep intimate/hardcore selected.
       if (partial.relationship) {
         const blocked = relationshipBlocksIntimate(partial.relationship);
@@ -294,7 +311,7 @@ export function PromptLab() {
   }
 
   const visibleCategories = ACTION_CATEGORIES.filter((c) => {
-    if ((c.id === "intimate" || c.id === "hardcore" || c.id === "hardcore-grk" || c.id === "swap-four-grk" || c.id === "mmf-grk") && intimateBlocked) return false;
+    if ((c.id === "intimate" || c.id === "hardcore" || c.id === "hardcore-grk" || c.id === "swap-four-grk" || c.id === "mmf-grk" || c.id === "ffm-grk") && intimateBlocked) return false;
     if (under21 && categoryRequiresAdult21(c.id)) return false;
     return true;
   });
@@ -302,7 +319,7 @@ export function PromptLab() {
   const filteredActions = ACTIONS.filter((a) => {
     if (a.category !== form.actionCategory) return false;
     if (
-      (a.category === "intimate" || a.category === "hardcore" || a.category === "hardcore-grk" || a.category === "swap-four-grk" || a.category === "mmf-grk") &&
+      (a.category === "intimate" || a.category === "hardcore" || a.category === "hardcore-grk" || a.category === "swap-four-grk" || a.category === "mmf-grk" || a.category === "ffm-grk") &&
       intimateBlocked
     )
       return false;
@@ -357,7 +374,7 @@ export function PromptLab() {
           <Section
             step={1}
             title="Action"
-            hint="Most categories only filter actions. Swap four sets 4 people; Two men + her sets 3 (1F+2M)."
+            hint="Most categories only filter actions. Swap four=4; Two men+her / Two women+him=3."
           >
             <ChipRow
               label="Category"
