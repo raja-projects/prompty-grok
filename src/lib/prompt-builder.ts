@@ -40,9 +40,9 @@ function sentence(parts: Array<string | undefined | null | false>): string {
   return /[.!?]$/.test(text) ? text : `${text}.`;
 }
 
-function describePerson(p: PersonFields, index: number, regionIds?: string[]): string {
+function describePerson(p: PersonFields, index: number, regionIds?: string[], faceCutPool?: "general" | "known"): string {
   const label = `person ${index + 1}`;
-  const faceCut = getFaceCut(p.gender, p.faceCutId, p.age, regionIds);
+  const faceCut = getFaceCut(p.gender, p.faceCutId, p.age, regionIds, faceCutPool);
   const face = faceCut?.prompt;
   const dress = getDress(p.gender, p.dressId)?.prompt ?? p.dressId;
   const ageNum = p.age || "24";
@@ -75,7 +75,7 @@ function peopleBlock(state: SceneFormState): string {
   const n = Number(state.peopleCount);
   const listed = state.people
     .slice(0, n)
-    .map((p, i) => describePerson(p, i, state.regionIds))
+    .map((p, i) => describePerson(p, i, state.regionIds, state.faceCutPool))
     .join("; ");
   return listed || `${n} adult${n > 1 ? "s" : ""}`;
 }
@@ -240,6 +240,7 @@ export function createStudioDefaults(): SceneFormState {
     actionCategory: "hardcore",
     actionId: "hc-face-into-central-curve",
     regionIds: ["kerala"],
+    faceCutPool: "general",
     peopleCount: "2",
     relationship: "couple",
     people: [woman, man],
@@ -267,6 +268,7 @@ export function createRandomizedDefaults(): SceneFormState {
     actionCategory: action.category,
     actionId: action.id,
     regionIds: [...DEFAULT_REGION_IDS],
+    faceCutPool: "general",
     peopleCount,
     relationship,
     people: defaultPeopleForCount(peopleCount),

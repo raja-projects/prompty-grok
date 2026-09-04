@@ -53,16 +53,18 @@ export function PersonCard({
   index,
   person,
   regionIds,
+  faceCutPool = "general",
   onChange,
 }: {
   index: number;
   person: PersonFields;
   regionIds: string[];
+  faceCutPool?: "general" | "known";
   onChange: (p: PersonFields) => void;
 }) {
   const skinOpts = skinTonesForRegions(regionIds);
   const hairOpts = hairColorsForRegions(regionIds);
-  const faceOpts = faceCutsForAge(person.gender, person.age, regionIds);
+  const faceOpts = faceCutsForAge(person.gender, person.age, regionIds, faceCutPool);
 
   function patch(partial: Partial<PersonFields>) {
     const next = { ...person, ...partial };
@@ -73,17 +75,17 @@ export function PersonCard({
       if (!hairs.includes(next.hairStyle)) next.hairStyle = hairs[0]!;
       const bodies = bodyTypesForAge(g, next.age);
       if (!bodies.includes(next.bodyType)) next.bodyType = bodies[0]!;
-      const cuts = faceCutsForAge(g, next.age, regionIds);
+      const cuts = faceCutsForAge(g, next.age, regionIds, faceCutPool);
       if (!cuts.some((c) => c.id === next.faceCutId)) {
-        next.faceCutId = defaultFaceCutId(g, next.age, regionIds);
+        next.faceCutId = defaultFaceCutId(g, next.age, regionIds, faceCutPool);
       }
     }
     if (partial.age && partial.age !== person.age) {
       const bodies = bodyTypesForAge(next.gender, next.age);
       if (!bodies.includes(next.bodyType)) next.bodyType = bodies[0]!;
-      const cuts = faceCutsForAge(next.gender, next.age, regionIds);
+      const cuts = faceCutsForAge(next.gender, next.age, regionIds, faceCutPool);
       if (!cuts.some((c) => c.id === next.faceCutId)) {
-        next.faceCutId = defaultFaceCutId(next.gender, next.age, regionIds);
+        next.faceCutId = defaultFaceCutId(next.gender, next.age, regionIds, faceCutPool);
       }
     }
     onChange(next);
@@ -118,7 +120,7 @@ export function PersonCard({
         </label>
         <label className="block space-y-1 sm:col-span-2">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
-            Face cut
+            Face cut {faceCutPool === "known" ? "(known looks)" : "(random library)"}
           </span>
           <select
             value={faceOpts.some((f) => f.id === person.faceCutId) ? person.faceCutId : (faceOpts[0]?.id ?? "")}

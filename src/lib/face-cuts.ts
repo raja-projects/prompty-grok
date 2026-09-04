@@ -1,11 +1,15 @@
 /** Region-locked face-cut library: each cut is tagged to phenotype region(s). */
 import type { Gender } from "./people";
 
+export type FaceCutPool = "general" | "known";
+
 export interface FaceCut {
   id: string;
   label: string;
   /** Phenotype region ids this face matches (must align with scene region). */
   regionIds: string[];
+  /** general = random library; known = celebrity-inspired (UI name only, never in prompt). */
+  pool?: FaceCutPool;
   prompt: string;
 }
 
@@ -483,19 +487,124 @@ export const YOUNG_ADULT_MAN_FACE_CUTS: FaceCut[] = [
 
 export const YOUNG_ADULT_NONBINARY_FACE_CUTS: FaceCut[] = YOUNG_ADULT_WOMAN_FACE_CUTS.filter((_, i) => i % 2 === 0).slice(0, 24);
 
+
+/** Known / celebrity-inspired faces. Label shows name for UI; prompt never names the person. */
+export const KNOWN_WOMAN_FACE_CUTS: FaceCut[] = [
+  { id: "kw-nayan", label: "Inspired: Nayanthara", regionIds: ["tamil", "kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: strong elegant oval face, sharp expressive dark eyes, defined arched brows, refined straight nose, full soft lips, high soft cheekbones, confident calm gaze, clear natural skin with fine pores, classic heroine bone structure, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-samantha", label: "Inspired: Samantha", regionIds: ["telugu", "tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft oval face, large bright dark eyes, soft arched brows, petite refined nose, warm apple cheeks, full smile-ready lips, fresh natural skin with fine pores, graceful heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-kajal", label: "Inspired: Kajal Aggarwal", regionIds: ["telugu", "tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft rounded oval face, large doe-like dark eyes, soft brows, delicate nose, full rosy cheeks, plush lips, luminous natural skin with fine pores, gentle glamorous heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-tamannaah", label: "Inspired: Tamannaah", regionIds: ["telugu", "tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: youthful oval face, large sparkling dark eyes, soft brows, soft button-soft nose, full cheeks, wide bright smile lips, fresh natural skin with fine pores, lively heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-trisha", label: "Inspired: Trisha", regionIds: ["tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: elegant oval face, soft almond dark eyes, neat brows, refined nose, soft sculpted cheeks, gentle smile lips, clear natural skin with fine pores, classic Tamil heroine elegance, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-keerthy", label: "Inspired: Keerthy Suresh", regionIds: ["tamil", "kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft round-oval face, large expressive dark eyes, soft brows, soft nose tip, full soft cheeks, natural full lips, warm natural skin with fine pores, fresh girl-next-door heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-sai-pallavi", label: "Inspired: Sai Pallavi", regionIds: ["tamil", "telugu", "kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: natural soft oval face, deep expressive dark eyes, soft natural brows, soft nose, minimal makeup look, soft cheeks, natural lips, real skin texture with fine pores, understated graceful heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-rashmika", label: "Inspired: Rashmika Mandanna", regionIds: ["kannada", "telugu"], pool: "known", prompt: "strikingly beautiful South Indian woman: bright oval face, large lively dark eyes, soft brows, soft nose, full cheerful cheeks, wide smile lips, fresh natural skin with fine pores, energetic heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-anushka-s", label: "Inspired: Anushka Shetty", regionIds: ["telugu", "tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: tall elegant oval face, intense dark eyes, strong brows, defined nose, high cheekbones, full lips, clear natural skin with fine pores, regal heroine bone structure, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-shruti", label: "Inspired: Shruti Haasan", regionIds: ["tamil", "telugu"], pool: "known", prompt: "strikingly beautiful South Indian woman: sharp soft-diamond face, striking dark eyes, defined brows, refined nose, high soft cheekbones, full lips, clear natural skin with fine pores, edgy glamorous heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-hansika", label: "Inspired: Hansika", regionIds: ["tamil", "telugu"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft round-oval face, large soft dark eyes, thin soft brows, petite nose, full cheeks, soft pout lips, smooth natural skin with fine pores, soft glam heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-amala", label: "Inspired: Amala Paul", regionIds: ["tamil", "kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft oval face, deep dark eyes, soft brows, soft nose, warm cheeks, natural full lips, clear natural skin with fine pores, contemporary heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-aishwarya-r", label: "Inspired: Aishwarya Rajesh", regionIds: ["tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft natural oval face, expressive dark eyes, soft brows, soft nose, warm cheeks, natural smile, real skin texture with fine pores, grounded Tamil heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-nithya", label: "Inspired: Nithya Menen", regionIds: ["kerala", "tamil", "telugu"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft round-oval face, large soft dark eyes, natural brows, soft nose, gentle cheeks, soft natural lips, fresh natural skin with fine pores, warm understated heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-manju", label: "Inspired: Manju Warrier", regionIds: ["kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: elegant oval face, sharp expressive dark eyes, defined brows, refined nose, soft high cheeks, firm soft lips, clear natural skin with fine pores, classic Malayalam heroine strength, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-parvathy", label: "Inspired: Parvathy", regionIds: ["kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft oval face, deep thoughtful dark eyes, soft brows, soft nose, natural cheeks, natural lips, real skin texture with fine pores, intelligent graceful Malayalam heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-malavika", label: "Inspired: Malavika Mohanan", regionIds: ["kerala", "tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: long elegant oval face, large dark eyes, soft brows, refined nose, high soft cheekbones, full lips, clear natural skin with fine pores, modern model-heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-pooja-h", label: "Inspired: Pooja Hegde", regionIds: ["telugu", "kannada"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft glamorous oval face, large dark eyes, soft arched brows, refined nose, soft sculpted cheeks, full soft lips, clear natural skin with fine pores, glossy heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-raashi", label: "Inspired: Raashi Khanna", regionIds: ["telugu", "tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft oval face, bright dark eyes, soft brows, soft nose, warm cheeks, gentle smile lips, fresh natural skin with fine pores, polished heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-regina", label: "Inspired: Regina Cassandra", regionIds: ["tamil", "telugu"], pool: "known", prompt: "strikingly beautiful South Indian woman: elegant oval face, sharp dark eyes, defined brows, refined nose, soft high cheeks, full lips, clear natural skin with fine pores, stylish heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-priya-bs", label: "Inspired: Priya Bhavani Shankar", regionIds: ["tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft oval face, expressive dark eyes, soft brows, soft nose, warm cheeks, natural smile, real skin texture with fine pores, contemporary Tamil heroine / serial-lead look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-sneha", label: "Inspired: Sneha", regionIds: ["tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft round-oval face, large soft dark eyes, soft brows, soft nose, full soft cheeks, gentle lips, warm natural skin with fine pores, classic Tamil heroine softness, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-jyothika", label: "Inspired: Jyothika", regionIds: ["tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft oval face, warm expressive dark eyes, soft brows, soft nose, soft cheeks, natural smile lips, clear natural skin with fine pores, graceful Tamil heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-meena", label: "Inspired: Meena", regionIds: ["tamil", "kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: classic oval face, large expressive dark eyes, soft brows, soft nose, full soft cheeks, warm smile, clear natural skin with fine pores, evergreen South Indian heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-simran", label: "Inspired: Simran", regionIds: ["tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: elegant oval face, sharp dark eyes, defined brows, refined nose, soft cheekbones, full lips, clear natural skin with fine pores, 90s-modern Tamil heroine elegance, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-asin", label: "Inspired: Asin", regionIds: ["tamil", "kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft oval face, large bright dark eyes, soft brows, soft nose, warm cheeks, bright smile, fresh natural skin with fine pores, lively classic heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-genelia", label: "Inspired: Genelia", regionIds: ["telugu", "tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft round-oval face, large sparkling dark eyes, soft brows, petite nose, full cheerful cheeks, wide smile lips, fresh natural skin with fine pores, bubbly heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-ileana", label: "Inspired: Ileana", regionIds: ["telugu"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft glamorous oval face, large dark eyes, soft arched brows, refined nose, soft sculpted cheeks, full lips, clear natural skin with fine pores, western-glam Telugu heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-nazriya", label: "Inspired: Nazriya", regionIds: ["kerala", "tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: petite soft oval face, large soft dark eyes, soft brows, soft nose, soft cheeks, gentle smile, fresh natural skin with fine pores, cute graceful Malayalam heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-nivetha-t", label: "Inspired: Nivetha Thomas", regionIds: ["telugu", "kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft oval face, deep calm dark eyes, soft brows, soft nose, gentle cheeks, natural lips, real skin texture with fine pores, soft contemporary heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-nivetha-p", label: "Inspired: Nivetha Pethuraj", regionIds: ["tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft round-oval face, bright dark eyes, soft brows, soft nose, full warm cheeks, natural smile, clear natural skin with fine pores, cheerful Tamil heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-aishwarya-l", label: "Inspired: Aishwarya Lekshmi", regionIds: ["kerala", "tamil"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft elegant oval face, large dark eyes, soft brows, refined nose, soft cheeks, natural full lips, clear natural skin with fine pores, modern Malayalam heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-kalyani", label: "Inspired: Kalyani Priyadarshan", regionIds: ["kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft oval face, bright dark eyes, soft brows, soft nose, warm cheeks, gentle smile, fresh natural skin with fine pores, youthful Malayalam heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-anna-ben", label: "Inspired: Anna Ben", regionIds: ["kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft natural oval face, expressive dark eyes, soft brows, soft nose, natural cheeks, natural lips, real skin texture with fine pores, grounded Malayalam heroine look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-darshana", label: "Inspired: Darshana Rajendran", regionIds: ["kerala"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft oval face, deep dark eyes, soft brows, soft nose, gentle cheeks, natural lips, clear natural skin with fine pores, contemporary Malayalam heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-rasha", label: "Inspired: Rasha Thadani", regionIds: ["north-indian", "western"], pool: "known", prompt: "strikingly beautiful woman: soft glamorous oval face, large dark eyes, soft arched brows, refined nose, soft sculpted cheeks, full lips, clear natural skin with fine pores, young fashion-model features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-suhana", label: "Inspired: Suhana Khan", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft oval face, large dark eyes, soft brows, soft nose, warm cheeks, gentle smile, fresh natural skin with fine pores, youthful model-actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-ananya", label: "Inspired: Ananya Panday", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft round-oval face, large bright dark eyes, soft brows, soft nose, full cheeks, soft smile lips, fresh natural skin with fine pores, youthful Bollywood model-actress look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-sharvari", label: "Inspired: Sharvari", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft oval face, sharp dark eyes, soft arched brows, refined nose, soft high cheeks, full lips, clear natural skin with fine pores, modern model-actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-janhvi", label: "Inspired: Janhvi Kapoor", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft oval face, large dark eyes, soft brows, soft nose, full soft cheeks, full lips, clear natural skin with fine pores, glamorous young actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-kiara", label: "Inspired: Kiara Advani", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft glamorous oval face, large dark eyes, soft arched brows, refined nose, soft sculpted cheeks, full soft lips, clear natural skin with fine pores, polished actress-model look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-kriti", label: "Inspired: Kriti Sanon", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: tall elegant oval face, large dark eyes, soft brows, refined nose, high soft cheekbones, full lips, clear natural skin with fine pores, model-turned-actress bone structure, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-deepika", label: "Inspired: Deepika Padukone", regionIds: ["north-indian", "kannada"], pool: "known", prompt: "strikingly beautiful woman: long elegant oval face, striking dark eyes, defined brows, refined nose, high cheekbones, full lips, clear natural skin with fine pores, statuesque heroine-model features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-alia", label: "Inspired: Alia Bhatt", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft round-oval face, large expressive dark eyes, soft brows, soft nose, full soft cheeks, soft smile lips, fresh natural skin with fine pores, youthful actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-katrina", label: "Inspired: Katrina Kaif", regionIds: ["western", "north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft glamorous oval face, large light-dark eyes, soft arched brows, refined nose, soft sculpted cheeks, full lips, clear natural skin with fine pores, international model-actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-disha", label: "Inspired: Disha Patani", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft athletic oval face, large dark eyes, soft brows, soft nose, soft cheeks, full lips, clear natural skin with fine pores, fitness-model actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-nora", label: "Inspired: Nora Fatehi", regionIds: ["western", "north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft glamorous oval face, large dark eyes, defined brows, refined nose, high soft cheekbones, full lips, clear natural skin with fine pores, dancer-model features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-mrunal", label: "Inspired: Mrunal Thakur", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft oval face, warm dark eyes, soft brows, soft nose, soft cheeks, gentle smile, real skin texture with fine pores, graceful actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-sanya", label: "Inspired: Sanya Malhotra", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft natural oval face, expressive dark eyes, soft brows, soft nose, natural cheeks, natural lips, real skin texture with fine pores, grounded actress look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-wamiqa", label: "Inspired: Wamiqa Gabbi", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft oval face, sharp dark eyes, soft brows, refined nose, soft cheeks, full lips, clear natural skin with fine pores, contemporary actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-sobhita", label: "Inspired: Sobhita Dhulipala", regionIds: ["telugu", "north-indian"], pool: "known", prompt: "strikingly beautiful woman: long elegant oval face, striking dark eyes, defined brows, refined nose, high soft cheekbones, full lips, clear natural skin with fine pores, fashion-model actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-banita", label: "Inspired: Banita Sandhu", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft oval face, large dark eyes, soft brows, soft nose, soft cheeks, natural lips, clear natural skin with fine pores, model-actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-aditi-r", label: "Inspired: Aditi Rao Hydari", regionIds: ["north-indian", "telugu"], pool: "known", prompt: "strikingly beautiful woman: delicate soft-diamond face, large soft dark eyes, soft brows, refined nose, soft high cheeks, soft lips, clear natural skin with fine pores, ethereal actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-taapsee", label: "Inspired: Taapsee Pannu", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft oval face, sharp expressive dark eyes, defined brows, refined nose, soft cheeks, firm soft lips, clear natural skin with fine pores, strong contemporary actress look, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-vidya", label: "Inspired: Vidya Balan", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft round-oval face, large expressive dark eyes, soft brows, soft nose, full warm cheeks, full smile lips, clear natural skin with fine pores, classic graceful actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-kajol", label: "Inspired: Kajol", regionIds: ["north-indian", "bengali"], pool: "known", prompt: "strikingly beautiful woman: soft oval face, large intense dark eyes, defined brows, soft nose, warm cheeks, full smile, clear natural skin with fine pores, classic Bollywood heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-madhuri", label: "Inspired: Madhuri Dixit", regionIds: ["north-indian"], pool: "known", prompt: "strikingly beautiful woman: soft oval face, large expressive dark eyes, soft arched brows, soft nose, warm cheeks, iconic smile lips, clear natural skin with fine pores, classic dancer-actress elegance, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-aishwarya-r-b", label: "Inspired: Aishwarya Rai", regionIds: ["tamil", "north-indian"], pool: "known", prompt: "strikingly beautiful woman: elegant oval face, striking light-dark eyes, soft arched brows, refined nose, soft high cheekbones, full soft lips, clear natural skin with fine pores, classic international beauty features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-sridevi", label: "Inspired: Sridevi", regionIds: ["tamil", "telugu", "north-indian"], pool: "known", prompt: "strikingly beautiful South Indian woman: soft elegant oval face, large expressive dark eyes, soft brows, soft nose, soft cheeks, iconic smile, clear natural skin with fine pores, legendary heroine features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "kw-rekha", label: "Inspired: Rekha", regionIds: ["north-indian", "tamil"], pool: "known", prompt: "strikingly beautiful woman: long elegant oval face, almond dark eyes, defined brows, refined nose, high soft cheekbones, full lips, clear natural skin with fine pores, classic regal actress features, adult woman 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+];
+
+export const KNOWN_MAN_FACE_CUTS: FaceCut[] = [
+  { id: "km-dulquer", label: "Inspired: Dulquer Salmaan", regionIds: ["kerala", "tamil"], pool: "known", prompt: "handsome South Indian man: soft oval masculine face, warm dark eyes, neat brows, refined soft nose, soft cheeks, gentle smile, clear natural skin with fine pores, charming Malayalam hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-nivin", label: "Inspired: Nivin Pauly", regionIds: ["kerala"], pool: "known", prompt: "handsome South Indian man: soft round-oval masculine face, warm dark eyes, soft brows, soft nose, friendly cheeks, natural smile, real skin texture with fine pores, boy-next-door Malayalam hero look, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-fahadh", label: "Inspired: Fahadh Faasil", regionIds: ["kerala"], pool: "known", prompt: "handsome South Indian man: sharp soft-rectangular face, intense dark eyes, defined brows, refined nose, lean cheeks, firm lips, clear natural skin with fine pores, understated Malayalam hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-vijay-d", label: "Inspired: Vijay Deverakonda", regionIds: ["telugu"], pool: "known", prompt: "handsome South Indian man: soft rugged oval face, intense dark eyes, thick brows, defined nose, stubbled soft jaw, clear natural skin with fine pores, contemporary Telugu hero look, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-ram-charan", label: "Inspired: Ram Charan", regionIds: ["telugu"], pool: "known", prompt: "handsome South Indian man: soft oval masculine face, sharp dark eyes, neat brows, refined nose, soft sculpted cheeks, clear natural skin with fine pores, polished Telugu hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-ntr", label: "Inspired: Jr NTR", regionIds: ["telugu"], pool: "known", prompt: "handsome South Indian man: energetic oval face, intense dark eyes, strong brows, defined nose, firm jaw, clear natural skin with fine pores, powerful Telugu hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-allu", label: "Inspired: Allu Arjun", regionIds: ["telugu"], pool: "known", prompt: "handsome South Indian man: soft stylish oval face, sharp dark eyes, neat brows, refined nose, soft cheeks, clear natural skin with fine pores, stylish Telugu hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-surya", label: "Inspired: Suriya", regionIds: ["tamil"], pool: "known", prompt: "handsome South Indian man: soft oval masculine face, warm intense dark eyes, neat brows, refined nose, soft cheeks, clear natural skin with fine pores, earnest Tamil hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-karthi", label: "Inspired: Karthi", regionIds: ["tamil"], pool: "known", prompt: "handsome South Indian man: soft rugged oval face, warm dark eyes, thick brows, soft nose, friendly stubble jaw, real skin texture with fine pores, grounded Tamil hero look, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-dhanush", label: "Inspired: Dhanush", regionIds: ["tamil"], pool: "known", prompt: "handsome South Indian man: lean oval face, expressive dark eyes, soft brows, soft nose, lean cheeks, natural smile, real skin texture with fine pores, distinctive Tamil hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-sivakarthikeyan", label: "Inspired: Sivakarthikeyan", regionIds: ["tamil"], pool: "known", prompt: "handsome South Indian man: soft oval face, bright dark eyes, neat brows, soft nose, friendly smile, clear natural skin with fine pores, cheerful Tamil hero look, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-prithviraj", label: "Inspired: Prithviraj", regionIds: ["kerala"], pool: "known", prompt: "handsome South Indian man: sharp oval masculine face, intense dark eyes, defined brows, refined nose, firm jaw, clear natural skin with fine pores, intense Malayalam hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-tq", label: "Inspired: Tovino Thomas", regionIds: ["kerala"], pool: "known", prompt: "handsome South Indian man: tall soft-rectangular face, deep dark eyes, neat brows, refined nose, lean jaw, clear natural skin with fine pores, modern Malayalam hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-dq-style", label: "Inspired: Unni Mukundan", regionIds: ["kerala"], pool: "known", prompt: "handsome South Indian man: soft athletic oval face, warm dark eyes, neat brows, refined nose, soft jaw, clear natural skin with fine pores, athletic Malayalam hero look, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-yash", label: "Inspired: Yash", regionIds: ["kannada"], pool: "known", prompt: "handsome South Indian man: strong rectangular face, intense dark eyes, thick brows, strong nose, solid jaw, clear natural skin with fine pores, rugged Kannada hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-punith", label: "Inspired: Puneeth Rajkumar", regionIds: ["kannada"], pool: "known", prompt: "handsome South Indian man: soft oval masculine face, warm dark eyes, neat brows, soft nose, friendly smile, clear natural skin with fine pores, beloved Kannada hero look, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-ranbir", label: "Inspired: Ranbir Kapoor", regionIds: ["north-indian"], pool: "known", prompt: "handsome man: soft oval masculine face, expressive dark eyes, neat brows, soft nose, soft cheeks, natural smile, clear natural skin with fine pores, contemporary Bollywood hero features, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-ranveer", label: "Inspired: Ranveer Singh", regionIds: ["north-indian"], pool: "known", prompt: "handsome man: energetic oval face, sharp dark eyes, defined brows, refined nose, expressive features, clear natural skin with fine pores, lively Bollywood hero look, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-hrithik", label: "Inspired: Hrithik Roshan", regionIds: ["north-indian"], pool: "known", prompt: "handsome man: sharp sculpted oval face, striking green-hazel-dark eyes, defined brows, refined nose, high cheekbones, clear natural skin with fine pores, classic model-hero bone structure, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+  { id: "km-vicky", label: "Inspired: Vicky Kaushal", regionIds: ["north-indian"], pool: "known", prompt: "handsome man: soft rugged oval face, warm dark eyes, thick brows, soft nose, soft stubble jaw, real skin texture with fine pores, grounded Bollywood hero look, adult man 21+, photoreal natural skin with fine pores, not illustration, not doll" },
+];
+
+export const KNOWN_NONBINARY_FACE_CUTS: FaceCut[] = KNOWN_WOMAN_FACE_CUTS.slice(0, 12);
+
 export const FACE_CUTS_BY_GENDER: Record<Gender, FaceCut[]> = {
   woman: WOMAN_FACE_CUTS,
   man: MAN_FACE_CUTS,
   nonbinary: NONBINARY_FACE_CUTS,
 };
 
-function allCutsForAge(gender: Gender, age?: string): FaceCut[] {
+export const KNOWN_FACE_CUTS_BY_GENDER: Record<Gender, FaceCut[]> = {
+  woman: KNOWN_WOMAN_FACE_CUTS,
+  man: KNOWN_MAN_FACE_CUTS,
+  nonbinary: KNOWN_NONBINARY_FACE_CUTS,
+};
+
+function allCutsForAge(gender: Gender, age?: string, pool?: FaceCutPool): FaceCut[] {
   const n = Number(age);
+  const useKnown = pool === "known";
   if (Number.isFinite(n) && n < 21) {
+    // Known celebrity library is 21+ framing; under 21 stays on YA general cuts
+    if (useKnown) {
+      // fall back to YA general — no celebrity pool for under 21
+      if (gender === "woman") return YOUNG_ADULT_WOMAN_FACE_CUTS;
+      if (gender === "man") return YOUNG_ADULT_MAN_FACE_CUTS;
+      return YOUNG_ADULT_NONBINARY_FACE_CUTS;
+    }
     if (gender === "woman") return YOUNG_ADULT_WOMAN_FACE_CUTS;
     if (gender === "man") return YOUNG_ADULT_MAN_FACE_CUTS;
     return YOUNG_ADULT_NONBINARY_FACE_CUTS;
   }
+  if (useKnown) return KNOWN_FACE_CUTS_BY_GENDER[gender];
   return FACE_CUTS_BY_GENDER[gender];
 }
 
@@ -504,44 +613,60 @@ function matchesRegions(face: FaceCut, regionIds?: string[]): boolean {
   return face.regionIds.some((r) => regionIds.includes(r));
 }
 
-export function faceCutsFor(gender: Gender, regionIds?: string[]): FaceCut[] {
-  const list = FACE_CUTS_BY_GENDER[gender];
+function matchesPool(face: FaceCut, pool?: FaceCutPool): boolean {
+  if (!pool || pool === "general") return face.pool !== "known";
+  return face.pool === "known";
+}
+
+export function faceCutsFor(
+  gender: Gender,
+  regionIds?: string[],
+  pool?: FaceCutPool,
+): FaceCut[] {
+  const list = pool === "known" ? KNOWN_FACE_CUTS_BY_GENDER[gender] : FACE_CUTS_BY_GENDER[gender];
+  const filtered = list.filter((f) => matchesRegions(f, regionIds) && matchesPool(f, pool));
+  return filtered.length ? filtered : list;
+}
+
+export function faceCutsForAge(
+  gender: Gender,
+  age?: string,
+  regionIds?: string[],
+  pool?: FaceCutPool,
+): FaceCut[] {
+  const list = allCutsForAge(gender, age, pool);
   const filtered = list.filter((f) => matchesRegions(f, regionIds));
   return filtered.length ? filtered : list;
 }
 
-export function faceCutsForAge(gender: Gender, age?: string, regionIds?: string[]): FaceCut[] {
-  const list = allCutsForAge(gender, age);
-  const filtered = list.filter((f) => matchesRegions(f, regionIds));
-  return filtered.length ? filtered : list;
-}
-
-/** Resolve by id across all age pools; prefers exact id even if region filter would hide it. */
+/** Resolve by id across all age/pools; prefers exact id. */
 export function getFaceCut(
   gender: Gender,
   id: string,
   age?: string,
   regionIds?: string[],
+  pool?: FaceCutPool,
 ): FaceCut | undefined {
-  const primary = allCutsForAge(gender, age);
-  const hit = primary.find((f) => f.id === id);
-  if (hit) return hit;
-  // search other pools for stale ids
   const pools = [
-    FACE_CUTS_BY_GENDER[gender],
-    YOUNG_ADULT_WOMAN_FACE_CUTS,
-    YOUNG_ADULT_MAN_FACE_CUTS,
-    YOUNG_ADULT_NONBINARY_FACE_CUTS,
+    ...allCutsForAge(gender, age, pool),
+    ...FACE_CUTS_BY_GENDER[gender],
+    ...KNOWN_FACE_CUTS_BY_GENDER[gender],
+    ...YOUNG_ADULT_WOMAN_FACE_CUTS,
+    ...YOUNG_ADULT_MAN_FACE_CUTS,
+    ...YOUNG_ADULT_NONBINARY_FACE_CUTS,
   ];
-  for (const pool of pools) {
-    const f = pool.find((x) => x.id === id);
-    if (f) return f;
-  }
-  return faceCutsForAge(gender, age, regionIds)[0];
+  const hit = pools.find((f) => f.id === id);
+  if (hit) return hit;
+  return faceCutsForAge(gender, age, regionIds, pool)[0];
 }
 
-export function defaultFaceCutId(gender: Gender, age?: string, regionIds?: string[]): string {
-  return faceCutsForAge(gender, age, regionIds)[0]?.id ?? "";
+export function defaultFaceCutId(
+  gender: Gender,
+  age?: string,
+  regionIds?: string[],
+  pool?: FaceCutPool,
+): string {
+  return faceCutsForAge(gender, age, regionIds, pool)[0]?.id ?? "";
 }
 
 export function randomFaceCutId(
@@ -549,8 +674,9 @@ export function randomFaceCutId(
   avoidId?: string,
   age?: string,
   regionIds?: string[],
+  pool?: FaceCutPool,
 ): string {
-  const list = faceCutsForAge(gender, age, regionIds);
+  const list = faceCutsForAge(gender, age, regionIds, pool);
   if (!list.length) return "";
   let pick = list[Math.floor(Math.random() * list.length)]!;
   if (avoidId && list.length > 1) {

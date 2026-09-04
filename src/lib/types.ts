@@ -21,6 +21,8 @@ export interface SceneFormState {
   actionCategory: ActionCategoryId;
   actionId: string;
   regionIds: string[];
+  /** general = random library; known = celebrity-inspired UI names */
+  faceCutPool: "general" | "known";
   peopleCount: PeopleCount;
   relationship: Relationship;
   people: PersonFields[];

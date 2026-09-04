@@ -543,10 +543,11 @@ export function regionCues(ids: string[]): string {
 export function reshuffleFaceCuts(
   people: PersonFields[],
   regionIds?: string[],
+  faceCutPool?: "general" | "known",
 ): PersonFields[] {
   return people.map((p) => ({
     ...p,
-    faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age, regionIds),
+    faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age, regionIds, faceCutPool),
   }));
 }
 
@@ -554,6 +555,7 @@ export function reshuffleFaceCuts(
 export function applyRegionLook(
   people: PersonFields[],
   regionIds: string[],
+  faceCutPool?: "general" | "known",
 ): PersonFields[] {
   const skins = skinTonesForRegions(regionIds);
   const hairs = hairColorsForRegions(regionIds);
@@ -561,7 +563,7 @@ export function applyRegionLook(
   const defHair = defaultHairColorForRegions(regionIds);
   return people.map((p) => ({
     ...p,
-    faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age, regionIds),
+    faceCutId: randomFaceCutId(p.gender, p.faceCutId, p.age, regionIds, faceCutPool),
     skinTone: skins.includes(p.skinTone) ? p.skinTone : defSkin,
     hairColor: hairs.includes(p.hairColor) ? p.hairColor : defHair,
   }));

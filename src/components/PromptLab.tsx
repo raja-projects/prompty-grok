@@ -255,7 +255,7 @@ export function PromptLab() {
   function changeFacesOnly() {
     setForm((prev) => {
       if (prev.peopleCount === "group") return prev;
-      return { ...prev, people: reshuffleFaceCuts(prev.people, prev.regionIds) };
+      return { ...prev, people: reshuffleFaceCuts(prev.people, prev.regionIds, prev.faceCutPool) };
     });
   }
 
@@ -419,7 +419,7 @@ export function PromptLab() {
                           people:
                             prev.peopleCount === "group"
                               ? prev.people
-                              : applyRegionLook(prev.people, nextIds),
+                              : applyRegionLook(prev.people, nextIds, prev.faceCutPool),
                         }));
                       }}
                       className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
@@ -433,6 +433,50 @@ export function PromptLab() {
                   );
                 })}
               </div>
+            </div>
+
+            <div>
+              <FieldLabel>Face cuts</FieldLabel>
+              <div className="flex flex-wrap gap-1.5">
+                {(
+                  [
+                    { id: "general" as const, label: "Random" },
+                    { id: "known" as const, label: "Known" },
+                  ]
+                ).map((opt) => {
+                  const active = (form.faceCutPool ?? "general") === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setForm((prev) => {
+                          const faceCutPool = opt.id;
+                          const people =
+                            prev.peopleCount === "group"
+                              ? prev.people
+                              : reshuffleFaceCuts(
+                                  prev.people,
+                                  prev.regionIds,
+                                  faceCutPool,
+                                );
+                          return { ...prev, faceCutPool, people };
+                        });
+                      }}
+                      className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
+                        active
+                          ? "border-prompty-accent2 bg-prompty-accent2/20 text-white"
+                          : "border-prompty-border bg-prompty-bg text-prompty-muted hover:text-white"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-1 text-[10px] text-prompty-muted">
+                Known = heroine / actress / model inspired (name in UI only). Random = general library.
+              </p>
             </div>
 
             {form.peopleCount === "group" ? (
@@ -463,6 +507,7 @@ export function PromptLab() {
                       index={i}
                       person={person}
                       regionIds={form.regionIds}
+                      faceCutPool={form.faceCutPool ?? "general"}
                       onChange={(p) => {
                         const people = [...form.people];
                         people[i] = p;
