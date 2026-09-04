@@ -26,6 +26,8 @@ export interface SceneFormState {
   peopleCount: PeopleCount;
   relationship: Relationship;
   people: PersonFields[];
+  /** Specifically selected favorite people to include when using Group (5+). */
+  groupPeople: PersonFields[];
   /** Simplified descriptors when peopleCount === "group" */
   crowdDescriptors: string;
   placeId: string;
@@ -35,6 +37,12 @@ export interface SceneFormState {
   timeOfDay: TimeOfDay;
   extraNotes: string;
   negativePrompt: string;
+}
+
+export interface FavoritePerson {
+  id: string;
+  name: string;
+  person: PersonFields;
 }
 
 /** @deprecated kept for storage compatibility aliases */

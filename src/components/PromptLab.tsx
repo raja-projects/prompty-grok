@@ -39,8 +39,15 @@ import {
   createStudioDefaults,
   DEFAULT_FORM,
 } from "@/lib/prompt-builder";
-import { clearRecent, loadRecent, saveRecent } from "@/lib/storage";
-import type { Mode, RecentPrompt, SceneFormState } from "@/lib/types";
+import {
+  clearRecent,
+  deleteFavoritePerson,
+  loadFavoritePeople,
+  loadRecent,
+  saveFavoritePerson,
+  saveRecent,
+} from "@/lib/storage";
+import type { FavoritePerson, Mode, RecentPrompt, SceneFormState } from "@/lib/types";
 import { CopyButton } from "./CopyButton";
 import { ModeToggle } from "./ModeToggle";
 import { PersonCard } from "./PersonCard";
@@ -177,9 +184,11 @@ export function PromptLab() {
   const [recent, setRecent] = useState<RecentPrompt[]>([]);
   const [savedFlash, setSavedFlash] = useState(false);
   const [actionQuery, setActionQuery] = useState("");
+  const [favoritePeople, setFavoritePeople] = useState<FavoritePerson[]>([]);
 
   useEffect(() => {
     setRecent(loadRecent());
+    setFavoritePeople(loadFavoritePeople());
     setForm(createStudioDefaults());
     setHydrated(true);
   }, []);
@@ -349,6 +358,12 @@ export function PromptLab() {
       if (prev.peopleCount === "group") return prev;
       return { ...prev, people: reshuffleFaceCuts(prev.people, prev.regionIds) };
     });
+  }
+
+  function savePersonAsFavorite(person: SceneFormState["people"][number], index: number) {
+    const name = window.prompt("Name this favorite person", `Person ${index + 1}`);
+    if (name === null) return;
+    setFavoritePeople(saveFavoritePerson(name, person));
   }
 
   const visibleCategories = ACTION_CATEGORIES.filter((c) => {
@@ -557,15 +572,53 @@ export function PromptLab() {
 
 
             {form.peopleCount === "group" ? (
-              <label className="block">
-                <FieldLabel>Crowd notes</FieldLabel>
-                <textarea
-                  value={form.crowdDescriptors}
-                  onChange={(e) => patch({ crowdDescriptors: e.target.value })}
-                  rows={3}
-                  className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
-                />
-              </label>
+              <div className="space-y-3">
+                <div>
+                  <FieldLabel>Favorite people in this group</FieldLabel>
+                  {favoritePeople.length ? (
+                    <div className="flex flex-wrap gap-2">
+                      {favoritePeople.map((favorite) => {
+                        const selected = (form.groupPeople ?? []).some(
+                          (person) => JSON.stringify(person) === JSON.stringify(favorite.person)
+                        );
+                        return (
+                          <button
+                            key={favorite.id}
+                            type="button"
+                            onClick={() =>
+                              patch({
+                                groupPeople: selected
+                                  ? (form.groupPeople ?? []).filter(
+                                      (person) => JSON.stringify(person) !== JSON.stringify(favorite.person)
+                                    )
+                                  : [...(form.groupPeople ?? []), { ...favorite.person }],
+                              })
+                            }
+                            className={`rounded-lg border px-3 py-2 text-xs font-medium transition ${
+                              selected
+                                ? "border-prompty-accent bg-prompty-accent/30 text-white"
+                                : "border-prompty-border bg-prompty-bg text-prompty-muted hover:text-white"
+                            }`}
+                          >
+                            {selected ? "✓ " : "+ "}{favorite.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-prompty-muted">Save a person as a favorite first.</p>
+                  )}
+                </div>
+                <label className="block">
+                  <FieldLabel>Crowd notes</FieldLabel>
+                  <textarea
+                    value={form.crowdDescriptors}
+                    onChange={(e) => patch({ crowdDescriptors: e.target.value })}
+                    rows={3}
+                    className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
+                  />
+                </label>
+              </div>
             ) : (
               <>
                 <div className="flex flex-wrap gap-2">
@@ -584,6 +637,13 @@ export function PromptLab() {
                       index={i}
                       person={person}
                       regionIds={form.regionIds}
+                      favoritePeople={favoritePeople}
+                      onSelectFavorite={(favorite) => {
+                        const people = [...form.people];
+                        people[i] = favorite;
+                        patch({ people });
+                      }}
+                      onSaveFavorite={() => savePersonAsFavorite(person, i)}
                       onChange={(p) => {
                         const people = [...form.people];
                         people[i] = p;
@@ -592,6 +652,24 @@ export function PromptLab() {
                     />
                   ))}
                 </div>
+                {favoritePeople.length ? (
+                  <div>
+                    <FieldLabel>Manage favorite people</FieldLabel>
+                    <div className="flex flex-wrap gap-2">
+                      {favoritePeople.map((favorite) => (
+                        <button
+                          key={favorite.id}
+                          type="button"
+                          title={`Delete ${favorite.name}`}
+                          onClick={() => setFavoritePeople(deleteFavoritePerson(favorite.id))}
+                          className="rounded-lg border border-prompty-border px-2.5 py-1.5 text-xs text-prompty-muted hover:border-red-400/50 hover:text-red-200"
+                        >
+                          {favorite.name} ×
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
               </>
             )}
           </Section>

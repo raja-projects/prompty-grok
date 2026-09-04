@@ -19,6 +19,7 @@ import {
   faceCutsForAge,
   isKnownFaceId,
 } from "@/lib/face-cuts";
+import type { FavoritePerson } from "@/lib/types";
 
 function SelectField({
   label,
@@ -62,11 +63,17 @@ export function PersonCard({
   person,
   regionIds,
   onChange,
+  favoritePeople,
+  onSelectFavorite,
+  onSaveFavorite,
 }: {
   index: number;
   person: PersonFields;
   regionIds: string[];
   onChange: (p: PersonFields) => void;
+  favoritePeople: FavoritePerson[];
+  onSelectFavorite: (person: PersonFields) => void;
+  onSaveFavorite: () => void;
 }) {
   const isWoman = person.gender === "woman";
   const pool: "general" | "known" =
@@ -143,9 +150,33 @@ export function PersonCard({
 
   return (
     <div className="rounded-2xl border border-prompty-border bg-prompty-bg/60 p-4">
-      <h4 className="mb-3 text-sm font-semibold text-white">
-        Person {index + 1}
-      </h4>
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+        <label className="min-w-48 flex-1">
+          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
+            Person {index + 1} · choose favorite
+          </span>
+          <select
+            value=""
+            onChange={(e) => {
+              const favorite = favoritePeople.find((item) => item.id === e.target.value);
+              if (favorite) onSelectFavorite({ ...favorite.person });
+            }}
+            className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
+          >
+            <option value="">Current person</option>
+            {favoritePeople.map((favorite) => (
+              <option key={favorite.id} value={favorite.id}>{favorite.name}</option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          onClick={onSaveFavorite}
+          className="rounded-xl border border-prompty-border px-3 py-2 text-xs font-medium text-prompty-muted hover:text-white"
+        >
+          Save favorite
+        </button>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block space-y-1 sm:col-span-2">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">

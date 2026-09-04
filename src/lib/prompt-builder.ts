@@ -81,7 +81,12 @@ function peopleBlock(state: SceneFormState): string {
   if (state.peopleCount === "group") {
     const crowd = sanitizeText(state.crowdDescriptors) ||
       "a diverse adult group, ages 19 and above, natural expressions";
-    return `group of five or more adults (${crowd})`;
+    const favorites = (state.groupPeople ?? [])
+      .map((person, index) => describePerson(person, index, state.regionIds))
+      .join("; ");
+    return favorites
+      ? `group of five or more adults (${crowd}); specifically include ${favorites}`
+      : `group of five or more adults (${crowd})`;
   }
   const n = Number(state.peopleCount);
   const listed = state.people
@@ -260,6 +265,7 @@ export function createStudioDefaults(): SceneFormState {
     peopleCount: "2",
     relationship: "couple",
     people: [woman, man],
+    groupPeople: [],
     crowdDescriptors:
       "mixed adult ages 19+, Kerala–Malayali inspired attire, natural candid expressions",
     placeId: "bedroom",
@@ -289,6 +295,7 @@ export function createRandomizedDefaults(): SceneFormState {
     peopleCount,
     relationship,
     people: defaultPeopleForCount(peopleCount),
+    groupPeople: [],
     crowdDescriptors:
       "mixed adult ages 19+, Kerala–Tamil inspired attire, natural candid expressions",
     placeId: place.id,
