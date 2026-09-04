@@ -458,6 +458,34 @@ export function PromptLab() {
                 })
               )}
             </div>
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-white">
+              <input
+                type="checkbox"
+                checked={form.useCustomActionPrompt}
+                onChange={(e) =>
+                  patch({ useCustomActionPrompt: e.target.checked })
+                }
+                className="h-4 w-4 rounded border-prompty-border bg-prompty-bg accent-prompty-accent"
+              />
+              Use custom action prompt
+            </label>
+            {form.useCustomActionPrompt ? (
+              <label className="block">
+                <FieldLabel>Custom action prompt</FieldLabel>
+                <textarea
+                  value={form.customActionPrompt}
+                  onChange={(e) =>
+                    patch({ customActionPrompt: e.target.value })
+                  }
+                  rows={3}
+                  placeholder="Describe the action to use instead of the selected preset…"
+                  className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent placeholder:text-prompty-muted/50 focus:ring-2"
+                />
+                <span className="mt-1 block text-[11px] text-prompty-muted">
+                  When enabled and filled, this replaces the selected action text in the generated prompts.
+                </span>
+              </label>
+            ) : null}
           </Section>
 
           <Section

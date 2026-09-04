@@ -161,7 +161,11 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
   const state = enforceAgeCategorySafety(enforceRelationshipSafety(raw));
   const action = getActionById(state.actionId);
   const place = getPlaceById(state.placeId);
-  const actionText = action?.prompt ?? "posed naturally";
+  const customActionText = state.customActionPrompt?.trim();
+  const actionText =
+    state.useCustomActionPrompt && customActionText
+      ? customActionText
+      : action?.prompt ?? "posed naturally";
   const placeText = place?.prompt ?? "an everyday setting";
   const regions = regionCues(state.regionIds);
   const people = peopleBlock(state);
@@ -250,6 +254,8 @@ export function createStudioDefaults(): SceneFormState {
     mode: "image",
     actionCategory: "hardcore",
     actionId: "hc-face-into-central-curve",
+    useCustomActionPrompt: false,
+    customActionPrompt: "",
     regionIds: ["kerala"],
     peopleCount: "2",
     relationship: "couple",
@@ -277,6 +283,8 @@ export function createRandomizedDefaults(): SceneFormState {
     mode: "image",
     actionCategory: action.category,
     actionId: action.id,
+    useCustomActionPrompt: false,
+    customActionPrompt: "",
     regionIds: [...DEFAULT_REGION_IDS],
     peopleCount,
     relationship,

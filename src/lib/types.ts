@@ -20,6 +20,8 @@ export interface SceneFormState {
   mode: Mode;
   actionCategory: ActionCategoryId;
   actionId: string;
+  useCustomActionPrompt: boolean;
+  customActionPrompt: string;
   regionIds: string[];
   peopleCount: PeopleCount;
   relationship: Relationship;
