@@ -7,6 +7,7 @@ import {
   getActionById,
   isIntimateAction,
   categoryRequiresAdult21,
+  type ActionCategoryId,
 } from "@/lib/actions";
 import { ASPECT_RATIOS, CAMERA_ANGLES, FRAMINGS, TIMES_OF_DAY } from "@/lib/camera";
 import {
@@ -57,7 +58,7 @@ const chipIdle =
   "border border-prompty-line bg-white text-prompty-ink hover:border-prompty-accent hover:text-prompty-accent";
 const chipActive = "border border-prompty-accent bg-prompty-accentSoft text-prompty-accent font-semibold";
 
-const ACTION_FAMILIES: { id: string; label: string; categories: string[] }[] = [
+const ACTION_FAMILIES: { id: string; label: string; categories: ActionCategoryId[] }[] = [
   { id: "basics", label: "Everyday", categories: ["everyday", "social", "physical"] },
   { id: "romance", label: "Romance", categories: ["romance", "intimate"] },
   { id: "hardcore", label: "Hardcore", categories: ["hardcore", "hardcore-grk"] },
