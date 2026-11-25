@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import {
   AGES,
   bodyTypesForAge,
@@ -15,10 +13,12 @@ import {
   type PersonFields,
   type Gender,
 } from "@/lib/people";
+
 import {
   applyKnownFaceLocks,
   defaultFaceCutId,
   faceCutsForAge,
+  getKnownFaceLock,
   isKnownFaceId,
 } from "@/lib/face-cuts";
 import type { FavoritePerson } from "@/lib/types";
@@ -29,6 +29,29 @@ const MINOR_HAIR_BY_GENDER: Record<Gender, string[]> = {
   nonbinary: ["Short textured", "Medium wavy", "Long loose", "Curly volume", "Neat bob", "Tied back"],
 };
 const MINOR_FASHION_VIBES = ["Everyday casual", "Festive traditional", "Urban street", "Monsoon cozy"];
+
+const WOMAN_HAIR = [
+  "Medium straight",
+  "Medium wavy",
+  "Medium layered",
+  "Thick medium waves",
+  "Long straight",
+  "Long wavy",
+  "Long layered",
+  "Long soft curls",
+  "Thick long waves",
+  "Extra long straight",
+  "Extra long wavy",
+  "Hip length straight",
+  "Hip length waves",
+  "Extreme length straight",
+  "Extreme length waves",
+];
+
+const fieldClass =
+  "w-full rounded-lg border border-prompty-line bg-white px-2 py-1.5 text-[12px] text-prompty-ink outline-none transition focus:border-prompty-accent focus:ring-2 focus:ring-prompty-accent/20";
+
+const fieldLabel = "mb-1 block text-[9px] font-semibold uppercase tracking-[0.1em] text-prompty-muted";
 
 function SelectField({
   label,
@@ -44,18 +67,16 @@ function SelectField({
   disabled?: boolean;
 }) {
   return (
-    <label className="block space-y-1">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
+    <label className="block min-w-0">
+      <span className={fieldLabel}>
         {label}
-        {disabled ? " (locked)" : ""}
+        {disabled ? " · locked" : ""}
       </span>
       <select
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2 ${
-          disabled ? "opacity-60 cursor-not-allowed" : ""
-        }`}
+        className={`${fieldClass} ${disabled ? "cursor-not-allowed bg-prompty-page opacity-60" : ""}`}
       >
         {options.map((o) => (
           <option key={o} value={o}>
@@ -63,6 +84,40 @@ function SelectField({
           </option>
         ))}
       </select>
+    </label>
+  );
+}
+
+function Segmented({
+  label,
+  options,
+  active,
+  onPick,
+}: {
+  label: string;
+  options: { id: string; label: string }[];
+  active: string;
+  onPick: (id: string) => void;
+}) {
+  return (
+    <label className="block">
+      <span className={fieldLabel}>{label}</span>
+      <div className="flex gap-1">
+        {options.map((o) => (
+          <button
+            key={o.id}
+            type="button"
+            onClick={() => onPick(o.id)}
+            className={`flex-1 rounded-lg border px-1.5 py-1.5 text-[11px] font-medium transition ${
+              active === o.id
+                ? "border-prompty-accent bg-prompty-accentSoft text-prompty-accent"
+                : "border-prompty-line bg-white text-prompty-muted hover:text-prompty-ink"
+            }`}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
     </label>
   );
 }
@@ -75,7 +130,7 @@ export function PersonCard({
   favoritePeople,
   onSelectFavorite,
   onSaveFavorite,
-  saveLabel = "Save favorite",
+  saveLabel = "Save",
   allowUnder19 = false,
 }: {
   index: number;
@@ -88,31 +143,24 @@ export function PersonCard({
   saveLabel?: string;
   allowUnder19?: boolean;
 }) {
-  const [expanded, setExpanded] = useState(false);
-  const isWoman = person.gender === "woman";
   const isMinor = Number(person.age) < 19;
   const pool: "general" | "known" =
-    isWoman && !isMinor && (person.faceCutPool === "known" || isKnownFaceId(person.faceCutId))
+    !isMinor && (person.faceCutPool === "known" || isKnownFaceId(person.faceCutId))
       ? "known"
       : "general";
-  const knownLocked = isWoman && pool === "known";
+  const knownLocked = pool === "known" && !!getKnownFaceLock(person.faceCutId);
   const display = knownLocked ? applyKnownFaceLocks(person) : person;
 
   const skinOpts = skinTonesForRegions(regionIds);
   const hairOpts = hairColorsForRegions(regionIds);
   const faceOpts = faceCutsForAge(display.gender, display.age, regionIds, pool);
-  const hairStyles = HAIR_BY_GENDER[display.gender];
+  const hairStyles = display.gender === "woman" ? WOMAN_HAIR : HAIR_BY_GENDER[display.gender];
   const bodies = bodyTypesForAge(display.gender, display.age);
 
   function commit(next: PersonFields) {
-    if (next.gender !== "woman") {
-      onChange({ ...next, faceCutPool: "general" });
-      return;
-    }
     const p = next.faceCutPool === "known" ? applyKnownFaceLocks(next) : next;
     onChange(p);
   }
-
   function patch(partial: Partial<PersonFields>) {
     let next: PersonFields = { ...person, ...partial };
 
@@ -127,11 +175,11 @@ export function PersonCard({
 
     if (partial.gender && partial.gender !== person.gender) {
       const g = partial.gender as Gender;
-      const hairs = HAIR_BY_GENDER[g];
+      const hairs = g === "woman" ? WOMAN_HAIR : HAIR_BY_GENDER[g];
       next.dressId = defaultDressId(g);
       if (!hairs.includes(next.hairStyle)) next.hairStyle = hairs[0]!;
-      next.faceCutPool = g === "woman" ? (next.faceCutPool ?? "general") : "general";
-      const poolNext = g === "woman" ? (next.faceCutPool ?? "general") : "general";
+      next.faceCutPool = next.faceCutPool ?? "general";
+      const poolNext = next.faceCutPool;
       const bodiesNext = bodyTypesForAge(g, next.age);
       if (!bodiesNext.includes(next.bodyType)) next.bodyType = bodiesNext[0]!;
       const cuts = faceCutsForAge(g, next.age, regionIds, poolNext);
@@ -141,7 +189,7 @@ export function PersonCard({
     }
 
     if (partial.faceCutPool) {
-      const poolNext = next.gender === "woman" ? partial.faceCutPool : "general";
+      const poolNext = partial.faceCutPool;
       next.faceCutPool = poolNext;
       next.faceCutId = defaultFaceCutId(next.gender, next.age, regionIds, poolNext);
     }
@@ -164,8 +212,7 @@ export function PersonCard({
       }
     }
 
-    // Known mode: ignore manual edits to locked fields
-    if (next.gender === "woman" && next.faceCutPool === "known") {
+    if (next.faceCutPool === "known") {
       next = applyKnownFaceLocks(next);
     }
 
@@ -173,101 +220,77 @@ export function PersonCard({
   }
 
   return (
-    <div className="rounded-2xl border border-prompty-border bg-prompty-bg/60 p-4">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <label className="min-w-48 flex-1">
-          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
-            Person {index + 1} · choose favorite
-          </span>
-          <select
-            value=""
-            onChange={(e) => {
-              const favorite = favoritePeople.find((item) => item.id === e.target.value);
-              if (favorite) onSelectFavorite(favorite);
-            }}
-            className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
-          >
-            <option value="">Current person</option>
-            {favoritePeople.map((favorite) => (
-              <option key={favorite.id} value={favorite.id}>{favorite.name}</option>
-            ))}
-          </select>
-        </label>
+    <div className="rounded-xl border border-prompty-line bg-prompty-page/70 p-2.5">
+      <div className="mb-2 flex items-center gap-1.5">
+        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-prompty-ink text-[10px] font-bold text-white">
+          {index + 1}
+        </span>
+        <span className="mr-auto truncate text-[11.5px] font-medium text-prompty-ink">
+          {display.gender} · {display.age} · {display.bodyType}
+        </span>
+        <select
+          value=""
+          onChange={(e) => {
+            const favorite = favoritePeople.find((item) => item.id === e.target.value);
+            if (favorite) onSelectFavorite(favorite);
+          }}
+          className="max-w-[110px] rounded-md border border-prompty-line bg-white px-1.5 py-1 text-[10.5px] text-prompty-muted outline-none"
+        >
+          <option value="">Favorites</option>
+          {favoritePeople.map((favorite) => (
+            <option key={favorite.id} value={favorite.id}>
+              {favorite.name}
+            </option>
+          ))}
+        </select>
         <button
           type="button"
           onClick={onSaveFavorite}
-          className="rounded-xl border border-prompty-border px-3 py-2 text-xs font-medium text-prompty-muted hover:text-white"
+          className="rounded-md border border-prompty-line bg-white px-1.5 py-1 text-[10.5px] text-prompty-muted transition hover:border-prompty-accent hover:text-prompty-accent"
         >
           {saveLabel}
         </button>
       </div>
-      <div className="mt-3 flex items-center justify-between rounded-xl bg-prompty-elevated/60 px-3 py-2 text-xs text-prompty-muted">
-        <span>{display.gender} · {display.age} · {display.bodyType} · {display.hairStyle}</span>
-        <button type="button" onClick={() => setExpanded((value) => !value)} className="font-medium text-prompty-accent2 hover:text-white">
-          {expanded ? "Close details" : "Edit details"}
-        </button>
-      </div>
-      {expanded ? <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <label className="block space-y-1 sm:col-span-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
-            Gender
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {GENDERS.map((g) => (
-              <button
-                key={g.id}
-                type="button"
-                onClick={() => patch({ gender: g.id })}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                  person.gender === g.id
-                    ? "border-prompty-accent bg-prompty-accent/25 text-white"
-                    : "border-prompty-border bg-prompty-elevated text-prompty-muted hover:text-white"
-                }`}
-              >
-                {g.label}
-              </button>
-            ))}
-          </div>
-        </label>
 
-        {isWoman && !isMinor ? (
-          <label className="block space-y-1 sm:col-span-2">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
-              Face source
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {(
-                [
-                  { id: "general" as const, label: "Random" },
-                  { id: "known" as const, label: "Known" },
-                ]
-              ).map((opt) => {
-                const active = pool === opt.id;
-                return (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => patch({ faceCutPool: opt.id })}
-                    className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                      active
-                        ? "border-prompty-accent2 bg-prompty-accent2/25 text-white"
-                        : "border-prompty-border bg-prompty-elevated text-prompty-muted hover:text-white"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="text-[10px] text-prompty-muted">
-              Known locks face, age, hair, skin, and body to that look (name in UI only).
-            </p>
-          </label>
+      <div className="grid gap-1.5 sm:grid-cols-4">
+        <Segmented
+          label="Gender"
+          active={person.gender}
+          options={GENDERS.map((g) => ({ id: g.id, label: g.label }))}
+          onPick={(id) => patch({ gender: id as Gender })}
+        />
+
+        {!isMinor ? (
+          <Segmented
+            label="Face source"
+            active={pool}
+            options={[
+              { id: "general", label: "Random" },
+              { id: "known", label: "Known" },
+            ]}
+            onPick={(id) => patch({ faceCutPool: id as "general" | "known" })}
+          />
         ) : null}
 
-        <label className="block space-y-1 sm:col-span-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
-            Face cut {pool === "known" ? "(known looks)" : "(random library)"}
+        <SelectField
+          label="Age"
+          value={display.age}
+          options={allowUnder19 ? AGES : AGES.filter((age) => Number(age) >= 19)}
+          disabled={knownLocked}
+          onChange={(v) => patch({ age: v })}
+        />
+
+        <SelectField
+          label="Body"
+          value={bodies.includes(display.bodyType) ? display.bodyType : bodies[0]!}
+          options={bodies}
+          disabled={knownLocked}
+          onChange={(v) => patch({ bodyType: v })}
+        />
+
+        <label className="block sm:col-span-2">
+          <span className={fieldLabel}>
+            Face {pool === "known" ? "· known" : "· random"}
           </span>
           <select
             value={
@@ -276,7 +299,7 @@ export function PersonCard({
                 : (faceOpts[0]?.id ?? "")
             }
             onChange={(e) => patch({ faceCutId: e.target.value })}
-            className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
+            className={fieldClass}
           >
             {faceOpts.map((f) => (
               <option key={f.id} value={f.id}>
@@ -286,21 +309,12 @@ export function PersonCard({
           </select>
         </label>
 
-        <SelectField
-          label="Age (exact year)"
-          value={display.age}
-          options={allowUnder19 ? AGES : AGES.filter((age) => Number(age) >= 19)}
-          disabled={knownLocked}
-          onChange={(v) => patch({ age: v })}
-        />
-        <label className="block space-y-1 sm:col-span-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-prompty-muted">
-            Dress / attire
-          </span>
+        <label className="block sm:col-span-2">
+          <span className={fieldLabel}>Dress</span>
           <select
             value={display.dressId}
             onChange={(e) => patch({ dressId: e.target.value })}
-            className="w-full rounded-xl border border-prompty-border bg-prompty-bg px-3 py-2 text-sm text-white outline-none ring-prompty-accent focus:ring-2"
+            className={fieldClass}
           >
             {dressesForAge(display.gender, display.age).map((d) => (
               <option key={d.id} value={d.id}>
@@ -309,49 +323,39 @@ export function PersonCard({
             ))}
           </select>
         </label>
+
         <SelectField
-          label="Hair style"
+          label="Hair"
           value={
-            hairStyles.includes(display.hairStyle)
+            (isMinor ? MINOR_HAIR_BY_GENDER[display.gender] : hairStyles).includes(display.hairStyle)
               ? display.hairStyle
-              : hairStyles[0]!
+              : (isMinor ? MINOR_HAIR_BY_GENDER[display.gender] : hairStyles)[0]!
           }
           options={isMinor ? MINOR_HAIR_BY_GENDER[display.gender] : hairStyles}
           disabled={knownLocked}
           onChange={(v) => patch({ hairStyle: v })}
         />
         <SelectField
-          label="Hair color"
-          value={
-            hairOpts.includes(display.hairColor) ? display.hairColor : hairOpts[0]!
-          }
+          label="Hair colour"
+          value={hairOpts.includes(display.hairColor) ? display.hairColor : hairOpts[0]!}
           options={hairOpts}
           disabled={knownLocked}
           onChange={(v) => patch({ hairColor: v })}
         />
         <SelectField
-          label="Body type"
-          value={bodies.includes(display.bodyType) ? display.bodyType : bodies[0]!}
-          options={bodies}
-          disabled={knownLocked}
-          onChange={(v) => patch({ bodyType: v })}
-        />
-        <SelectField
-          label="Fashion vibe"
-          value={display.fashionVibe}
-          options={isMinor ? MINOR_FASHION_VIBES : FASHION_VIBES}
-          onChange={(v) => patch({ fashionVibe: v })}
-        />
-        <SelectField
-          label="Skin tone"
-          value={
-            skinOpts.includes(display.skinTone) ? display.skinTone : skinOpts[0]!
-          }
+          label="Skin"
+          value={skinOpts.includes(display.skinTone) ? display.skinTone : skinOpts[0]!}
           options={skinOpts}
           disabled={knownLocked}
           onChange={(v) => patch({ skinTone: v })}
         />
-      </div> : null}
+        <SelectField
+          label="Vibe"
+          value={display.fashionVibe}
+          options={isMinor ? MINOR_FASHION_VIBES : FASHION_VIBES}
+          onChange={(v) => patch({ fashionVibe: v })}
+        />
+      </div>
     </div>
   );
 }

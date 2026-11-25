@@ -1,9 +1,15 @@
-import { getActionById, isHardcoreAction, isIntimateAction, actionRequiresAdult21, randomEverydayOrSocialAction } from "./actions";
+import { getActionById, isHardcoreAction, isIntimateAction, actionRequiresAdult21, randomEverydayOrSocialAction, resolvePose } from "./actions";
 import {
   CAMERA_ANGLES,
   FRAMINGS,
   TIMES_OF_DAY,
   randomCameraDefaults,
+  cameraForPose,
+  poseNote,
+  type CameraAngle,
+  type Framing,
+  type AspectRatio,
+  type PoseTag,
 } from "./camera";
 import {
   DEFAULT_REGION_IDS,
@@ -24,6 +30,18 @@ import {
 } from "./safety";
 import type { BuiltPrompts, SceneFormState } from "./types";
 
+/** One-line quality for draft prompts. Full block is used in detailed only. */
+const SHORT_QUALITY =
+  "real photograph, 50mm lens wide open, natural side light, true colour, real skin texture with visible pores, light film grain";
+
+/** Trim a long face description to its first few clauses for draft prompts. */
+function trimFace(face: string, max = 300): string {
+  if (face.length <= max) return face;
+  const cut = face.slice(0, max);
+  const lastComma = cut.lastIndexOf(", ");
+  return lastComma > 120 ? cut.slice(0, lastComma) : cut;
+}
+
 function clean(parts: Array<string | undefined | null | false>): string {
   return parts
     .map((p) => (typeof p === "string" ? p.trim() : ""))
@@ -40,13 +58,15 @@ function sentence(parts: Array<string | undefined | null | false>): string {
   return /[.!?]$/.test(text) ? text : `${text}.`;
 }
 
-function describePerson(p: PersonFields, index: number, regionIds?: string[]): string {
+function describePerson(
+  p: PersonFields,
+  index: number,
+  regionIds: string[] | undefined,
+  brief: boolean
+): string {
   const label = `person ${index + 1}`;
   const pool =
-    p.gender === "woman" && (p.faceCutPool === "known" || isKnownFaceId(p.faceCutId))
-      ? "known"
-      : "general";
-  // Known woman: force locked age/hair/skin/body — never leave random fields in the prompt
+    p.faceCutPool === "known" || isKnownFaceId(p.faceCutId) ? "known" : "general";
   const locked = pool === "known" ? applyKnownFaceLocks(p) : p;
   const faceCut = getFaceCut(locked.gender, locked.faceCutId, locked.age, regionIds, pool);
   const face = faceCut?.prompt;
@@ -56,9 +76,10 @@ function describePerson(p: PersonFields, index: number, regionIds?: string[]): s
     ? `phenotype locked to ${faceCut.regionIds.join(" / ")} region look`
     : "";
   const knownCue =
-    pool === "known"
+    pool === "known" && !brief
       ? "KNOWN LOOK MODE: face, brows, eyes, nose, lips, jaw, age, hair style, hair color, skin tone, and body type are hard-locked from the selected known face cut — do not invent alternate features"
       : "";
+
   return clean([
     `${label}: ${locked.gender}`,
     knownCue,
@@ -66,27 +87,24 @@ function describePerson(p: PersonFields, index: number, regionIds?: string[]): s
     regionLock,
     `${locked.skinTone} skin tone`,
     `${locked.bodyType} build`,
-    /youth|teen|young|innocent|fresh-faced|delicate|boyish/i.test(locked.bodyType)
+    /youth|teen|young|innocent|fresh-faced|delicate|boyish/i.test(locked.bodyType) && !brief
       ? "clearly adult age 19+ appearance — not a minor"
       : "",
     `${locked.hairColor} ${locked.hairStyle} hair`,
-    face ? `face: ${face}` : "",
-    locked.gender === "woman"
-      ? Number(ageNum) < 19
-        ? "age-appropriate natural appearance, no adult styling"
-        : "beautiful and attractive"
-      : "",
+    face ? `face: ${brief ? trimFace(face) : face}` : "",
+    locked.gender === "woman" ? "beautiful and attractive" : "",
     `wearing complete outfit: ${dress}`,
     `${locked.fashionVibe} vibe`,
   ]);
 }
 
-function peopleBlock(state: SceneFormState): string {
+function peopleBlock(state: SceneFormState, brief: boolean): string {
   if (state.peopleCount === "group") {
-    const crowd = sanitizeText(state.crowdDescriptors) ||
+    const crowd =
+      sanitizeText(state.crowdDescriptors) ||
       "a diverse adult group, ages 19 and above, natural expressions";
     const favorites = (state.groupPeople ?? [])
-      .map((person, index) => describePerson(person, index, state.regionIds))
+      .map((person, index) => describePerson(person, index, state.regionIds, brief))
       .join("; ");
     return favorites
       ? `group of five or more adults (${crowd}); specifically include ${favorites}`
@@ -95,7 +113,7 @@ function peopleBlock(state: SceneFormState): string {
   const n = Number(state.peopleCount);
   const listed = state.people
     .slice(0, n)
-    .map((p, i) => describePerson(p, i, state.regionIds))
+    .map((p, i) => describePerson(p, i, state.regionIds, brief))
     .join("; ");
   return listed || `${n} adult${n > 1 ? "s" : ""}`;
 }
@@ -109,68 +127,47 @@ function lightingFor(state: SceneFormState): string {
   return TIMES_OF_DAY.find((t) => t.id === state.timeOfDay)?.lighting ?? "";
 }
 
-
 function sceneHasWoman(state: SceneFormState): boolean {
   if (state.peopleCount === "group") return true;
   const n = Number(state.peopleCount);
   return state.people.slice(0, n).some((p) => p.gender === "woman");
 }
 
-/** Keep her face readable in any angle or pose. */
-function femaleFaceVisibleCue(state: SceneFormState): string {
+function femaleFaceVisibleCue(
+  state: SceneFormState,
+  brief: boolean,
+  angle: CameraAngle
+): string {
   if (!sceneHasWoman(state)) return "";
-  const rear =
-    state.cameraAngle === "back" || state.cameraAngle === "over-shoulder";
+  const rear = angle === "back" || angle === "over-shoulder";
   if (rear) {
-    return "her face stays clearly visible — even from behind she turns her head over her shoulder so you can see her face";
+    return brief
+      ? "her face visible, head turned over her shoulder"
+      : "her face stays clearly visible — even from behind she turns her head over her shoulder so you can see her face";
   }
   return "her face stays clearly visible in frame";
 }
 
 function femaleBeautyCue(state: SceneFormState): string {
   if (!sceneHasWoman(state)) return "";
-  if (state.peopleCount !== "group" && state.people.some((person) => person.gender === "woman" && Number(person.age) < 19)) {
-    return "age-appropriate natural appearance with no adult glamour or sexualization";
-  }
   return "she looks beautiful and attractive";
 }
 
-function cameraPhrase(state: SceneFormState): string {
-  const angle =
-    CAMERA_ANGLES.find((a) => a.id === state.cameraAngle)?.prompt ?? "";
-  const framing =
-    FRAMINGS.find((f) => f.id === state.framing)?.prompt ?? "";
-  return clean([angle, framing, `aspect ratio ${state.aspectRatio}`]);
+function cameraPhrase(angle: CameraAngle, framing: Framing, aspect: AspectRatio): string {
+  const angleText = CAMERA_ANGLES.find((a) => a.id === angle)?.prompt ?? "";
+  const framingText = FRAMINGS.find((f) => f.id === framing)?.prompt ?? "";
+  return clean([angleText, framingText, `aspect ratio ${aspect}`]);
 }
 
-function enforceRelationshipSafety(state: SceneFormState): SceneFormState {
-  const blocked = relationshipBlocksIntimate(state.relationship);
-  if (!blocked) return state;
-  if (!isIntimateAction(state.actionId)) return state;
-  const fallback = randomEverydayOrSocialAction();
-  return {
-    ...state,
-    actionCategory: fallback.category,
-    actionId: fallback.id,
-  };
+/** The resolved pose for this state, or null when the user typed their own action. */
+function currentPose(state: SceneFormState): PoseTag | null {
+  if (state.useCustomActionPrompt && state.customActionPrompt?.trim()) return null;
+  const action = getActionById(state.actionId);
+  if (!action) return null;
+  return resolvePose(action);
 }
 
-
-function enforceAgeCategorySafety(state: SceneFormState): SceneFormState {
-  if (!sceneHasUnder21(state.people, state.peopleCount)) return state;
-  if (!actionRequiresAdult21(state.actionId) && !["romance","intimate","hardcore","hardcore-grk","swap-own-grk","swap-cross-grk","gf-exchange-grk","five-couples-games","mmf-grk","mmmf-grk","ffm-grk","crowd-press-grk","wlw-grk"].includes(state.actionCategory)) {
-    return { ...state, useCustomActionPrompt: false, customActionPrompt: "", relationship: state.relationship === "couple" || state.relationship === "married" ? "friends" : state.relationship };
-  }
-  const fallback = randomEverydayOrSocialAction();
-  return {
-    ...state,
-    actionCategory: fallback.category,
-    actionId: fallback.id,
-  };
-}
-
-export function buildPrompts(raw: SceneFormState): BuiltPrompts {
-  const state = enforceAgeCategorySafety(enforceRelationshipSafety(raw));
+export function buildPrompts(state: SceneFormState): BuiltPrompts {
   const action = getActionById(state.actionId);
   const place = getPlaceById(state.placeId);
   const customActionText = state.customActionPrompt?.trim();
@@ -178,70 +175,86 @@ export function buildPrompts(raw: SceneFormState): BuiltPrompts {
     state.useCustomActionPrompt && customActionText
       ? customActionText
       : action?.prompt ?? "posed naturally";
+
+  // POSE LAYER — its own separate sentence, never mixed into the action text.
+  const pose = currentPose(state);
+  const poseText = pose ? poseNote(pose) : "";
+
+  // CAMERA — the pose tag owns it. Manual fields only apply to custom actions.
+  const cam = pose
+    ? cameraForPose(pose)
+    : { cameraAngle: state.cameraAngle, framing: state.framing };
+
   const placeText = place?.prompt ?? "an everyday setting";
   const regions = regionCues(state.regionIds);
-  const people = peopleBlock(state);
   const rel = relationshipPhrase(state);
   const lighting = lightingFor(state);
-  const camera = cameraPhrase(state);
+  const camera = cameraPhrase(cam.cameraAngle, cam.framing, state.aspectRatio);
   const sanitizeMode = isHardcoreAction(state.actionId) ? "hardcore" : "soft";
-
-  const faceVisibleCue = femaleFaceVisibleCue(state);
-  const beautyCue = femaleBeautyCue(state);
-
   const notes = sanitizeText(state.extraNotes, sanitizeMode);
-  const quality = DEFAULT_QUALITY_PHRASE;
-  const minorSafe = sceneHasUnder21(state.people, state.peopleCount);
-  const minorSafetyCue = minorSafe
-    ? "strictly age-appropriate non-romantic everyday scene; ordinary family, school, friendship or supervised play context only; no sexualization, adult glamour, suggestive posing, intimate contact, exposed clothing or mature styling"
-    : "";
 
+  // DRAFT: essentials only, compressed face, one-line quality.
   const short = sanitizeText(
     clean([
       "real photograph shot on camera",
-      people,
+      peopleBlock(state, true),
       rel,
       regions ? `appearance cues: ${regions}` : "",
-      minorSafetyCue,
       actionText,
-      faceVisibleCue,
-      beautyCue,
+      poseText,
+      femaleFaceVisibleCue(state, true, cam.cameraAngle),
+      femaleBeautyCue(state),
       `at ${placeText}`,
       `${state.timeOfDay} lighting`,
       camera,
-      quality,
+      SHORT_QUALITY,
       state.mode === "video" ? "natural camera motion, real movement" : "still real photo",
       notes,
-    ])
-, sanitizeMode);
+    ]),
+    sanitizeMode
+  );
 
+  // FINAL: full face descriptions, full quality block, labelled sections.
   const detailed = sanitizeText(
     sentence([
-      `Photorealistic real photograph of ${people}`,
+      `Photorealistic real photograph of ${peopleBlock(state, false)}`,
       rel ? `They share a ${rel}` : "",
       regions ? `Cultural/appearance cues: ${regions}` : "",
-      minorSafetyCue ? `Minor-safe direction: ${minorSafetyCue}` : "",
       `Action: ${actionText}`,
+      poseText ? `Pose: ${poseText}` : "",
       `Setting: ${placeText}`,
       `Time: ${state.timeOfDay} with ${lighting}`,
-      faceVisibleCue ? `Face visibility: ${faceVisibleCue}` : "",
-      beautyCue ? `Beauty: ${beautyCue}` : "",
+      femaleFaceVisibleCue(state, false, cam.cameraAngle)
+        ? `Face visibility: ${femaleFaceVisibleCue(state, false, cam.cameraAngle)}`
+        : "",
+      femaleBeautyCue(state) ? `Beauty: ${femaleBeautyCue(state)}` : "",
       `Camera: ${camera}`,
-      `Quality: ${quality}`,
+      `Quality: ${DEFAULT_QUALITY_PHRASE}`,
       state.mode === "video"
         ? "Motion: natural continuous movement suitable for short video"
         : "Still image with documentary realism",
       notes ? `Notes: ${notes}` : "",
-    ])
-, sanitizeMode);
+    ]),
+    sanitizeMode
+  );
 
   const negative = sanitizeText(
-    state.negativePrompt.trim() || DEFAULT_NEGATIVE
-, "soft");
+    state.negativePrompt.trim() || DEFAULT_NEGATIVE,
+    "soft"
+  );
 
   return { short, detailed, negative };
 }
 
+/** Camera the UI should show as selected for a given action. */
+export function cameraForAction(actionId: string): {
+  cameraAngle: CameraAngle;
+  framing: Framing;
+} | null {
+  const action = getActionById(actionId);
+  if (!action) return null;
+  return cameraForPose(resolvePose(action));
+}
 
 /** Fixed studio defaults — used on load and Reset. Independent fields. */
 export function createStudioDefaults(): SceneFormState {

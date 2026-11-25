@@ -41,8 +41,9 @@ async function basicAuthOk(
 }
 
 export async function middleware(req: NextRequest) {
-  const expectedUser = process.env.SITE_AUTH_USER ?? "";
-  const expectedPass = process.env.SITE_AUTH_PASSWORD ?? "";
+  // trim() removes stray spaces and quotes from the password file
+  const expectedUser = (process.env.SITE_AUTH_USER ?? "").trim();
+  const expectedPass = (process.env.SITE_AUTH_PASSWORD ?? "").trim();
   const { pathname } = req.nextUrl;
 
   const lockEnabled =

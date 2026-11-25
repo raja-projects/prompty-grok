@@ -1,0 +1,2146 @@
+﻿=== tailwind.config.ts ===
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        prompty: {
+          bg: "#080d14",
+          surface: "#101822",
+          elevated: "#16212c",
+          border: "#212d3b",
+          muted: "#8fa1b5",
+          accent: "#7b6ef0",
+          accent2: "#6fe3c8",
+          glow: "#b58cf0",
+          success: "#3ddc97",
+          warn: "#f7c15c",
+        },
+      },
+      fontFamily: {
+        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
+      },
+      borderRadius: {
+        card: "22px",
+        pill: "999px",
+      },
+      boxShadow: {
+        "glow-sm": "0 10px 26px -12px rgba(111, 227, 200, 0.45)",
+        card: "0 18px 40px -26px rgba(0, 0, 0, 0.9)",
+        rail: "0 22px 50px -24px rgba(0, 0, 0, 0.9)",
+      },
+      backgroundImage: {
+        "mint-sheen":
+          "linear-gradient(160deg, rgba(111,227,200,0.20), rgba(111,227,200,0.05) 62%, rgba(111,227,200,0))",
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
+=== src\app\globals.css ===
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background-color: #080d14;
+  color: #f2f6fb;
+  background-image: radial-gradient(
+    ellipse 70% 42% at 50% -12%,
+    rgba(111, 227, 200, 0.07),
+    transparent 66%
+  );
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(111, 227, 200, 0.28);
+  color: #fff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #26333f transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #26333f;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+input[type="range"] {
+  accent-color: #6fe3c8;
+}
+
+select option {
+  background: #101822;
+  color: #f2f6fb;
+}
+
+.section-anchor {
+  scroll-margin-top: 88px;
+}
+
+.rail-btn {
+  transition: background-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rail-btn[data-active="true"] {
+  background: #6fe3c8;
+  color: #080d14;
+  box-shadow: 0 10px 24px -12px rgba(111, 227, 200, 0.55);
+}
+
+.rail-btn:hover {
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .rail-btn:hover {
+    transform: none;
+  }
+}
+=== src\components\PromptLab.tsx ===
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ACTION_CATEGORIES,
+  ACTIONS,
+  getActionById,
+  isIntimateAction,
+  categoryRequiresAdult21,
+} from "@/lib/actions";
+import { ASPECT_RATIOS, CAMERA_ANGLES, FRAMINGS, TIMES_OF_DAY } from "@/lib/camera";
+import {
+  PEOPLE_COUNTS,
+  REGIONS,
+  RELATIONSHIPS,
+  defaultPerson,
+  defaultDressId,
+  dressesForAge,
+  defaultFoursomeSwapPeople,
+  defaultMmfPeople,
+  defaultMmmfPeople,
+  defaultFiveCouplesPeople,
+  defaultFfmPeople,
+  defaultCrowdPressPeople,
+  defaultWlwPeople,
+  relationshipBlocksIntimate,
+  reshuffleFaceCuts,
+  applyRegionLook,
+  sceneHasUnder21,
+  type PeopleCount,
+  type Relationship,
+  type Gender,
+} from "@/lib/people";
+import { PLACES } from "@/lib/places";
+import {
+  buildPrompts,
+  createRandomizedDefaults,
+  createStudioDefaults,
+  DEFAULT_FORM,
+} from "@/lib/prompt-builder";
+import {
+  clearRecent,
+  deleteFavoritePerson,
+  loadFavoritePeople,
+  loadRecent,
+  saveFavoritePerson,
+  saveRecent,
+  updateFavoritePerson,
+} from "@/lib/storage";
+import type { FavoritePerson, Mode, RecentPrompt, SceneFormState } from "@/lib/types";
+import { CopyButton } from "./CopyButton";
+import { ModeToggle } from "./ModeToggle";
+import { PersonCard } from "./PersonCard";
+import { RecentList } from "./RecentList";
+
+const inputBase =
+  "w-full rounded-xl border border-white/10 bg-prompty-bg/80 px-3 py-2 text-[13px] text-white outline-none transition placeholder:text-prompty-muted/50 focus-visible:border-prompty-accent2/60 focus-visible:ring-2 focus-visible:ring-prompty-accent2/25";
+
+const pillIdle =
+  "border-white/10 bg-white/[0.04] text-prompty-muted hover:border-prompty-accent2/40 hover:text-white";
+const pillActive =
+  "border-prompty-accent2/80 bg-prompty-accent2/15 text-white font-semibold";
+
+const ACTION_FAMILIES: {
+  id: string;
+  label: string;
+  icon: string;
+  categories: string[];
+}[] = [
+  { id: "basics", label: "Everyday", icon: "◍", categories: ["everyday", "social", "physical"] },
+  { id: "romance", label: "Romance", icon: "♡", categories: ["romance", "intimate"] },
+  { id: "hardcore", label: "Hardcore", icon: "◈", categories: ["hardcore", "hardcore-grk"] },
+  {
+    id: "couples",
+    label: "Couples",
+    icon: "⚭",
+    categories: ["swap-own-grk", "swap-cross-grk", "gf-exchange-grk", "five-couples-games"],
+  },
+  {
+    id: "multi",
+    label: "Multi",
+    icon: "❋",
+    categories: ["mmf-grk", "mmmf-grk", "ffm-grk", "crowd-press-grk", "wlw-grk"],
+  },
+];
+
+const SUBGROUPS: { id: string; label: string; words: string[] }[] = [
+  { id: "threesome", label: "Threesome", words: ["threesome", "three"] },
+  { id: "foursome", label: "Foursome", words: ["foursome", "four"] },
+  { id: "group", label: "Group", words: ["group", "crowd", "gang", "five", "ten"] },
+  { id: "butt", label: "Butt", words: ["butt", "rear", "glute"] },
+  { id: "boobs", label: "Boobs", words: ["boob", "breast", "chest", "bust"] },
+  { id: "oral", label: "Oral", words: ["oral", "mouth", "blow", "lick", "suck", "tongue"] },
+  { id: "missionary", label: "Missionary", words: ["missionary"] },
+  { id: "behind", label: "From behind", words: ["behind", "doggy", "rear entry"] },
+  { id: "cowgirl", label: "On top", words: ["cowgirl", "riding", "on top", "straddle"] },
+  { id: "standing", label: "Standing", words: ["standing", "against the wall", "upright"] },
+  { id: "seated", label: "Seated", words: ["seated", "sitting", "chair", "on a lap"] },
+  { id: "lying", label: "Lying", words: ["lying", "on her back", "on his back", "spoon"] },
+  { id: "hands", label: "Hands", words: ["hand", "finger", "touch", "grip", "caress"] },
+  { id: "kiss", label: "Kiss", words: ["kiss", "lip", "neck"] },
+  { id: "move", label: "Walk / move", words: ["walk", "stroll", "dance", "run"] },
+  { id: "look", label: "Look / pose", words: ["look", "gaze", "stare", "pose", "smile", "photo"] },
+];
+
+function subgroupOf(action: { label: string; prompt: string }) {
+  const hay = `${action.label} ${action.prompt}`.toLowerCase();
+  return SUBGROUPS.find((s) => s.words.some((w) => hay.includes(w)))?.id ?? "other";
+}
+
+const CAMERA_RULES: Record<string, string[]> = {
+  butt: ["behind", "back", "low", "above"],
+  behind: ["behind", "back", "low"],
+  boobs: ["front", "eye", "level"],
+  missionary: ["above", "top", "high", "side"],
+  lying: ["above", "side", "high"],
+  oral: ["above", "top", "high"],
+  cowgirl: ["low", "below", "eye"],
+  seated: ["eye", "level", "side"],
+  standing: ["eye", "level", "side"],
+  kiss: ["eye", "level", "front"],
+  hands: ["eye", "level", "above"],
+  threesome: ["above", "side", "high"],
+  foursome: ["above", "side", "high"],
+  group: ["above", "high", "side"],
+};
+
+function cameraForSubgroup(group: string): string | null {
+  const words = CAMERA_RULES[group];
+  if (!words) return null;
+  for (const word of words) {
+    const hit = CAMERA_ANGLES.find((c) => c.label.toLowerCase().includes(word));
+    if (hit) return hit.id;
+  }
+  return null;
+}
+
+const RAIL = [
+  { id: "sec-people", label: "People", icon: "☺" },
+  { id: "sec-action", label: "Action", icon: "◈" },
+  { id: "sec-setting", label: "Setting", icon: "⌖" },
+  { id: "sec-notes", label: "Notes", icon: "✎" },
+  { id: "sec-prompt", label: "Prompt", icon: "❏" },
+];
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.15em] text-prompty-muted">
+      {children}
+    </span>
+  );
+}
+
+function Card({
+  title,
+  hint,
+  open,
+  onToggle,
+  id,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  open: boolean;
+  onToggle: () => void;
+  id?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      id={id}
+      className="section-anchor rounded-card border border-white/[0.07] bg-prompty-surface shadow-card"
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex w-full items-start gap-3 rounded-card px-5 py-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-prompty-accent2/50"
+      >
+        <span className="flex-1">
+          <span className="block font-display text-[15px] font-semibold text-white">{title}</span>
+          {hint ? (
+            <span className="mt-0.5 block truncate text-[11px] text-prompty-muted">{hint}</span>
+          ) : null}
+        </span>
+        <span
+          className={`mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/10 text-[11px] text-prompty-muted transition ${
+            open ? "rotate-180 border-prompty-accent2/40 text-prompty-accent2" : ""
+          }`}
+          aria-hidden
+        >
+          ⌄
+        </span>
+      </button>
+      {open ? <div className="space-y-4 px-5 pb-5">{children}</div> : null}
+    </section>
+  );
+}
+
+function Select({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: { id: string; label: string }[];
+  onChange: (id: string) => void;
+}) {
+  return (
+    <label className="block">
+      <Label>{label}</Label>
+      <select value={value} onChange={(e) => onChange(e.target.value)} className={inputBase}>
+        {options.map((o) => (
+          <option key={o.id} value={o.id}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function Chips({
+  label,
+  options,
+  value,
+  values,
+  onChange,
+}: {
+  label: string;
+  options: { id: string; label: string }[];
+  value?: string;
+  values?: string[];
+  onChange: (id: string) => void;
+}) {
+  return (
+    <div>
+      <Label>{label}</Label>
+      <div role="group" aria-label={label} className="flex flex-wrap gap-1.5">
+        {options.map((o) => {
+          const active = values ? values.includes(o.id) : value === o.id;
+          return (
+            <button
+              key={o.id}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(o.id)}
+              className={`rounded-pill border px-3 py-1.5 text-[11.5px] font-medium transition outline-none focus-visible:ring-2 focus-visible:ring-prompty-accent2/50 ${
+                active ? pillActive : pillIdle
+              }`}
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const DRESS_MATCHES: string[][] = [
+  ["salwar"],
+  ["co-ord kurta"],
+  ["dhoti"],
+  ["kurti", "leggings"],
+  ["track"],
+];
+
+const LIGHT_WORDS = [
+  "light grey",
+  "light",
+  "off-white",
+  "white",
+  "cream",
+  "beige",
+  "ivory",
+  "pastel",
+  "pale",
+  "sand",
+];
+
+const MALE_BOTTOM_WORDS = [
+  "trouser",
+  "chino",
+  "short",
+  "track",
+  "cargo",
+  "dhoti",
+  "jean",
+  "mundu",
+  "lungi",
+  "towel",
+  "boxer",
+];
+
+function dressHay(d: { label: string; prompt: string }) {
+  return `${d.label} ${d.prompt}`.toLowerCase();
+}
+
+function pickDressId(gender: Gender, age: string): string {
+  const all = dressesForAge(gender, age);
+  if (!all.length) return defaultDressId(gender);
+
+  if (gender === "man") {
+    const bottoms = all.filter((d) => MALE_BOTTOM_WORDS.some((w) => dressHay(d).includes(w)));
+    if (!bottoms.length) return defaultDressId(gender);
+    return bottoms[Math.floor(Math.random() * bottoms.length)]!.id;
+  }
+
+  if (gender !== "woman") return defaultDressId(gender);
+
+  const pool = all.filter((d) =>
+    DRESS_MATCHES.some((group) => group.every((word) => dressHay(d).includes(word)))
+  );
+  if (!pool.length) return defaultDressId(gender);
+
+  const chosen = pool[Math.floor(Math.random() * pool.length)]!;
+  if (dressHay(chosen).includes("track")) {
+    const light = pool.filter(
+      (d) => dressHay(d).includes("track") && LIGHT_WORDS.some((w) => dressHay(d).includes(w))
+    );
+    if (light.length) return light[Math.floor(Math.random() * light.length)]!.id;
+  }
+  return chosen.id;
+}
+
+function makePerson(gender: "woman" | "man", age: string, bodyType: string) {
+  return {
+    ...defaultPerson({ gender, age }),
+    bodyType,
+    dressId: pickDressId(gender, age),
+  };
+}
+
+function withRandomDress<T extends { gender: Gender; age: string }>(person: T): T {
+  return { ...person, dressId: pickDressId(person.gender, person.age) };
+}
+
+function adjustPeopleCount(
+  people: SceneFormState["people"],
+  count: PeopleCount
+): SceneFormState["people"] {
+  if (count === "group") return people;
+  const n = Number(count);
+  if (people.length === n) return people;
+  if (people.length > n) return people.slice(0, n);
+  const next = [...people];
+  const ladder: { gender: "woman" | "man"; age: string; bodyType: string }[] = [
+    { gender: "woman", age: "19", bodyType: "Petite" },
+    { gender: "man", age: "30", bodyType: "Average" },
+    { gender: "woman", age: "30", bodyType: "Average" },
+    { gender: "man", age: "50", bodyType: "Average" },
+  ];
+  while (next.length < n) {
+    const step = ladder[next.length % ladder.length]!;
+    next.push(makePerson(step.gender, step.age, step.bodyType));
+  }
+  return next;
+}
+
+const SWAP_CATEGORIES = ["swap-own-grk", "swap-cross-grk", "gf-exchange-grk"];
+
+const BARE_OK_WORDS = [
+  "beach",
+  "pool",
+  "resort",
+  "bath",
+  "shower",
+  "bedroom",
+  "bed",
+  "home",
+  "house",
+  "garden",
+  "terrace",
+  "balcony",
+  "lake",
+  "river",
+  "waterfall",
+  "backwater",
+];
+
+const SHIRTED_WORDS = ["shirt", "tee", "t-shirt", "vest", "hoodie", "kurta", "pathani"];
+
+function dressText(d: { label: string; prompt: string }) {
+  return `${d.label} ${d.prompt}`.toLowerCase();
+}
+
+function bareAllowed(placeLabel: string) {
+  const hay = placeLabel.toLowerCase();
+  return BARE_OK_WORDS.some((w) => hay.includes(w));
+}
+
+function fixDressForPlace<
+  T extends { gender: Gender; age: string; dressId: string }
+>(person: T, placeLabel: string): T {
+  if (person.gender !== "man") return person;
+  if (bareAllowed(placeLabel)) return person;
+
+  const list = dressesForAge(person.gender, person.age);
+  const current = list.find((d) => d.id === person.dressId);
+  if (!current || !dressText(current).includes("bare chest")) return person;
+
+  const shirted = list.filter((d) => SHIRTED_WORDS.some((w) => dressText(d).includes(w)));
+  if (!shirted.length) return person;
+  return { ...person, dressId: shirted[Math.floor(Math.random() * shirted.length)]!.id };
+}
+
+function buildCast(
+  category: string
+): {
+  count: PeopleCount;
+  people: SceneFormState["people"];
+  relationship?: Relationship;
+} | null {
+  const coupleA = () => [makePerson("woman", "19", "Petite"), makePerson("man", "30", "Average")];
+  const coupleB = () => [makePerson("woman", "30", "Average"), makePerson("man", "50", "Average")];
+  switch (category) {
+    case "swap-own-grk":
+    case "swap-cross-grk":
+    case "gf-exchange-grk":
+      return { count: "4", people: [...coupleA(), ...coupleB()], relationship: "friends" };
+    case "mmf-grk":
+      return {
+        count: "3",
+        people: [makePerson("man", "32", "Average"), makePerson("woman", "21", "Slim"), makePerson("man", "45", "Average")],
+        relationship: "friends",
+      };
+    case "ffm-grk":
+      return {
+        count: "3",
+        people: [makePerson("woman", "21", "Slim"), makePerson("woman", "24", "Average"), makePerson("man", "34", "Average")],
+        relationship: "friends",
+      };
+    case "mmmf-grk":
+      return {
+        count: "4",
+        people: [
+          makePerson("woman", "22", "Slim"),
+          makePerson("man", "30", "Average"),
+          makePerson("man", "36", "Athletic"),
+          makePerson("man", "44", "Average"),
+        ],
+        relationship: "friends",
+      };
+    case "wlw-grk":
+      return {
+        count: "2",
+        people: [makePerson("woman", "24", "Slim"), makePerson("woman", "28", "Average")],
+        relationship: "couple",
+      };
+    case "crowd-press-grk":
+      return {
+        count: "2",
+        people: [makePerson("man", "34", "Average"), makePerson("woman", "21", "Slim")],
+        relationship: "strangers",
+      };
+    default:
+      return null;
+  }
+}
+
+export function PromptLab() {
+  const [form, setForm] = useState<SceneFormState>(DEFAULT_FORM);
+  const [hydrated, setHydrated] = useState(false);
+  const [recent, setRecent] = useState<RecentPrompt[]>([]);
+  const [savedFlash, setSavedFlash] = useState(false);
+  const [actionQuery, setActionQuery] = useState("");
+  const [actionFamily, setActionFamily] = useState<string>("basics");
+  const [actionPage, setActionPage] = useState(0);
+  const [actionSubgroup, setActionSubgroup] = useState("all");
+  const [railActive, setRailActive] = useState("sec-people");
+  const [favoritePeople, setFavoritePeople] = useState<FavoritePerson[]>([]);
+  const [editingFavoriteIds, setEditingFavoriteIds] = useState<Record<number, string>>({});
+  const [tab, setTab] = useState<"short" | "detailed">("short");
+  const [open, setOpen] = useState<Record<string, boolean>>({
+    cast: true,
+    action: true,
+    place: false,
+    notes: false,
+  });
+  const searchRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    setRecent(loadRecent());
+    setFavoritePeople(loadFavoritePeople());
+    const studio = createStudioDefaults();
+    const placeLabel = PLACES.find((p) => p.id === studio.placeId)?.label ?? "";
+    setForm({
+      ...studio,
+      people: studio.people.map((p) => fixDressForPlace(withRandomDress(p), placeLabel)),
+    });
+    setHydrated(true);
+  }, []);
+
+  const intimateBlocked = relationshipBlocksIntimate(form.relationship);
+  const under21 = sceneHasUnder21(form.people, form.peopleCount);
+  const prompts = useMemo(() => buildPrompts(form), [form]);
+
+  const activeAction = getActionById(form.actionId);
+  const activePlace = PLACES.find((p) => p.id === form.placeId);
+  const currentText = tab === "short" ? prompts.short : prompts.detailed;
+  const searching = actionQuery.trim().length > 0;
+
+  function toggle(key: string) {
+    setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  function goTo(sectionId: string) {
+    setRailActive(sectionId);
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (sectionId === "sec-action") {
+      window.setTimeout(() => searchRef.current?.focus(), 420);
+    }
+  }
+
+  function patch(partial: Partial<SceneFormState>) {
+    setForm((prev) => {
+      const next: SceneFormState = { ...prev, ...partial };
+
+      if (partial.actionCategory && categoryRequiresAdult21(partial.actionCategory)) {
+        next.people = next.people.map((person) =>
+          Number(person.age) < 19 ? { ...person, age: "19" } : person
+        );
+        next.groupPeople = (next.groupPeople ?? []).map((person) =>
+          Number(person.age) < 19 ? { ...person, age: "19" } : person
+        );
+      }
+
+      if (partial.peopleCount && partial.peopleCount !== prev.peopleCount) {
+        next.people = adjustPeopleCount(prev.people, partial.peopleCount);
+      }
+
+      if (
+        partial.actionCategory === "swap-own-grk" ||
+        partial.actionCategory === "swap-cross-grk" ||
+        partial.actionCategory === "gf-exchange-grk"
+      ) {
+        next.peopleCount = "4";
+        next.people = defaultFoursomeSwapPeople();
+        if (!relationshipBlocksIntimate("friends")) next.relationship = "friends";
+        const cat = partial.actionCategory;
+        const first = ACTIONS.find((a) => a.category === cat) ?? getActionById(next.actionId);
+        if (first && getActionById(next.actionId)?.category !== cat) {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+        }
+      }
+
+      if (partial.actionCategory === "mmf-grk") {
+        next.peopleCount = "3";
+        next.people = defaultMmfPeople();
+        if (!relationshipBlocksIntimate("friends")) next.relationship = "friends";
+        const first = ACTIONS.find((a) => a.category === "mmf-grk") ?? getActionById(next.actionId);
+        if (first && getActionById(next.actionId)?.category !== "mmf-grk") {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+        }
+      }
+
+      if (partial.actionCategory === "mmmf-grk") {
+        next.peopleCount = "4";
+        next.people = defaultMmmfPeople();
+        next.relationship = "friends";
+        const first = ACTIONS.find((a) => a.category === "mmmf-grk") ?? getActionById(next.actionId);
+        if (first && getActionById(next.actionId)?.category !== "mmmf-grk") {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+        }
+      }
+
+      if (partial.actionCategory === "five-couples-games") {
+        next.peopleCount = "group";
+        next.relationship = "friends";
+        next.crowdDescriptors =
+          "exactly five established adult couples, ten consenting adults age 19+, dressed for a stylish private couples party, every face distinct and visible";
+        next.groupPeople = defaultFiveCouplesPeople();
+        const first = ACTIONS.find((a) => a.category === "five-couples-games");
+        if (first) {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+          if (first.placeHints?.length) next.placeId = first.placeHints[0]!;
+        }
+      }
+
+      if (partial.actionCategory === "ffm-grk") {
+        next.peopleCount = "3";
+        next.people = defaultFfmPeople();
+        if (!relationshipBlocksIntimate("friends")) next.relationship = "friends";
+        const first = ACTIONS.find((a) => a.category === "ffm-grk") ?? getActionById(next.actionId);
+        if (first && getActionById(next.actionId)?.category !== "ffm-grk") {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+        }
+      }
+
+      if (partial.actionCategory === "crowd-press-grk") {
+        next.peopleCount = "2";
+        next.people = defaultCrowdPressPeople();
+        next.relationship = "strangers";
+        const first =
+          ACTIONS.find((a) => a.category === "crowd-press-grk") ?? getActionById(next.actionId);
+        if (first && getActionById(next.actionId)?.category !== "crowd-press-grk") {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+        }
+      }
+
+      if (partial.actionCategory === "wlw-grk") {
+        next.peopleCount = "2";
+        next.people = defaultWlwPeople();
+        if (!relationshipBlocksIntimate("couple")) next.relationship = "couple";
+        const first = ACTIONS.find((a) => a.category === "wlw-grk") ?? getActionById(next.actionId);
+        if (first && getActionById(next.actionId)?.category !== "wlw-grk") {
+          next.actionId = first.id;
+          next.actionCategory = first.category;
+        }
+      }
+
+      if (partial.relationship) {
+        const blocked = relationshipBlocksIntimate(partial.relationship);
+        if (blocked && isIntimateAction(next.actionId)) {
+          const fallback = ACTIONS.find((a) => a.category === "everyday");
+          if (fallback) {
+            next.actionCategory = fallback.category;
+            next.actionId = fallback.id;
+          }
+        }
+      }
+
+      if (partial.actionId) {
+        const action = getActionById(partial.actionId);
+        if (action) {
+          next.actionCategory = action.category;
+          const autoAngle = cameraForSubgroup(subgroupOf(action));
+          if (autoAngle) {
+            next.cameraAngle = autoAngle as SceneFormState["cameraAngle"];
+          } else if (action.autoCamera) {
+            next.cameraAngle = action.autoCamera;
+          }
+          if (action.autoFraming) next.framing = action.autoFraming;
+          if (action.placeHints?.length) next.placeId = action.placeHints[0]!;
+        }
+      }
+
+      const castCategory = partial.actionId
+        ? (getActionById(partial.actionId)?.category ?? next.actionCategory)
+        : next.actionCategory;
+      if (castCategory !== prev.actionCategory) {
+        const cast = buildCast(castCategory);
+        if (cast) {
+          next.peopleCount = cast.count;
+          next.people = cast.people;
+          if (cast.relationship && !relationshipBlocksIntimate(cast.relationship)) {
+            next.relationship = cast.relationship;
+          }
+        }
+        if (SWAP_CATEGORIES.includes(castCategory)) {
+          next.extraNotes =
+            "each man's attention stays fixed on the other man's wife — eyes on her face and her body, hands on her waist and hips, leaning in close to her — while each woman answers the other man rather than her own, the two men almost never looking at each other, all four faces clearly visible";
+        }
+      }
+
+      if (sceneHasUnder21(next.people, next.peopleCount)) {
+        next.useCustomActionPrompt = false;
+        next.customActionPrompt = "";
+        if (next.relationship === "couple" || next.relationship === "married") {
+          next.relationship = "friends";
+        }
+        if (
+          categoryRequiresAdult21(next.actionCategory) ||
+          categoryRequiresAdult21(getActionById(next.actionId)?.category ?? "everyday")
+        ) {
+          const fallback = ACTIONS.find((a) => a.category === "everyday");
+          if (fallback) {
+            next.actionCategory = fallback.category;
+            next.actionId = fallback.id;
+          }
+        }
+      }
+
+      const placeLabel = PLACES.find((p) => p.id === next.placeId)?.label ?? "";
+      next.people = next.people.map((p) => fixDressForPlace(p, placeLabel));
+      if (next.groupPeople) {
+        next.groupPeople = next.groupPeople.map((p) => fixDressForPlace(p, placeLabel));
+      }
+
+      return next;
+    });
+  }
+
+  function persist() {
+    if (!prompts.short.trim()) return;
+    const action = getActionById(form.actionId);
+    const list = saveRecent({
+      mode: form.mode,
+      subject: action?.label ?? "Scene",
+      short: prompts.short,
+      detailed: prompts.detailed,
+    });
+    setRecent(list);
+    setSavedFlash(true);
+    window.setTimeout(() => setSavedFlash(false), 1400);
+  }
+
+  function resetDefaults() {
+    const next = createStudioDefaults();
+    const placeLabel = PLACES.find((p) => p.id === next.placeId)?.label ?? "";
+    setForm({
+      ...next,
+      people: next.people.map((p) => fixDressForPlace(withRandomDress(p), placeLabel)),
+    });
+    setActionQuery("");
+  }
+
+  function randomizeAll() {
+    const next = createRandomizedDefaults();
+    const placeLabel = PLACES.find((p) => p.id === next.placeId)?.label ?? "";
+    setForm({
+      ...next,
+      people: next.people.map((p) => fixDressForPlace(withRandomDress(p), placeLabel)),
+      groupPeople: next.groupPeople?.map((p) => fixDressForPlace(withRandomDress(p), placeLabel)),
+    });
+    setActionQuery("");
+  }
+
+  function changeFacesOnly() {
+    setForm((prev) => {
+      if (prev.peopleCount === "group") return prev;
+      return { ...prev, people: reshuffleFaceCuts(prev.people, prev.regionIds) };
+    });
+  }
+
+  function savePersonAsFavorite(person: SceneFormState["people"][number], index: number) {
+    const editingId = editingFavoriteIds[index];
+    const current = favoritePeople.find((favorite) => favorite.id === editingId);
+    const name = window.prompt(
+      editingId ? "Update this favorite person's name" : "Name this favorite person",
+      current?.name ?? `Person ${index + 1}`
+    );
+    if (name === null) return;
+    if (editingId) {
+      setFavoritePeople(updateFavoritePerson(editingId, name, person));
+      setEditingFavoriteIds((ids) => {
+        const next = { ...ids };
+        delete next[index];
+        return next;
+      });
+    } else {
+      setFavoritePeople(saveFavoritePerson(name, person));
+    }
+  }
+
+  function saveGroupPersonAsFavorite(person: SceneFormState["people"][number], index: number) {
+    const editingId = editingFavoriteIds[index];
+    const current = favoritePeople.find((favorite) => favorite.id === editingId);
+    const name = window.prompt(
+      editingId ? "Update this favorite person's name" : "Name this favorite person",
+      current?.name ?? `Couple member ${index + 1}`
+    );
+    if (name === null) return;
+    setFavoritePeople(
+      editingId ? updateFavoritePerson(editingId, name, person) : saveFavoritePerson(name, person)
+    );
+    if (editingId) {
+      setEditingFavoriteIds((ids) =>
+        Object.fromEntries(Object.entries(ids).filter(([slot]) => Number(slot) !== index))
+      );
+    }
+  }
+
+  const visibleCategories = ACTION_CATEGORIES.filter((c) => {
+    if (
+      (c.id === "intimate" ||
+        c.id === "hardcore" ||
+        c.id === "hardcore-grk" ||
+        c.id === "swap-own-grk" ||
+        c.id === "swap-cross-grk" ||
+        c.id === "gf-exchange-grk" ||
+        c.id === "five-couples-games" ||
+        c.id === "mmf-grk" ||
+        c.id === "mmmf-grk" ||
+        c.id === "ffm-grk" ||
+        c.id === "crowd-press-grk" ||
+        c.id === "wlw-grk") &&
+      intimateBlocked
+    )
+      return false;
+    if (under21 && categoryRequiresAdult21(c.id)) return false;
+    return true;
+  });
+
+  const visibleIds = visibleCategories.map((c) => c.id);
+  const query = actionQuery.trim().toLowerCase();
+
+  const searchResults = searching
+    ? ACTIONS.filter(
+        (a) =>
+          visibleIds.includes(a.category) &&
+          (a.label.toLowerCase().includes(query) || a.prompt.toLowerCase().includes(query))
+      ).slice(0, 80)
+    : [];
+
+  const familyOfCategory = ACTION_FAMILIES.find((f) =>
+    f.categories.includes(form.actionCategory)
+  )?.id;
+  const effectiveFamily =
+    ACTION_FAMILIES.find(
+      (f) => f.id === actionFamily && f.categories.some((id) => visibleIds.includes(id))
+    )?.id ??
+    familyOfCategory ??
+    "basics";
+
+  const familyCategories = visibleCategories.filter((c) =>
+    ACTION_FAMILIES.find((f) => f.id === effectiveFamily)?.categories.includes(c.id)
+  );
+
+  const shownCategory = familyCategories.some((c) => c.id === form.actionCategory)
+    ? form.actionCategory
+    : familyCategories[0]?.id;
+
+  const shownActions = ACTIONS.filter((a) => a.category === shownCategory);
+  const shownCategoryMeta = ACTION_CATEGORIES.find((c) => c.id === shownCategory);
+
+  const taggedActions = shownActions.map((action) => ({ action, group: subgroupOf(action) }));
+  const presentSubgroups = SUBGROUPS.filter((s) => taggedActions.some((t) => t.group === s.id));
+  const hasOther = taggedActions.some((t) => t.group === "other");
+  const subgroupOptions = hasOther
+    ? [...presentSubgroups, { id: "other", label: "Other", words: [] }]
+    : presentSubgroups;
+  const activeSubgroup = subgroupOptions.some((s) => s.id === actionSubgroup)
+    ? actionSubgroup
+    : "all";
+  const filteredActions =
+    activeSubgroup === "all"
+      ? shownActions
+      : taggedActions.filter((t) => t.group === activeSubgroup).map((t) => t.action);
+
+  const PAGE_SIZE = 12;
+  const pageCount = Math.max(1, Math.ceil(filteredActions.length / PAGE_SIZE));
+  const safePage = Math.min(actionPage, pageCount - 1);
+  const pageActions = filteredActions.slice(
+    safePage * PAGE_SIZE,
+    safePage * PAGE_SIZE + PAGE_SIZE
+  );
+
+  useEffect(() => {
+    setActionPage(0);
+  }, [shownCategory, effectiveFamily, actionQuery, actionSubgroup]);
+
+  const personSlots = form.peopleCount === "group" ? 0 : Number(form.peopleCount);
+
+  return (
+    <div className="relative z-10 min-h-screen pb-28">
+      <header className="sticky top-0 z-40 border-b border-white/[0.07] bg-prompty-bg/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[1500px] items-center gap-3 px-4 py-3 lg:px-6">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-mint-sheen text-base text-prompty-accent2">
+            ◍
+          </span>
+          <div className="mr-auto">
+            <h1 className="font-display text-[15px] font-bold leading-none tracking-tight text-white">
+              Prompty
+            </h1>
+            <span className="text-[10px] text-prompty-muted">Photoreal scene prompts</span>
+          </div>
+          <ModeToggle mode={form.mode} onChange={(mode: Mode) => patch({ mode })} />
+          {!hydrated ? <span className="text-xs text-prompty-muted">Loading…</span> : null}
+        </div>
+        <div className="flex gap-1.5 overflow-x-auto px-4 pb-3 lg:hidden">
+          {RAIL.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => goTo(item.id)}
+              className={`shrink-0 rounded-pill border px-3 py-1.5 text-[11px] font-medium ${
+                railActive === item.id ? pillActive : pillIdle
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      <div className="mx-auto flex max-w-[1500px] flex-col gap-5 px-4 py-5 lg:flex-row lg:px-6">
+        <nav className="sticky top-20 hidden h-fit w-[168px] shrink-0 flex-col gap-1 rounded-card border border-white/[0.07] bg-prompty-surface p-2.5 shadow-rail lg:flex">
+          <p className="px-2.5 pb-1 pt-1 text-[9.5px] font-semibold uppercase tracking-[0.16em] text-prompty-muted">
+            Jump to
+          </p>
+          {RAIL.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => goTo(item.id)}
+              data-active={railActive === item.id}
+              className={`rail-btn flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[12.5px] font-medium ${
+                railActive === item.id
+                  ? "text-prompty-bg"
+                  : "text-prompty-muted hover:bg-white/[0.06] hover:text-white"
+              }`}
+            >
+              <span className="w-4 text-center text-[13px]" aria-hidden>
+                {item.icon}
+              </span>
+              {item.label}
+            </button>
+          ))}
+          <span className="my-1 h-px w-full bg-white/10" />
+          <button
+            type="button"
+            onClick={randomizeAll}
+            className="rail-btn flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[12.5px] font-medium text-prompty-muted hover:bg-white/[0.06] hover:text-white"
+          >
+            <span className="w-4 text-center text-[13px]" aria-hidden>
+              ⇄
+            </span>
+            Shuffle all
+          </button>
+          <button
+            type="button"
+            onClick={resetDefaults}
+            className="rail-btn flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[12.5px] font-medium text-prompty-muted hover:bg-white/[0.06] hover:text-white"
+          >
+            <span className="w-4 text-center text-[13px]" aria-hidden>
+              ↺
+            </span>
+            Reset
+          </button>
+        </nav>
+
+        <main className="w-full min-w-0 max-w-[780px] flex-1 space-y-4">
+          <div className="rounded-card border border-white/[0.07] bg-prompty-surface px-5 py-4 shadow-card">
+            <Label>Describe it your own way (optional)</Label>
+            <input
+              value={form.customActionPrompt}
+              onChange={(e) =>
+                patch({
+                  customActionPrompt: e.target.value,
+                  useCustomActionPrompt: Boolean(e.target.value.trim()),
+                })
+              }
+              placeholder="e.g. a couple embracing in a quiet bedroom"
+              className="w-full bg-transparent text-[13px] text-white outline-none placeholder:text-prompty-muted/50"
+            />
+            {form.useCustomActionPrompt && form.customActionPrompt.trim() ? (
+              <p className="mt-2 text-[11px] text-prompty-accent2">
+                Your words override the preset below.
+              </p>
+            ) : null}
+          </div>
+
+          {under21 ? (
+            <p className="rounded-xl border border-prompty-warn/30 bg-prompty-warn/10 px-4 py-2.5 text-[11px] text-prompty-warn">
+              Someone is under 19 — choices limited to Everyday, Social and Play.
+            </p>
+          ) : null}
+
+          <Card
+            id="sec-people"
+            title="People"
+            hint="Count, relationship, region, faces"
+            open={open.cast!}
+            onToggle={() => toggle("cast")}
+          >
+            <div className="grid gap-3 sm:grid-cols-2">
+              {form.actionCategory === "five-couples-games" ? (
+                <div>
+                  <Label>People count</Label>
+                  <div className="rounded-xl border border-prompty-accent2/30 bg-prompty-accent2/10 px-3 py-2 text-[13px] text-white">
+                    10 people · 5 couples
+                  </div>
+                </div>
+              ) : (
+                <Select
+                  label="People count"
+                  value={form.peopleCount}
+                  options={PEOPLE_COUNTS.map((p) => ({ id: p.id, label: p.label }))}
+                  onChange={(id) => patch({ peopleCount: id as PeopleCount })}
+                />
+              )}
+              {form.peopleCount !== "1" ? (
+                <Select
+                  label="Relationship"
+                  value={form.relationship}
+                  options={RELATIONSHIPS.filter(
+                    (r) =>
+                      !under21 ||
+                      ["friends", "siblings", "colleagues", "parent-child"].includes(r.id)
+                  ).map((r) => ({ id: r.id, label: r.label }))}
+                  onChange={(id) => patch({ relationship: id as Relationship })}
+                />
+              ) : null}
+            </div>
+
+            <Chips
+              label="Region look"
+              options={REGIONS.map((r) => ({ id: r.id, label: r.label }))}
+              values={form.regionIds}
+              onChange={(id) => {
+                const has = form.regionIds.includes(id);
+                const regionIds = has
+                  ? form.regionIds.filter((x) => x !== id)
+                  : [...form.regionIds, id];
+                const nextIds = regionIds.length ? regionIds : ["kerala"];
+                setForm((prev) => ({
+                  ...prev,
+                  regionIds: nextIds,
+                  people:
+                    prev.peopleCount === "group"
+                      ? prev.people
+                      : applyRegionLook(prev.people, nextIds),
+                }));
+              }}
+            />
+
+            {form.peopleCount === "group" ? (
+              form.actionCategory === "five-couples-games" ? (
+                <div className="space-y-3">
+                  {Array.from({ length: 5 }, (_, coupleIndex) => (
+                    <div
+                      key={coupleIndex}
+                      className="space-y-2 rounded-xl border border-white/[0.07] bg-white/[0.02] p-3"
+                    >
+                      <h4 className="text-xs font-semibold text-white">Couple {coupleIndex + 1}</h4>
+                      {[coupleIndex * 2, coupleIndex * 2 + 1].map((personIndex) => {
+                        const person = (form.groupPeople ?? [])[personIndex];
+                        if (!person) return null;
+                        return (
+                          <PersonCard
+                            key={personIndex}
+                            index={personIndex}
+                            person={person}
+                            regionIds={form.regionIds}
+                            favoritePeople={favoritePeople}
+                            onSelectFavorite={(favorite) => {
+                              const groupPeople = [...(form.groupPeople ?? [])];
+                              groupPeople[personIndex] = { ...favorite.person };
+                              patch({ groupPeople });
+                              setEditingFavoriteIds((ids) => ({
+                                ...ids,
+                                [personIndex]: favorite.id,
+                              }));
+                            }}
+                            onSaveFavorite={() => saveGroupPersonAsFavorite(person, personIndex)}
+                            saveLabel={
+                              editingFavoriteIds[personIndex] ? "Update favorite" : "Save favorite"
+                            }
+                            allowUnder19={false}
+                            onChange={(updated) => {
+                              const groupPeople = [...(form.groupPeople ?? [])];
+                              groupPeople[personIndex] = updated;
+                              patch({ groupPeople });
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div>
+                    <Label>Favorite people in this group</Label>
+                    {favoritePeople.length ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {favoritePeople.map((favorite) => {
+                          const selected = (form.groupPeople ?? []).some(
+                            (person) => JSON.stringify(person) === JSON.stringify(favorite.person)
+                          );
+                          return (
+                            <button
+                              key={favorite.id}
+                              type="button"
+                              onClick={() =>
+                                patch({
+                                  groupPeople: selected
+                                    ? (form.groupPeople ?? []).filter(
+                                        (person) =>
+                                          JSON.stringify(person) !== JSON.stringify(favorite.person)
+                                      )
+                                    : [...(form.groupPeople ?? []), { ...favorite.person }],
+                                })
+                              }
+                              className={`rounded-pill border px-3 py-1.5 text-[11.5px] font-medium transition ${
+                                selected ? pillActive : pillIdle
+                              }`}
+                            >
+                              {selected ? "✓ " : "+ "}
+                              {favorite.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-prompty-muted">Save a person as a favorite first.</p>
+                    )}
+                  </div>
+                  <label className="block">
+                    <Label>Crowd notes</Label>
+                    <textarea
+                      value={form.crowdDescriptors}
+                      onChange={(e) => patch({ crowdDescriptors: e.target.value })}
+                      rows={3}
+                      className={inputBase}
+                    />
+                  </label>
+                </div>
+              )
+            ) : (
+              <>
+                <div className="space-y-3">
+                  {form.people.slice(0, personSlots).map((person, i) => (
+                    <PersonCard
+                      key={i}
+                      index={i}
+                      person={person}
+                      regionIds={form.regionIds}
+                      favoritePeople={favoritePeople}
+                      onSelectFavorite={(favorite) => {
+                        const people = [...form.people];
+                        people[i] = { ...favorite.person };
+                        setEditingFavoriteIds((ids) => ({ ...ids, [i]: favorite.id }));
+                        patch({ people });
+                      }}
+                      onSaveFavorite={() => savePersonAsFavorite(person, i)}
+                      saveLabel={editingFavoriteIds[i] ? "Update favorite" : "Save favorite"}
+                      allowUnder19={["everyday", "social", "physical"].includes(form.actionCategory)}
+                      onChange={(p) => {
+                        const people = [...form.people];
+                        people[i] = p;
+                        patch({ people });
+                      }}
+                    />
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={changeFacesOnly}
+                  className="rounded-pill border border-white/10 px-3 py-1.5 text-[11.5px] font-medium text-prompty-muted transition hover:border-prompty-accent2/40 hover:text-white"
+                >
+                  Change faces only
+                </button>
+                {favoritePeople.length ? (
+                  <div>
+                    <Label>Saved people</Label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {favoritePeople.map((favorite) => (
+                        <div
+                          key={favorite.id}
+                          className="flex items-center gap-1 rounded-pill border border-white/10 py-1 pl-3 pr-1 text-[11.5px]"
+                        >
+                          <span className="mr-1 text-white">{favorite.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const people = [...form.people];
+                              people[0] = { ...favorite.person };
+                              patch({
+                                peopleCount: form.peopleCount === "group" ? "1" : form.peopleCount,
+                                people,
+                              });
+                              setEditingFavoriteIds((ids) => ({ ...ids, 0: favorite.id }));
+                            }}
+                            className="rounded-pill px-2 py-0.5 text-prompty-accent2 hover:bg-white/10 hover:text-white"
+                          >
+                            load
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFavoritePeople(deleteFavoritePerson(favorite.id));
+                              setEditingFavoriteIds((ids) =>
+                                Object.fromEntries(
+                                  Object.entries(ids).filter(([, id]) => id !== favorite.id)
+                                )
+                              );
+                            }}
+                            className="rounded-pill px-2 py-0.5 text-prompty-muted hover:bg-red-500/10 hover:text-red-200"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </>
+            )}
+          </Card>
+
+          <Card
+            id="sec-action"
+            title="Action"
+            hint={activeAction ? `Selected: ${activeAction.label}` : "Pick a preset"}
+            open={open.action!}
+            onToggle={() => toggle("action")}
+          >
+            <div className="relative">
+              <input
+                ref={searchRef}
+                type="search"
+                value={actionQuery}
+                onChange={(e) => setActionQuery(e.target.value)}
+                placeholder="Search all actions…"
+                className={`${inputBase} rounded-pill pl-10`}
+              />
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-prompty-muted">
+                ⌕
+              </span>
+              {searching ? (
+                <button
+                  type="button"
+                  onClick={() => setActionQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-pill px-2.5 py-1 text-[11px] text-prompty-muted hover:text-white"
+                >
+                  clear
+                </button>
+              ) : null}
+            </div>
+
+            {searching ? (
+              <div>
+                <Label>{searchResults.length} matches</Label>
+                <div className="grid gap-1.5 sm:grid-cols-3">
+                  {searchResults.map((action) => {
+                    const active = form.actionId === action.id && !form.useCustomActionPrompt;
+                    return (
+                      <button
+                        key={action.id}
+                        type="button"
+                        onClick={() =>
+                          patch({ actionId: action.id, useCustomActionPrompt: false })
+                        }
+                        className={`rounded-xl border px-3 py-2 text-left text-[12.5px] leading-snug transition ${
+                          active ? pillActive : pillIdle
+                        }`}
+                      >
+                        {action.label}
+                        <span className="ml-1.5 text-[10px] opacity-60">
+                          {ACTION_CATEGORIES.find((c) => c.id === action.category)?.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                  {!searchResults.length ? (
+                    <p className="text-xs text-prompty-muted">Nothing matches that.</p>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <>
+                <div>
+                  <Label>Group</Label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {ACTION_FAMILIES.map((family) => {
+                      const available = family.categories.some((id) => visibleIds.includes(id));
+                      if (!available) return null;
+                      const active = effectiveFamily === family.id;
+                      return (
+                        <button
+                          key={family.id}
+                          type="button"
+                          onClick={() => setActionFamily(family.id)}
+                          className={`rounded-pill border px-3 py-1.5 text-[11.5px] font-medium transition ${
+                            active ? pillActive : pillIdle
+                          }`}
+                        >
+                          <span className="mr-1.5" aria-hidden>
+                            {family.icon}
+                          </span>
+                          {family.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {familyCategories.length > 1 ? (
+                  <Chips
+                    label="Category"
+                    options={familyCategories.map((c) => ({ id: c.id, label: c.label }))}
+                    value={shownCategory}
+                    onChange={(id) => {
+                      const first = ACTIONS.find((action) => action.category === id);
+                      if (first) patch({ actionId: first.id, useCustomActionPrompt: false });
+                    }}
+                  />
+                ) : null}
+
+                <div className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-[12.5px] font-medium text-white">
+                      {shownCategoryMeta?.label ?? "—"}
+                    </p>
+                    <p className="truncate text-[10px] text-prompty-muted">
+                      {shownCategoryMeta?.description ?? ""}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-pill bg-white/[0.06] px-2 py-0.5 text-[10px] text-prompty-muted">
+                    {filteredActions.length}
+                  </span>
+                </div>
+
+                {subgroupOptions.length > 1 ? (
+                  <div>
+                    <Label>Pose type</Label>
+                    <div className="flex flex-wrap gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setActionSubgroup("all")}
+                        className={`rounded-pill border px-3 py-1.5 text-[11.5px] font-medium transition ${
+                          activeSubgroup === "all" ? pillActive : pillIdle
+                        }`}
+                      >
+                        All {shownActions.length}
+                      </button>
+                      {subgroupOptions.map((sub) => {
+                        const count = taggedActions.filter((t) => t.group === sub.id).length;
+                        return (
+                          <button
+                            key={sub.id}
+                            type="button"
+                            onClick={() => setActionSubgroup(sub.id)}
+                            className={`rounded-pill border px-3 py-1.5 text-[11.5px] font-medium transition ${
+                              activeSubgroup === sub.id ? pillActive : pillIdle
+                            }`}
+                          >
+                            {sub.label} {count}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : null}
+
+                <p className="text-[10px] text-prompty-muted">
+                  Showing {safePage * PAGE_SIZE + 1}–
+                  {Math.min((safePage + 1) * PAGE_SIZE, filteredActions.length)} of{" "}
+                  {filteredActions.length}
+                </p>
+
+                <div className="grid gap-1.5 sm:grid-cols-3">
+                  {pageActions.map((action) => {
+                    const active = form.actionId === action.id && !form.useCustomActionPrompt;
+                    return (
+                      <button
+                        key={action.id}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() =>
+                          patch({ actionId: action.id, useCustomActionPrompt: false })
+                        }
+                        className={`rounded-xl border px-3 py-2 text-left text-[12.5px] leading-snug transition ${
+                          active ? pillActive : pillIdle
+                        }`}
+                      >
+                        {action.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {pageCount > 1 ? (
+                  <div className="flex items-center justify-between gap-2 rounded-xl border border-white/[0.07] bg-white/[0.02] px-2 py-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setActionPage(Math.max(0, safePage - 1))}
+                      disabled={safePage === 0}
+                      className="rounded-pill px-3 py-1 text-[11px] text-prompty-muted transition hover:text-white disabled:opacity-30"
+                    >
+                      ← Prev
+                    </button>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: pageCount }, (_, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setActionPage(i)}
+                          className={`h-6 min-w-6 rounded-pill px-1.5 text-[11px] font-semibold transition ${
+                            safePage === i
+                              ? "bg-prompty-accent2 text-prompty-bg"
+                              : "text-prompty-muted hover:text-white"
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActionPage(Math.min(pageCount - 1, safePage + 1))}
+                      disabled={safePage === pageCount - 1}
+                      className="rounded-pill px-3 py-1 text-[11px] text-prompty-muted transition hover:text-white disabled:opacity-30"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                ) : null}
+              </>
+            )}
+          </Card>
+
+          <Card
+            id="sec-setting"
+            title="Setting and camera"
+            hint={activePlace ? `Place: ${activePlace.label}` : "Place, time, angle"}
+            open={open.place!}
+            onToggle={() => toggle("place")}
+          >
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Select
+                label="Place"
+                value={form.placeId}
+                options={PLACES.map((p) => ({ id: p.id, label: p.label }))}
+                onChange={(id) => patch({ placeId: id })}
+              />
+              <Select
+                label="Time of day"
+                value={form.timeOfDay}
+                options={TIMES_OF_DAY.map((t) => ({ id: t.id, label: t.label }))}
+                onChange={(id) => patch({ timeOfDay: id as SceneFormState["timeOfDay"] })}
+              />
+              <Select
+                label="Camera angle"
+                value={form.cameraAngle}
+                options={CAMERA_ANGLES.map((c) => ({ id: c.id, label: c.label }))}
+                onChange={(id) => patch({ cameraAngle: id as SceneFormState["cameraAngle"] })}
+              />
+              <Select
+                label="Framing"
+                value={form.framing}
+                options={FRAMINGS.map((f) => ({ id: f.id, label: f.label }))}
+                onChange={(id) => patch({ framing: id as SceneFormState["framing"] })}
+              />
+            </div>
+            <Chips
+              label="Aspect ratio"
+              options={ASPECT_RATIOS.map((r) => ({ id: r, label: r }))}
+              value={form.aspectRatio}
+              onChange={(id) => patch({ aspectRatio: id as SceneFormState["aspectRatio"] })}
+            />
+          </Card>
+
+          <Card id="sec-notes" title="Notes" open={open.notes!} onToggle={() => toggle("notes")}>
+            <label className="block">
+              <Label>Extra notes</Label>
+              <textarea
+                value={form.extraNotes}
+                onChange={(e) => patch({ extraNotes: e.target.value })}
+                rows={3}
+                placeholder="Optional extras…"
+                className={inputBase}
+              />
+            </label>
+          </Card>
+        </main>
+
+        <aside
+          id="sec-prompt"
+          className="section-anchor w-full shrink-0 lg:w-[380px] xl:w-[400px]"
+        >
+          <div className="space-y-3 lg:sticky lg:top-20">
+            <div className="flex flex-wrap gap-1.5 text-[10px]">
+              <span className="rounded-pill bg-white/[0.06] px-2.5 py-1 capitalize text-prompty-muted">
+                {form.mode}
+              </span>
+              <span className="rounded-pill bg-white/[0.06] px-2.5 py-1 text-prompty-muted">
+                {form.peopleCount === "group" ? "Group" : `${form.peopleCount} people`}
+              </span>
+              <span className="max-w-[45%] truncate rounded-pill bg-white/[0.06] px-2.5 py-1 text-prompty-muted">
+                {activePlace?.label}
+              </span>
+              <span className="rounded-pill bg-prompty-accent2/15 px-2.5 py-1 text-prompty-accent2">
+                {activeAction?.label ?? "—"}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={persist}
+              disabled={!prompts.short.trim()}
+              className="w-full rounded-pill bg-prompty-accent2 px-4 py-2 text-[12.5px] font-semibold text-prompty-bg transition hover:brightness-105 disabled:opacity-40"
+            >
+              {savedFlash ? "Saved ✓" : "Save to recents"}
+            </button>
+
+            <div className="overflow-hidden rounded-card border border-white/[0.07] bg-prompty-surface shadow-card">
+              <div className="flex items-center gap-1 border-b border-white/[0.07] p-2">
+                {(["short", "detailed"] as const).map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setTab(t)}
+                    aria-pressed={tab === t}
+                    className={`flex-1 rounded-pill px-3 py-1.5 text-xs font-semibold capitalize transition ${
+                      tab === t ? pillActive : "text-prompty-muted hover:text-white"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+                <span className="px-2 text-[10px] tabular-nums text-prompty-muted">
+                  {currentText.length}
+                </span>
+              </div>
+              <pre className="max-h-[52vh] overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-[11.5px] leading-relaxed text-white/85">
+                {currentText.trim() || "…"}
+              </pre>
+              <div className="flex gap-2 border-t border-white/[0.07] p-2">
+                <CopyButton text={currentText} label={`Copy ${tab}`} />
+                <CopyButton text={prompts.negative} label="Copy negative" />
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.07] bg-prompty-bg/95 backdrop-blur-xl lg:hidden">
+        <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-2 px-4 py-3 lg:px-6">
+          <button
+            type="button"
+            onClick={persist}
+            disabled={!prompts.short.trim()}
+            className="rounded-pill bg-prompty-accent2 px-5 py-2.5 text-sm font-semibold text-prompty-bg transition hover:brightness-105 disabled:opacity-40"
+          >
+            {savedFlash ? "Saved ✓" : "Save to recents"}
+          </button>
+          <CopyButton text={prompts.short} label="Copy short" />
+          <button
+            type="button"
+            onClick={randomizeAll}
+            className="rounded-pill border border-white/10 px-3.5 py-2.5 text-xs text-prompty-muted transition hover:text-white lg:hidden"
+          >
+            Shuffle
+          </button>
+          <button
+            type="button"
+            onClick={() => goTo("sec-prompt")}
+            className="ml-auto rounded-pill border border-white/10 px-3.5 py-2.5 text-xs text-prompty-muted transition hover:text-white lg:hidden"
+          >
+            Prompt
+          </button>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-[1500px] px-4 pb-8 lg:px-6">
+        <RecentList
+          items={recent}
+          onClear={() => {
+            clearRecent();
+            setRecent([]);
+          }}
+          onReuse={(item) => patch({ mode: item.mode })}
+        />
+      </div>
+    </div>
+  );
+}
+=== src\components\PersonCard.tsx ===
+"use client";
+
+import {
+  AGES,
+  bodyTypesForAge,
+  FASHION_VIBES,
+  GENDERS,
+  HAIR_BY_GENDER,
+  hairColorsForRegions,
+  skinTonesForRegions,
+  dressesForAge,
+  defaultDressId,
+  type PersonFields,
+  type Gender,
+} from "@/lib/people";
+
+import {
+  applyKnownFaceLocks,
+  defaultFaceCutId,
+  faceCutsForAge,
+  getKnownFaceLock,
+  isKnownFaceId,
+} from "@/lib/face-cuts";
+import type { FavoritePerson } from "@/lib/types";
+
+const MINOR_HAIR_BY_GENDER: Record<Gender, string[]> = {
+  woman: ["Long straight", "Long wavy", "Simple long braid", "Double long braids", "Low ponytail long", "High ponytail long"],
+  man: ["Short neat", "Side part", "Wavy medium", "Curly", "Buzz cut"],
+  nonbinary: ["Short textured", "Medium wavy", "Long loose", "Curly volume", "Neat bob", "Tied back"],
+};
+const MINOR_FASHION_VIBES = ["Everyday casual", "Festive traditional", "Urban street", "Monsoon cozy"];
+
+const WOMAN_HAIR = [
+  "Medium straight",
+  "Medium wavy",
+  "Medium layered",
+  "Thick medium waves",
+  "Long straight",
+  "Long wavy",
+  "Long layered",
+  "Long soft curls",
+  "Thick long waves",
+  "Extra long straight",
+  "Extra long wavy",
+  "Hip length straight",
+  "Hip length waves",
+  "Extreme length straight",
+  "Extreme length waves",
+];
+
+const fieldClass =
+  "w-full rounded-lg border border-white/10 bg-prompty-bg px-2.5 py-1.5 text-[12.5px] text-white outline-none transition focus-visible:border-prompty-accent2/60 focus-visible:ring-2 focus-visible:ring-prompty-accent2/25";
+
+const fieldLabel =
+  "mb-1 block text-[9.5px] font-semibold uppercase tracking-[0.12em] text-prompty-muted";
+
+function SelectField({
+  label,
+  value,
+  options,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  value: string;
+  options: readonly string[];
+  onChange: (v: string) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <label className="block min-w-0">
+      <span className={fieldLabel}>
+        {label}
+        {disabled ? " · locked" : ""}
+      </span>
+      <select
+        value={value}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+        className={`${fieldClass} ${disabled ? "cursor-not-allowed opacity-55" : ""}`}
+      >
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+export function PersonCard({
+  index,
+  person,
+  regionIds,
+  onChange,
+  favoritePeople,
+  onSelectFavorite,
+  onSaveFavorite,
+  saveLabel = "Save favorite",
+  allowUnder19 = false,
+}: {
+  index: number;
+  person: PersonFields;
+  regionIds: string[];
+  onChange: (p: PersonFields) => void;
+  favoritePeople: FavoritePerson[];
+  onSelectFavorite: (favorite: FavoritePerson) => void;
+  onSaveFavorite: () => void;
+  saveLabel?: string;
+  allowUnder19?: boolean;
+}) {
+  const isMinor = Number(person.age) < 19;
+  const pool: "general" | "known" =
+    !isMinor && (person.faceCutPool === "known" || isKnownFaceId(person.faceCutId))
+      ? "known"
+      : "general";
+  const knownLocked = pool === "known" && !!getKnownFaceLock(person.faceCutId);
+  const display = knownLocked ? applyKnownFaceLocks(person) : person;
+
+  const skinOpts = skinTonesForRegions(regionIds);
+  const hairOpts = hairColorsForRegions(regionIds);
+  const faceOpts = faceCutsForAge(display.gender, display.age, regionIds, pool);
+  const hairStyles =
+    display.gender === "woman" ? WOMAN_HAIR : HAIR_BY_GENDER[display.gender];
+  const bodies = bodyTypesForAge(display.gender, display.age);
+
+  function commit(next: PersonFields) {
+    const p = next.faceCutPool === "known" ? applyKnownFaceLocks(next) : next;
+    onChange(p);
+  }
+  function patch(partial: Partial<PersonFields>) {
+    let next: PersonFields = { ...person, ...partial };
+
+    if (Number(next.age) < 19) {
+      next.faceCutPool = "general";
+      const safeDresses = dressesForAge(next.gender, next.age);
+      if (!safeDresses.some((dress) => dress.id === next.dressId)) next.dressId = safeDresses[0]!.id;
+      const safeHair = MINOR_HAIR_BY_GENDER[next.gender];
+      if (!safeHair.includes(next.hairStyle)) next.hairStyle = safeHair[0]!;
+      next.fashionVibe = "Everyday casual";
+    }
+
+    if (partial.gender && partial.gender !== person.gender) {
+      const g = partial.gender as Gender;
+      const hairs = g === "woman" ? WOMAN_HAIR : HAIR_BY_GENDER[g];
+      next.dressId = defaultDressId(g);
+      if (!hairs.includes(next.hairStyle)) next.hairStyle = hairs[0]!;
+      next.faceCutPool = next.faceCutPool ?? "general";
+      const poolNext = next.faceCutPool;
+      const bodiesNext = bodyTypesForAge(g, next.age);
+      if (!bodiesNext.includes(next.bodyType)) next.bodyType = bodiesNext[0]!;
+      const cuts = faceCutsForAge(g, next.age, regionIds, poolNext);
+      if (!cuts.some((c) => c.id === next.faceCutId)) {
+        next.faceCutId = defaultFaceCutId(g, next.age, regionIds, poolNext);
+      }
+    }
+
+    if (partial.faceCutPool) {
+      const poolNext = partial.faceCutPool;
+      next.faceCutPool = poolNext;
+      next.faceCutId = defaultFaceCutId(next.gender, next.age, regionIds, poolNext);
+    }
+
+    if (partial.faceCutId && next.faceCutPool === "known") {
+      next = applyKnownFaceLocks({ ...next, faceCutId: partial.faceCutId });
+    }
+
+    if (partial.age && partial.age !== person.age && next.faceCutPool !== "known") {
+      const bodiesNext = bodyTypesForAge(next.gender, next.age);
+      if (!bodiesNext.includes(next.bodyType)) next.bodyType = bodiesNext[0]!;
+      const cuts = faceCutsForAge(next.gender, next.age, regionIds, next.faceCutPool ?? "general");
+      if (!cuts.some((c) => c.id === next.faceCutId)) {
+        next.faceCutId = defaultFaceCutId(
+          next.gender,
+          next.age,
+          regionIds,
+          next.faceCutPool ?? "general",
+        );
+      }
+    }
+
+    // Known mode: ignore manual edits to locked fields
+    if (next.faceCutPool === "known") {
+      next = applyKnownFaceLocks(next);
+    }
+
+    commit(next);
+  }
+
+  return (
+    <div className="rounded-xl border border-white/[0.07] bg-prompty-elevated/50 p-3">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-prompty-accent2/15 text-[11px] font-bold text-prompty-accent2">
+          {index + 1}
+        </span>
+        <span className="mr-auto truncate text-[12.5px] font-medium text-white">
+          {display.gender} · {display.age} · {display.bodyType}
+        </span>
+        <select
+          value=""
+          onChange={(e) => {
+            const favorite = favoritePeople.find((item) => item.id === e.target.value);
+            if (favorite) onSelectFavorite(favorite);
+          }}
+          className="max-w-[130px] rounded-lg border border-white/10 bg-prompty-bg px-2 py-1 text-[11px] text-prompty-muted outline-none"
+        >
+          <option value="">Favorites</option>
+          {favoritePeople.map((favorite) => (
+            <option key={favorite.id} value={favorite.id}>
+              {favorite.name}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={onSaveFavorite}
+          className="rounded-lg border border-white/10 px-2 py-1 text-[11px] text-prompty-muted transition hover:border-prompty-accent2/40 hover:text-white"
+        >
+          {saveLabel}
+        </button>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-3">
+        <label className="block sm:col-span-3">
+          <span className={fieldLabel}>Gender</span>
+          <div className="flex gap-1.5">
+            {GENDERS.map((g) => (
+              <button
+                key={g.id}
+                type="button"
+                onClick={() => patch({ gender: g.id })}
+                className={`rounded-lg border px-3.5 py-1.5 text-[11.5px] font-medium transition ${
+                  person.gender === g.id
+                    ? "border-prompty-accent2/80 bg-prompty-accent2/15 text-white"
+                    : "border-white/10 bg-white/[0.03] text-prompty-muted hover:text-white"
+                }`}
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
+        </label>
+
+        {!isMinor ? (
+          <label className="block sm:col-span-3">
+            <span className={fieldLabel}>Face source</span>
+            <div className="flex gap-1.5">
+              {(
+                [
+                  { id: "general" as const, label: "Random library" },
+                  { id: "known" as const, label: "Known look" },
+                ]
+              ).map((opt) => {
+                const active = pool === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => patch({ faceCutPool: opt.id })}
+                    className={`rounded-lg border px-3.5 py-1.5 text-[11.5px] font-medium transition ${
+                      active
+                        ? "border-prompty-accent2/80 bg-prompty-accent2/15 text-white"
+                        : "border-white/10 bg-white/[0.03] text-prompty-muted hover:text-white"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </label>
+        ) : null}
+
+        <label className="block sm:col-span-3">
+          <span className={fieldLabel}>
+            Face cut {pool === "known" ? "· known looks" : "· random library"}
+          </span>
+          <select
+            value={
+              faceOpts.some((f) => f.id === display.faceCutId)
+                ? display.faceCutId
+                : (faceOpts[0]?.id ?? "")
+            }
+            onChange={(e) => patch({ faceCutId: e.target.value })}
+            className={fieldClass}
+          >
+            {faceOpts.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <SelectField
+          label="Age (exact year)"
+          value={display.age}
+          options={allowUnder19 ? AGES : AGES.filter((age) => Number(age) >= 19)}
+          disabled={knownLocked}
+          onChange={(v) => patch({ age: v })}
+        />
+        <SelectField
+          label="Hair style"
+          value={
+            (isMinor ? MINOR_HAIR_BY_GENDER[display.gender] : hairStyles).includes(
+              display.hairStyle
+            )
+              ? display.hairStyle
+              : (isMinor ? MINOR_HAIR_BY_GENDER[display.gender] : hairStyles)[0]!
+          }
+          options={isMinor ? MINOR_HAIR_BY_GENDER[display.gender] : hairStyles}
+          disabled={knownLocked}
+          onChange={(v) => patch({ hairStyle: v })}
+        />
+        <SelectField
+          label="Hair color"
+          value={hairOpts.includes(display.hairColor) ? display.hairColor : hairOpts[0]!}
+          options={hairOpts}
+          disabled={knownLocked}
+          onChange={(v) => patch({ hairColor: v })}
+        />
+        <SelectField
+          label="Body type"
+          value={bodies.includes(display.bodyType) ? display.bodyType : bodies[0]!}
+          options={bodies}
+          disabled={knownLocked}
+          onChange={(v) => patch({ bodyType: v })}
+        />
+        <SelectField
+          label="Skin tone"
+          value={skinOpts.includes(display.skinTone) ? display.skinTone : skinOpts[0]!}
+          options={skinOpts}
+          disabled={knownLocked}
+          onChange={(v) => patch({ skinTone: v })}
+        />
+        <SelectField
+          label="Fashion vibe"
+          value={display.fashionVibe}
+          options={isMinor ? MINOR_FASHION_VIBES : FASHION_VIBES}
+          onChange={(v) => patch({ fashionVibe: v })}
+        />
+        <label className="block sm:col-span-3">
+          <span className={fieldLabel}>Dress / attire</span>
+          <select
+            value={display.dressId}
+            onChange={(e) => patch({ dressId: e.target.value })}
+            className={fieldClass}
+          >
+            {dressesForAge(display.gender, display.age).map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+    </div>
+  );
+}
+=== src\components\ModeToggle.tsx ===
+"use client";
+
+import type { Mode } from "@/lib/types";
+
+export function ModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: Mode;
+  onChange: (mode: Mode) => void;
+}) {
+  return (
+    <div
+      className="inline-flex rounded-lg border border-prompty-border bg-prompty-bg p-0.5"
+      role="tablist"
+      aria-label="Generation mode"
+    >
+      {(["image", "video"] as Mode[]).map((m) => {
+        const active = mode === m;
+        return (
+          <button
+            key={m}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(m)}
+            className={`rounded-[6px] px-3.5 py-1.5 text-xs font-semibold capitalize transition focus-visible:ring-2 focus-visible:ring-prompty-accent2 focus-visible:outline-none ${
+              active
+                ? "bg-prompty-accent text-white"
+                : "text-prompty-muted hover:text-white"
+            }`}
+          >
+            {m}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+=== src\components\CopyButton.tsx ===
+"use client";
+
+import { useState } from "react";
+
+export function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function onCopy() {
+    if (!text.trim()) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onCopy}
+      disabled={!text.trim()}
+      className="inline-flex items-center gap-1.5 rounded-lg border border-prompty-border bg-prompty-elevated px-3 py-1.5 text-xs font-medium text-white transition hover:border-prompty-accent hover:bg-prompty-accent/20 disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      {copied ? (
+        <>
+          <span className="text-prompty-success">✓</span> Copied
+        </>
+      ) : (
+        <>
+          <span aria-hidden>⧉</span> {label}
+        </>
+      )}
+    </button>
+  );
+}

@@ -35,12 +35,56 @@ export type TimeOfDay =
   | "dusk"
   | "night";
 
+/**
+ * Physical pose families. Every action resolves to exactly one of these.
+ * The tag alone decides camera and supplies the pose phrase.
+ */
+export type PoseTag =
+  | "standing-front"
+  | "standing-back"
+  | "bent-forward"
+  | "all-fours"
+  | "kneeling-upright"
+  | "kneeling-low"
+  | "sitting-front"
+  | "sitting-side"
+  | "lying-back"
+  | "prone"
+  | "side-lying"
+  | "straddle-facing"
+  | "straddle-away"
+  | "lap-facing"
+  | "wall-front"
+  | "lifted"
+  | "seated-edge"
+  | "oral-giving"
+  | "oral-receiving"
+  | "mutual-oral"
+  | "breast-focus"
+  | "rear-focus"
+  | "crease-focus"
+  | "mirror-view"
+  | "crowd-standing-behind"
+  | "crowd-seated-beside"
+  | "group-circle"
+  | "group-surround"
+  | "dance-hold"
+  | "hug-standing"
+  | "kiss-standing"
+  | "floor-recline"
+  | "shower-stand"
+  | "chair-sit"
+  | "table-brace"
+  | "queue-standing"
+  | "walking-hold"
+  | "activity";
+
 export const CAMERA_ANGLES: { id: CameraAngle; label: string; prompt: string }[] = [
   { id: "front", label: "Front", prompt: "front-facing camera angle" },
   { id: "back", label: "Back", prompt: "shot from behind her back with clear view of soft lower curves and strong fabric tension, she turns her head over her shoulder so her face is clearly visible" },
   { id: "side", label: "Side", prompt: "side profile angle" },
   { id: "3/4", label: "3/4", prompt: "three-quarter angle" },
-  { id: "over-shoulder", label: "Over-shoulder", prompt: "over-the-shoulder framing, any woman\'s face still visible in frame" },
+  { id: "over-shoulder", label: "Over-shoulder", prompt: "over-the-shoulder framing, her face still visible in frame" },
   { id: "low-angle", label: "Low angle", prompt: "low-angle perspective" },
   { id: "high-angle", label: "High angle", prompt: "high-angle perspective" },
   { id: "eye-level", label: "Eye-level", prompt: "eye-level camera" },
@@ -72,37 +116,233 @@ export const TIMES_OF_DAY: {
   label: string;
   lighting: string;
 }[] = [
-  {
-    id: "morning",
-    label: "Morning",
-    lighting: "soft morning light, gentle cool-warm balance, fresh atmosphere",
-  },
-  {
-    id: "day",
-    label: "Day",
-    lighting: "bright daylight, clear sky illumination, natural clarity",
-  },
-  {
-    id: "afternoon",
-    label: "Afternoon",
-    lighting: "harsh noon-to-afternoon sun, strong highlights with crisp shadows",
-  },
-  {
-    id: "evening",
-    label: "Evening",
-    lighting: "golden hour warmth, long soft shadows, glowing rim light",
-  },
-  {
-    id: "dusk",
-    label: "Dusk",
-    lighting: "warm dusk tones transitioning to blue hour, soft ambient glow",
-  },
-  {
-    id: "night",
-    label: "Night",
-    lighting: "low-key night scene with practical lights, subtle highlights, deep shadows",
-  },
+  { id: "morning", label: "Morning", lighting: "soft morning light, gentle cool-warm balance, fresh atmosphere" },
+  { id: "day", label: "Day", lighting: "bright daylight, clear sky illumination, natural clarity" },
+  { id: "afternoon", label: "Afternoon", lighting: "harsh noon-to-afternoon sun, strong highlights with crisp shadows" },
+  { id: "evening", label: "Evening", lighting: "golden hour warmth, long soft shadows, glowing rim light" },
+  { id: "dusk", label: "Dusk", lighting: "warm dusk tones transitioning to blue hour, soft ambient glow" },
+  { id: "night", label: "Night", lighting: "low-key night scene with practical lights, subtle highlights, deep shadows" },
 ];
+
+/**
+ * THE MAP. Tag -> exact camera + the physical phrase that ships in the prompt.
+ * Notes are deliberately bodily and indirect: position, grip, weight, cloth.
+ */
+export const POSE_CAMERA: Record<
+  PoseTag,
+  { cameraAngle: CameraAngle; framing: Framing; note: string }
+> = {
+  "standing-front": {
+    cameraAngle: "front",
+    framing: "medium",
+    note: "both upright and close, her hands on his chest, his hands at her waist, faces turned toward each other",
+  },
+  "standing-back": {
+    cameraAngle: "back",
+    framing: "half-body",
+    note: "both upright, he stands directly behind her with both hands planted on her hips and lower back, her weight settled back into him; she turns her head over her shoulder so her face is fully visible",
+  },
+  "bent-forward": {
+    cameraAngle: "back",
+    framing: "half-body",
+    note: "she is bent forward braced on the furniture, back flat, hips pushed back; he stands behind gripping her waist with both hands; she turns her face back over her shoulder",
+  },
+  "all-fours": {
+    cameraAngle: "back",
+    framing: "half-body",
+    note: "she is on all fours, chest low, back arched, hips lifted; he kneels close behind with both hands planted on her hips and his weight forward; she looks back over her shoulder, face fully visible",
+  },
+  "kneeling-upright": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "she kneels upright, weight on her heels, hands resting on her own thighs; he kneels close in front of her",
+  },
+  "kneeling-low": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "she is low on the floor, chest down, forearms braced; he kneels over her from behind, hands on her shoulders and hips",
+  },
+  "sitting-front": {
+    cameraAngle: "front",
+    framing: "full-body",
+    note: "she sits with her weight back, one knee up, hands loose; he leans in close from the front",
+  },
+  "sitting-side": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "she sits sideways with her legs folded to one side, one arm hooked around his neck; he holds her waist and lower back",
+  },
+  "lying-back": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "she lies on her back, knees raised and parted, one hand above her head; he settles between her thighs leaning his upper body over her",
+  },
+  prone: {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "she lies flat on her stomach, cheek turned so her face is visible; he covers her from behind, forearms braced either side of her shoulders, hips settled against her",
+  },
+  "side-lying": {
+    cameraAngle: "side",
+    framing: "half-body",
+    note: "they lie on their sides nested together, her back to his chest, his arm around her waist, her top knee drawn up; both faces visible",
+  },
+  "straddle-facing": {
+    cameraAngle: "front",
+    framing: "full-body",
+    note: "she straddles him face to face, knees either side of his hips, hands on his shoulders; his hands lock on her waist and draw her down",
+  },
+  "straddle-away": {
+    cameraAngle: "back",
+    framing: "half-body",
+    note: "she straddles him facing away, leaning forward on her hands; his hands locked on her waist; she turns her head over her shoulder, face visible",
+  },
+  "lap-facing": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "she sits across his lap, one arm around his neck, legs draped over his thigh; he holds her waist and lower back",
+  },
+  "wall-front": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "her back is to the wall, one leg lifted and hooked around him; he presses her flat with his hips, one hand under her thigh and one at her waist",
+  },
+  lifted: {
+    cameraAngle: "side",
+    framing: "full-body",
+    note: "he carries her, her legs locked around his waist, her arms around his neck, her back to the wall; his hands support her seat",
+  },
+  "seated-edge": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "she sits at the edge of the bed with her feet on the floor; he stands between her parted knees, her calves hooked around his legs",
+  },
+  "oral-giving": {
+    cameraAngle: "3/4",
+    framing: "half-body",
+    note: "she lies back with knees raised and parted; he kneels between her thighs with his face pressed close to her lower front, both hands cupping her hips, her fingers in his hair",
+  },
+  "oral-receiving": {
+    cameraAngle: "3/4",
+    framing: "half-body",
+    note: "she leans in with her face close to his centre, one hand braced on his hip, her other hand at his waist; he looks down at her",
+  },
+  "mutual-oral": {
+    cameraAngle: "side",
+    framing: "full-body",
+    note: "they lie inverted against each other, her face at his centre and his face at hers, hands on each other's hips",
+  },
+  "breast-focus": {
+    cameraAngle: "front",
+    framing: "close-up",
+    note: "his palm presses flat over her upper front through the fabric, fingers spread, cloth indented in a clear hand shape; she leans into the pressure",
+  },
+  "rear-focus": {
+    cameraAngle: "back",
+    framing: "half-body",
+    note: "both his hands sink deep into the soft curves of her seat through the fabric, cloth stretched into two clear hand-shaped indentations; she turns her face over her shoulder",
+  },
+  "crease-focus": {
+    cameraAngle: "back",
+    framing: "half-body",
+    note: "her lower back is arched so the fabric pulls tight across the seat; his fingers press into the deep centre crease, knuckles readable through the stretched cloth; she looks back over her shoulder",
+  },
+  "mirror-view": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "both stand before a full-length mirror, her back to his chest; both faces and both hands clearly readable in the glass",
+  },
+  "crowd-standing-behind": {
+    cameraAngle: "back",
+    framing: "half-body",
+    note: "the crowd has pushed him right up behind her, hands on her hips as if steadying himself; both faces calm, both looking ahead as if nothing is happening",
+  },
+  "crowd-seated-beside": {
+    cameraAngle: "side",
+    framing: "half-body",
+    note: "they sit pressed shoulder to shoulder in a crowded row, his thigh against hers, one hand resting low on her upper front; both looking ahead calmly",
+  },
+  "group-circle": {
+    cameraAngle: "high-angle",
+    framing: "wide",
+    note: "the group forms a tight ring, separate hands on shoulders, waists and hips, everyone angled inward",
+  },
+  "group-surround": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "she is centred, the men close around her from front, side and behind, separate hands on waist, shoulder and hip",
+  },
+  "dance-hold": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "close dance hold, his hand at her lower back, her hand on his shoulder, bodies angled together",
+  },
+  "hug-standing": {
+    cameraAngle: "3/4",
+    framing: "medium",
+    note: "both upright, arms wrapped around each other, faces near, weight on one hip each",
+  },
+  "kiss-standing": {
+    cameraAngle: "3/4",
+    framing: "medium",
+    note: "both upright, faces meeting in a kiss, hands at waists",
+  },
+  "floor-recline": {
+    cameraAngle: "high-angle",
+    framing: "full-body",
+    note: "she reclines on the floor on a blanket, propped on one elbow; he leans over her, one knee down",
+  },
+  "shower-stand": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "both standing under running water, wet fabric clinging to every line, her back to the wet tiles, steam between them",
+  },
+  "chair-sit": {
+    cameraAngle: "3/4",
+    framing: "full-body",
+    note: "she sits back in the chair, hands on the arms; he leans over or kneels in front of her",
+  },
+  "table-brace": {
+    cameraAngle: "back",
+    framing: "half-body",
+    note: "she braces both palms on the edge of the surface, hips back, back flat; he stands behind her with both hands on her waist",
+  },
+  "queue-standing": {
+    cameraAngle: "side",
+    framing: "half-body",
+    note: "standing in a queue with him close behind her, hands light at her waist, both facing forward",
+  },
+  "walking-hold": {
+    cameraAngle: "side",
+    framing: "full-body",
+    note: "both walking, his arm around her waist, her hand on his arm, mid-stride",
+  },
+  activity: {
+    cameraAngle: "front",
+    framing: "medium",
+    note: "both engaged in the activity, hands busy, faces visible",
+  },
+};
+
+export function poseNote(tag: PoseTag): string {
+  return POSE_CAMERA[tag].note;
+}
+
+export function cameraForPose(tag: PoseTag): {
+  cameraAngle: CameraAngle;
+  framing: Framing;
+} {
+  const p = POSE_CAMERA[tag];
+  return { cameraAngle: p.cameraAngle, framing: p.framing };
+}
+
+/** Legacy shim so older call sites keep compiling. */
+export function cameraForSubgroup(_: string | undefined): {
+  cameraAngle: CameraAngle;
+  framing: Framing;
+} {
+  return cameraForPose("standing-front");
+}
 
 export function pickRandom<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]!;

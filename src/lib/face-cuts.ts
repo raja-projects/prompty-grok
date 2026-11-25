@@ -676,16 +676,33 @@ function age19To20FaceCuts(gender: Gender): FaceCut[] {
 }
 
 function minorFaceCuts(gender: Gender, age: number): FaceCut[] {
-  const base = FACE_CUTS_BY_GENDER[gender];
   const band = age <= 12 ? "pre-teen" : "teen";
   const identity = gender === "woman" ? "girl" : gender === "man" ? "boy" : "young person";
-  const shapes = ["oval", "soft round", "gentle square", "heart-shaped", "long oval", "soft diamond"];
-  return base.map((face, index) => ({
-    id: `${band}-${face.id}`,
-    label: `${age <= 12 ? "Pre-teen" : "Teen"} ${identity} · ${face.label.replace(/^#[0-9]+\s*/, "")}`,
-    regionIds: face.regionIds,
-    prompt: `clearly ${age} years old, age-appropriate ${band} ${identity}, natural ${shapes[index % shapes.length]} face, youthful facial proportions, natural brows and eyes, healthy everyday appearance, realistic unretouched skin, no makeup styling, no adult glamour, no sexualization`,
-  }));
+  const builds = ["slim still-growing child build", "soft rounded child build"];
+  const shapes = [
+    "youthful face with soft full cheeks and a short lower face",
+    "youthful face with a small narrow jaw and softly rounded cheeks",
+  ];
+  const looks = [
+    "everyday no-makeup look, hair simply parted and loose",
+    "everyday clean look, hair loosely tied back, no styling",
+  ];
+  const styles = ["plain cotton clothes, no jewellery", "simple everyday clothes, one small stud earring"];
+  const base = [...FACE_CUTS_BY_GENDER[gender], ...KNOWN_FACE_CUTS_BY_GENDER[gender]];
+  const out: FaceCut[] = [];
+  base.forEach((face, index) => {
+    for (let v = 0; v < 2; v += 1) {
+      const at = (arr: string[]) => arr[(index + v) % arr.length]!;
+      out.push({
+        id: `${band}-${face.id}-v${v + 1}`,
+        label: `${age <= 12 ? "Pre-teen" : "Teen"} ${identity} · ${face.label.replace(/^#[0-9]+\s*/, "")} · v${v + 1}`,
+        regionIds: face.regionIds,
+        pool: face.pool,
+        prompt: `clearly ${age} years old, age-appropriate ${band} ${identity} — not a small child, not an adult: ${at(builds)}, ${at(shapes)}; keep this exact facial identity: ${face.prompt}; ${at(looks)}; ${at(styles)}; realistic unretouched skin, no adult glamour, no sexualization`,
+      });
+    }
+  });
+  return out;
 }
 
 function allCutsForAge(gender: Gender, age?: string, pool?: FaceCutPool): FaceCut[] {
@@ -789,12 +806,12 @@ export function randomFaceCutId(
 
 
 export function isKnownFaceId(id: string | undefined): boolean {
-  return !!id && id.startsWith("kw-");
+  return !!id && (id.startsWith("kw-") || id.startsWith("km-"));
 }
 
 export function getKnownFaceLock(id: string | undefined): KnownFaceLock | undefined {
   if (!id) return undefined;
-  const hit = KNOWN_WOMAN_FACE_CUTS.find((f) => f.id === id);
+  const hit = [...KNOWN_WOMAN_FACE_CUTS, ...KNOWN_MAN_FACE_CUTS].find((f) => f.id === id);
   return hit?.locks;
 }
 
@@ -807,7 +824,6 @@ export function applyKnownFaceLocks<T extends {
   bodyType: string;
   gender: string;
 }>(person: T): T {
-  if (person.gender !== "woman") return person;
   const locks = getKnownFaceLock(person.faceCutId);
   if (!locks) return person;
   return {

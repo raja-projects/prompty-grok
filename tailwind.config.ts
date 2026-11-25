@@ -10,16 +10,20 @@ const config: Config = {
     extend: {
       colors: {
         prompty: {
-          bg: "#0c1018",
-          surface: "#121923",
-          elevated: "#1a2430",
-          border: "#2d3947",
-          muted: "#8e9baa",
-          accent: "#796bb0",
-          accent2: "#64cfc5",
-          glow: "#b47daa",
-          success: "#34d399",
-          warn: "#fbbf24",
+          page: "#f2f5f8",
+          card: "#ffffff",
+          line: "#e2e8ef",
+          ink: "#0f151d",
+          muted: "#5d6b7a",
+          accent: "#0f9e7d",
+          accentSoft: "#d8f3eb",
+          inkPanel: "#0d131a",
+          inkCard: "#161e28",
+          inkLine: "#26313d",
+          inkText: "#e9eff5",
+          inkMuted: "#8b9aab",
+          warn: "#a86300",
+          warnSoft: "#fdf1dc",
         },
       },
       fontFamily: {
@@ -27,13 +31,13 @@ const config: Config = {
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
         display: ["var(--font-display)", "system-ui", "sans-serif"],
       },
-      boxShadow: {
-        glow: "0 18px 48px rgba(70, 99, 118, 0.20)",
-        "glow-sm": "0 10px 28px rgba(100, 207, 197, 0.10)",
+      borderRadius: {
+        card: "18px",
+        pill: "999px",
       },
-      backgroundImage: {
-        "grid-fade":
-          "radial-gradient(ellipse at top, rgba(100,207,197,0.07), transparent 55%), radial-gradient(ellipse at bottom right, rgba(167,123,243,0.06), transparent 45%)",
+      boxShadow: {
+        card: "0 1px 2px rgba(15, 21, 29, 0.05), 0 8px 24px -18px rgba(15, 21, 29, 0.35)",
+        panel: "0 0 0 1px rgba(255, 255, 255, 0.04)",
       },
     },
   },

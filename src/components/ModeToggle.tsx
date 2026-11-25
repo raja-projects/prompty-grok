@@ -11,7 +11,7 @@ export function ModeToggle({
 }) {
   return (
     <div
-      className="inline-flex rounded-xl border border-prompty-border bg-prompty-surface p-1"
+      className="inline-flex rounded-lg border border-prompty-line bg-prompty-page p-0.5"
       role="tablist"
       aria-label="Generation mode"
     >
@@ -24,13 +24,11 @@ export function ModeToggle({
             role="tab"
             aria-selected={active}
             onClick={() => onChange(m)}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold capitalize transition ${
-              active
-                ? "bg-prompty-accent text-white shadow-glow-sm"
-                : "text-prompty-muted hover:text-white"
+            className={`rounded-[6px] px-3 py-1 text-[11.5px] font-semibold capitalize transition ${
+              active ? "bg-prompty-ink text-white" : "text-prompty-muted hover:text-prompty-ink"
             }`}
           >
-            {m === "image" ? "🖼 Image" : "🎬 Video"}
+            {m}
           </button>
         );
       })}

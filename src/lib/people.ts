@@ -416,7 +416,7 @@ export function defaultPerson(overrides?: Partial<PersonFields>): PersonFields {
     faceCutPool: "general",
   };
   const merged = { ...base, ...overrides, gender: overrides?.gender ?? gender };
-  const pool = merged.gender === "woman" ? (merged.faceCutPool ?? "general") : "general";
+  const pool = merged.faceCutPool ?? "general";
   const withFace = {
     ...merged,
     faceCutPool: pool,
@@ -718,7 +718,7 @@ export function reshuffleFaceCuts(
   regionIds?: string[],
 ): PersonFields[] {
   return people.map((p) => {
-    const pool = p.gender === "woman" ? (p.faceCutPool ?? "general") : "general";
+    const pool = p.faceCutPool ?? "general";
     const next = {
       ...p,
       faceCutPool: pool,
@@ -738,7 +738,7 @@ export function applyRegionLook(
   const defSkin = defaultSkinToneForRegions(regionIds);
   const defHair = defaultHairColorForRegions(regionIds);
   return people.map((p) => {
-    const pool = p.gender === "woman" ? (p.faceCutPool ?? "general") : "general";
+    const pool = p.faceCutPool ?? "general";
     const next = {
       ...p,
       faceCutPool: pool,
