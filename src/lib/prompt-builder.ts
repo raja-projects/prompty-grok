@@ -39,7 +39,10 @@ function trimFace(face: string, max = 300): string {
   if (face.length <= max) return face;
   const cut = face.slice(0, max);
   const lastComma = cut.lastIndexOf(", ");
-  return lastComma > 120 ? cut.slice(0, lastComma) : cut;
+  const kept = lastComma > 120 ? cut.slice(0, lastComma) : cut;
+  const open = (kept.match(/\(/g) ?? []).length;
+  const close = (kept.match(/\)/g) ?? []).length;
+  return open > close ? `${kept}${")".repeat(open - close)}` : kept;
 }
 
 function clean(parts: Array<string | undefined | null | false>): string {
@@ -58,6 +61,21 @@ function sentence(parts: Array<string | undefined | null | false>): string {
   return /[.!?]$/.test(text) ? text : `${text}.`;
 }
 
+/** Cut everything before the phenotype sentence — the caller writes its own age line. */
+function ageRewrite(text: string): string {
+  const marker = text.search(/clearly Malayali|Malayali South Indian|clearly South Indian/i);
+  const body = marker > 0 ? text.slice(marker) : text;
+  return body
+    .replace(/\bteen\b/gi, "")
+    .replace(/\byouthful\b/gi, "")
+    .replace(/young adult/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/^[\s;,.:]+/, "")
+    .trim();
+}
+
+
+
 function describePerson(
   p: PersonFields,
   index: number,
@@ -69,7 +87,7 @@ function describePerson(
     p.faceCutPool === "known" || isKnownFaceId(p.faceCutId) ? "known" : "general";
   const locked = pool === "known" ? applyKnownFaceLocks(p) : p;
   const faceCut = getFaceCut(locked.gender, locked.faceCutId, locked.age, regionIds, pool);
-  const face = faceCut?.prompt;
+  const face = faceCut?.prompt ? ageRewrite(faceCut.prompt) : undefined;
   const dress = getDress(locked.gender, locked.dressId)?.prompt ?? locked.dressId;
   const ageNum = locked.age || "24";
   const regionLock = faceCut?.regionIds?.length
@@ -87,8 +105,8 @@ function describePerson(
     regionLock,
     `${locked.skinTone} skin tone`,
     `${locked.bodyType} build`,
-    /youth|teen|young|innocent|fresh-faced|delicate|boyish/i.test(locked.bodyType) && !brief
-      ? "clearly adult age 19+ appearance — not a minor"
+    Number(ageNum) <= 25 && !brief
+      ? "clearly an adult woman, not a child; fully adult face and body proportions"
       : "",
     `${locked.hairColor} ${locked.hairStyle} hair`,
     face ? `face: ${brief ? trimFace(face) : face}` : "",
@@ -197,6 +215,7 @@ export function buildPrompts(state: SceneFormState): BuiltPrompts {
   const short = sanitizeText(
     clean([
       "real photograph shot on camera",
+      isIntimateAction(state.actionId) ? "adult couple in a close intimate moment" : "",
       peopleBlock(state, true),
       rel,
       regions ? `appearance cues: ${regions}` : "",

@@ -1,5 +1,5 @@
-import { PromptLab } from "@/components/PromptLab";
+import { Builder } from "@/components/Builder";
 
 export default function HomePage() {
-  return <PromptLab />;
+  return <Builder />;
 }

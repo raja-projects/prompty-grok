@@ -48,6 +48,7 @@ import {
   saveRecent,
   updateFavoritePerson,
 } from "@/lib/storage";
+import { hasInitialised, markInitialised, updateScene, useScene } from "@/lib/scene-store";
 import type { FavoritePerson, Mode, RecentPrompt, SceneFormState } from "@/lib/types";
 import { CopyButton } from "./CopyButton";
 import { ModeToggle } from "./ModeToggle";
@@ -314,8 +315,9 @@ function You({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function PromptLab() {
-  const [form, setForm] = useState<SceneFormState>(DEFAULT_FORM);
+export function PromptLab({ embedded = false }: { embedded?: boolean } = {}) {
+  const form = useScene();
+  const setForm = updateScene;
   const [hydrated, setHydrated] = useState(false);
   const [recent, setRecent] = useState<RecentPrompt[]>([]);
   const [savedFlash, setSavedFlash] = useState(false);
@@ -335,9 +337,14 @@ export function PromptLab() {
   useEffect(() => {
     setRecent(loadRecent());
     setFavoritePeople(loadFavoritePeople());
+    if (hasInitialised()) {
+      setHydrated(true);
+      return;
+    }
+    markInitialised();
     const studio = createStudioDefaults();
     const placeLabel = PLACES.find((p) => p.id === studio.placeId)?.label ?? "";
-    setForm({ ...studio, people: studio.people.map((p) => fixDressForPlace(withRandomDress(p), placeLabel)) });
+    updateScene({ ...studio, people: studio.people.map((p) => fixDressForPlace(withRandomDress(p), placeLabel)) });
     setHydrated(true);
   }, []);
 
@@ -676,8 +683,8 @@ export function PromptLab() {
   const personSlots = form.peopleCount === "group" ? 0 : Number(form.peopleCount);
 
   return (
-    <div className="flex min-h-screen bg-prompty-page text-prompty-ink">
-      <aside className="hidden w-[248px] shrink-0 flex-col border-r border-prompty-line bg-white px-2.5 py-3 lg:flex">
+    <div className={`flex bg-prompty-page text-prompty-ink ${embedded ? "min-h-0" : "min-h-screen"}`}>
+      <aside className={`${embedded ? "hidden" : "hidden lg:flex"} w-[248px] shrink-0 flex-col border-r border-prompty-line bg-white px-2.5 py-3`}>
         <div className="mb-3 flex items-center gap-2 px-1">
           <span className="grid h-7 w-7 place-items-center rounded-md bg-prompty-accent text-[13px] text-white">◍</span>
           <p className="text-[13px] font-bold">Prompty</p>
@@ -1059,7 +1066,7 @@ export function PromptLab() {
           <div ref={bottomRef} />
         </div>
 
-        <form onSubmit={submitText} className="sticky bottom-0 border-t border-prompty-line bg-white/95 px-4 py-2.5 backdrop-blur">
+        <form onSubmit={submitText} className={`${embedded ? "hidden" : "sticky bottom-0"} border-t border-prompty-line bg-white/95 px-4 py-2.5 backdrop-blur`}>
           <div className="mx-auto flex max-w-[720px] items-center gap-2">
             <input
               value={draft}
