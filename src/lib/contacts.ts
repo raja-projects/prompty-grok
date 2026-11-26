@@ -130,7 +130,7 @@ export const CONTACT: Record<ContactAction, ContactDef> = {
   "dick-suck": {
     label: "Dick suck",
     camera: "3/4",
-    framing: "close-up",
+    framing: "half-body",
     poses: ["kneeling-upright", "chair-sit", "standing-front", "seated-edge"],
     clauses: {
       "kneeling-upright": "he stands close in front of her and she leans in, face at his lap, one hand braced on his thigh",
