@@ -3,6 +3,8 @@ import {
   ETH_LABEL,
   LIGHT_LABEL,
   NEGATIVE,
+  REALISM,
+  stripExpressions,
 } from "./settings";
 import {
   POSE_CAMERA,
@@ -16,6 +18,8 @@ import { CONTACT, CONTACT_CAMERA, BASE, type ContactAction } from "./contacts";
 import { MODIFIER, type ModifierKey } from "./modifiers";
 import { findDress, findHair, frontPhrase } from "./wardrobe";
 import { REAR_ACTIONS } from "./contacts";
+import { TOUCH } from "./touches";
+import { applyCast } from "./pronoun";
 
 const TITLE: Record<Settings["room"], string> = {
   bedroom: "Editorial bedroom photograph",
@@ -72,6 +76,11 @@ function subject(s: Settings): string {
   return `${who}, ${ages}, ${hair}${body}`;
 }
 
+function tint(state: string, colour: string): string {
+  if (!colour) return state;
+  return state.replace(/^(the [a-z-]+)/, `$1 in ${colour}`);
+}
+
 function dress(s: Settings, contact?: ContactAction): string {
   const d = findDress(s.femaleAge, s.femaleDress, true);
   const rear = !!contact && REAR_ACTIONS.includes(contact);
@@ -79,11 +88,11 @@ function dress(s: Settings, contact?: ContactAction): string {
   const cover =
     s.covering === "bedsheet" || s.covering === "none"
       ? coverPhrase(s.covering, s.femaleAge)
-      : state;
+      : tint(state, s.femaleColour);
   if (s.genderMix === "solo-f" || s.genderMix === "ff") return cover;
   const m = findDress(s.maleAge, s.maleDress, false);
   const many = s.genderMix === "mmf" || s.genderMix === "mmmf" || s.genderMix === "crowd";
-  const manState = m ? m.state : "his shirt open";
+  const manState = m ? tint(m.state, s.maleColour) : "his shirt open";
   // dick-hold only: the hem must clear the fly, or the crotch is unreadable and refusals climb.
   const lifted =
     contact === "dick-hold" ? ", the shirt lifted clear of his waistband" : "";
@@ -121,8 +130,8 @@ function extraCast(s: Settings): string {
 }
 
 function texture(s: Settings): string {
-  if (s.length === "short") return "anatomically correct, matte skin, visible pores";
-  return "anatomically correct, matte skin, visible pores, slight film grain";
+  if (s.length === "short") return `anatomically correct, matte skin, visible pores, ${REALISM}`;
+  return `anatomically correct, matte skin, visible pores, ${REALISM}, slight film grain`;
 }
 
 function cap(t: string): string {
@@ -153,6 +162,7 @@ export function assemblePrompt(
   modifiers: ModifierKey[] = [],
 ): Assembled {
   const tag: PoseTag = pose && POSE_CAMERA[pose] ? pose : "standing-front";
+  const touch = s.touch ? TOUCH[s.touch] : undefined;
   const base = contact ? BASE[tag] : undefined;
   const clause = contact
     ? CONTACT[contact].clauses[tag]?.replace(
@@ -162,12 +172,25 @@ export function assemblePrompt(
     : undefined;
   const mods = modifiers
     .slice(0, 2)
-    .map((m) => MODIFIER[m]?.clause)
+    .map((m) => MODIFIER[m]?.clause && applyCast(MODIFIER[m].clause, s.genderMix))
     .filter(Boolean) as string[];
   const castExtra = extraCast(s);
-  const core = base && clause ? `${base}; ${clause}` : POSE_CAMERA[tag].note;
-  const withCast = castExtra ? `${core}; ${castExtra}` : core;
-  const geometry = cap(mods.length ? `${withCast}; ${mods.join("; ")}` : withCast);
+  const core = touch
+    ? clause
+      ? `${touch.pretext}; ${applyCast(clause, s.genderMix)}; ${touch.witness}`
+      : `${applyCast(POSE_CAMERA[tag].note, s.genderMix)}; ${touch.witness}`
+    : base && clause
+      ? `${applyCast(base, s.genderMix)}; ${applyCast(clause, s.genderMix)}`
+      : applyCast(POSE_CAMERA[tag].note, s.genderMix);
+  const withCast = castExtra && !touch ? `${core}; ${castExtra}` : core;
+  const hands =
+    s.genderMix === "solo-f"
+      ? ""
+      : s.genderMix === "ff"
+        ? " Each has exactly two hands, each hand on its own arm."
+        : " He has exactly two hands, each hand on its own arm.";
+  const raw = cap(mods.length ? `${withCast}; ${mods.join("; ")}` : withCast) + hands;
+  const geometry = s.expressions ? raw : stripExpressions(raw);
   const sheet = coverNeedsSheet(s.covering, s.femaleAge);
 
   const head = `${TITLE[s.room]} of ${subject(s)}. ${cap(dress(s, contact))}.`;

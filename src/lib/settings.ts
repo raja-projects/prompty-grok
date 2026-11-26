@@ -28,6 +28,10 @@ export interface Settings {
   ratio: Ratio;
   length: "short" | "normal";
   mode: Mode;
+  touch: string;
+  expressions: boolean;
+  femaleColour: string;
+  maleColour: string;
 }
 
 export type LockKey = "noDim" | "ethnicity" | "light";
@@ -53,6 +57,10 @@ export const DEFAULTS: Settings = {
   ratio: "1:1",
   length: "normal",
   mode: "A",
+  touch: "",
+  expressions: true,
+  femaleColour: "",
+  maleColour: "",
 };
 
 export const LOCKS: LockKey[] = ["ethnicity", "noDim"];
@@ -151,8 +159,28 @@ export const COVER_LABEL: Record<Covering, string> = {
   none: "no cover",
 };
 
+export const COLOURS = [
+  "deep ruby red", "royal blue", "emerald green", "midnight black", "ivory white",
+  "champagne gold", "silver grey", "burgundy wine", "coral pink", "peach",
+  "mint teal", "lavender purple", "mustard yellow", "olive green", "navy blue",
+  "blush pink", "cream beige", "chocolate brown", "rose gold", "turquoise",
+  "deep magenta", "sunset orange", "pastel lilac",
+] as const;
+
 export const NEGATIVE =
-  "no gloss, no wax skin, no floating bodies, no extra limbs, no extra hands, no orphan hands, no reversed body, no twisted neck, no merged fabric, no impossible drape";
+  "no gloss, no wax skin, no floating bodies, no extra limbs, no extra hands, no orphan hands, each hand on its own arm, no reversed body, no twisted neck, no merged fabric, no impossible drape";
+
+/** Realism floor. Rooms and cloth have to look used, not styled. */
+export const REALISM =
+  "real skin with pores, fine uneven tone, faint shine, stray hairs; real fabric weave, wrinkles, slight wear";
+
+/** Strips every face sentence, for when reactions are switched off. */
+export function stripExpressions(text: string): string {
+  return text
+    .replace(/\b(Her|His|Both)\b[^.!?]*?\b(face|expression|eyes|lips)\b[^.!?]*\.\s*/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
 
 /** Subject clause only — the frame assembler in step 3 does the rest. */
 export function subjectLine(s: Settings): string {

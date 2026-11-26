@@ -12,6 +12,8 @@ import { POSE_CAMERA, type PoseTag } from "@/lib/camera";
 import { assemblePrompt } from "@/lib/assemble";
 import { CONTACT, CONTACT_TAGS, type ContactAction } from "@/lib/contacts";
 import { MODIFIER, availableModifiers, type ModifierKey } from "@/lib/modifiers";
+import { TOUCH, type TouchKey } from "@/lib/touches";
+import { COLOURS } from "@/lib/settings";
 import {
   femaleDresses,
   maleDresses,
@@ -196,6 +198,26 @@ export default function SettingsPage() {
             </select>
           </div>
         </div>
+        <div style={row}>
+          <div>
+            <label style={label}>Her colour</label>
+            <select style={input} value={s.femaleColour} onChange={(e) => set("femaleColour", e.target.value)}>
+              <option value="">— none —</option>
+              {COLOURS.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label style={label}>His colour</label>
+            <select style={input} value={s.maleColour} onChange={(e) => set("maleColour", e.target.value)}>
+              <option value="">— none —</option>
+              {COLOURS.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+        </div>
         <label style={{ ...label, marginTop: 10 }}>Covering override</label>
         <select style={input} value={s.covering} onChange={(e) => set("covering", e.target.value as Covering)}>
           <option value="pallu-hip">use the dress state</option>
@@ -229,6 +251,14 @@ export default function SettingsPage() {
             <input style={input} value={s.cameraOverride} placeholder="side profile, hip height" onChange={(e) => set("cameraOverride", e.target.value)} />
           </>
         )}
+        <label style={{ ...label, display: "flex", gap: 8, alignItems: "center", marginTop: 10 }}>
+          <input
+            type="checkbox"
+            checked={s.expressions}
+            onChange={(e) => set("expressions", e.target.checked)}
+          />
+          Face reactions
+        </label>
         <div style={{ ...row, marginTop: 10 }}>
           <div>
             <label style={label}>Mode</label>
@@ -249,6 +279,23 @@ export default function SettingsPage() {
 
       <div style={box}>
         <h2 style={h}>Action</h2>
+        <label style={label}>Accidental touch — a stranger, a husband present</label>
+        <select
+          style={input}
+          value={s.touch}
+          onChange={(e) => {
+            const next = e.target.value;
+            set("touch", next);
+            if (next && TOUCH[next]) setPose(TOUCH[next].pose);
+          }}
+        >
+          <option value="">— none, use action and pose —</option>
+          {(Object.keys(TOUCH) as TouchKey[]).map((k) => (
+            <option key={k} value={k}>{TOUCH[k].label}</option>
+          ))}
+        </select>
+
+        <label style={{ ...label, marginTop: 10 }}>Contact</label>
         <select
           style={input}
           value={contact}
