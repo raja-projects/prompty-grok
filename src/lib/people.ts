@@ -63,7 +63,7 @@ export function isUnder21(age: Age | string | undefined): boolean {
 export function sceneHasUnder21(people: PersonFields[], peopleCount: PeopleCount): boolean {
   if (peopleCount === "group") return false;
   const n = Number(peopleCount);
-  return people.slice(0, n).some((p) => isUnder21(p.age));
+  return people.slice(0, n).some((p) => Number(p.age) < 19);
 }
 
 /** @deprecated alias */

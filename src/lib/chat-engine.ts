@@ -15,7 +15,7 @@ import {
 } from "./people";
 import { PLACES } from "./places";
 import { randomDefaultPeople } from "./defaults";
-import { ACTS, BODY, EXPLAIN, VOCAB } from "./chat-vocab";
+import { ACT_PICK, ACTS, BODY, EXPLAIN, VOCAB } from "./chat-vocab";
 import { POSES } from "./poses";
 import type { SceneFormState } from "./types";
 
@@ -72,6 +72,7 @@ const STOP = new Set([
   "he","both","into","over","under","for","as","wearing","wears","wore","has","have","from","age","old",
   "year","years","yr","yrs","yo","two","three","four","five","six","seven","eight","nine","ten","one","about",
   "teen","girl","girls","boy","boys","woman","women","man","men","guy","guys","lady","ladies","people","with",
+  "husband","wife","while","his","already","very","just","only","like","slightly","little",
 ]);
 
 const NUMBERS: Record<string, number> = {
@@ -198,13 +199,29 @@ function resolveToken(token: string): string[] {
 }
 
 function findAction(text: string, form: SceneFormState, castSize: number) {
-  const tokens = text.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 1);
+  const tokens = text
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t.length > 1 && !STOP.has(t));
+  if (!tokens.length) return null;
   const allowed = visibleCategories(form);
   const groups = tokens.map((token) => Array.from(new Set([token, ...resolveToken(token)])));
   const actToken = tokens.find((t) => ACTS.has(t)) ?? "";
   const bodyToken = tokens.find((t) => BODY.has(t)) ?? "";
   const soft = ["fingering", "finger", "lick", "licking", "kiss", "kissing", "grinding", "grind"];
   const key = bodyToken && soft.includes(actToken) ? bodyToken : actToken || tokens[tokens.length - 1] || "";
+
+  const picks = ACT_PICK[actToken];
+  if (picks) {
+    for (const id of picks) {
+      const hit = ACTIONS.find((a) => a.id === id);
+      if (!hit) continue;
+      if (!allowed.includes(hit.category)) continue;
+      const need = CAST_SIZE[hit.category];
+      if (need && need !== castSize) continue;
+      return { id: hit.id, label: hit.label, score: 999, key };
+    }
+  }
 
   let best: { id: string; label: string; score: number; key: string } | null = null;
 
@@ -479,7 +496,7 @@ export function parseTurn(raw: string, form: SceneFormState, known: Known): Turn
   }
   const leftovers = remaining
     .split(/[^a-z0-9']+/)
-    .filter((w) => w.length > 2 && !STOP.has(w) && !VOCAB[w] && !ACTS.has(w) && !BODY.has(w))
+    .filter((w) => w.length > 2 && !/^\d/.test(w) && !STOP.has(w) && !VOCAB[w] && !ACTS.has(w) && !BODY.has(w))
     .slice(0, 18)
     .join(" ");
 
