@@ -14,7 +14,7 @@ import {
 import { coverPhrase, coverNeedsSheet } from "./cover";
 import { CONTACT, CONTACT_CAMERA, BASE, type ContactAction } from "./contacts";
 import { MODIFIER, type ModifierKey } from "./modifiers";
-import { findDress, findHair } from "./wardrobe";
+import { findDress, findHair, frontPhrase } from "./wardrobe";
 import { REAR_ACTIONS } from "./contacts";
 
 const TITLE: Record<Settings["room"], string> = {
@@ -84,7 +84,10 @@ function dress(s: Settings, contact?: ContactAction): string {
   const m = findDress(s.maleAge, s.maleDress, false);
   const many = s.genderMix === "mmf" || s.genderMix === "mmmf" || s.genderMix === "crowd";
   const manState = m ? m.state : "his shirt open";
-  return `${cover}; ${many ? `each man in ${manState.replace(/\bthe /g, "")}` : manState}`;
+  // dick-hold only: the hem must clear the fly, or the crotch is unreadable and refusals climb.
+  const lifted =
+    contact === "dick-hold" ? ", the shirt lifted clear of his waistband" : "";
+  return `${cover}; ${many ? `each man in ${manState.replace(/\bthe /g, "")}` : manState.replace(/^the /, "his ")}${lifted}`;
 }
 
 function cameraClause(
@@ -151,7 +154,12 @@ export function assemblePrompt(
 ): Assembled {
   const tag: PoseTag = pose && POSE_CAMERA[pose] ? pose : "standing-front";
   const base = contact ? BASE[tag] : undefined;
-  const clause = contact ? CONTACT[contact].clauses[tag] : undefined;
+  const clause = contact
+    ? CONTACT[contact].clauses[tag]?.replace(
+        "{front}",
+        frontPhrase(findDress(s.maleAge, s.maleDress, false)?.id ?? ""),
+      )
+    : undefined;
   const mods = modifiers
     .slice(0, 2)
     .map((m) => MODIFIER[m]?.clause)

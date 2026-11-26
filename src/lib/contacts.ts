@@ -30,7 +30,7 @@ export type ContactAction =
 export const BASE: Partial<Record<PoseTag, string>> = {
   "all-fours": "she is on all fours, knees wide apart, hips lifted high and back dipped deep",
   "bent-forward": "she stands bent forward with her palms flat on the counter, back flat, hips pushed back",
-  "side-lying": "they lie on their sides, her top leg lifted high over his hip",
+  "side-lying": "they lie on their sides facing the same way, her back to his chest, her top knee hooked over his hip, her head turned back over her shoulder",
   "seated-edge": "she sits at the edge of the bed, leaning forward on her elbows, hips near the edge",
   "seated-edge-back": "she sits at the edge of the bed, leaning back on her hands, knees apart",
   "kneeling-low": "she is low with her chest down and her forearms braced",
@@ -74,6 +74,10 @@ export const CONTACT_CAMERA: Partial<
   Record<ContactAction, Partial<Record<PoseTag, { camera: CameraAngle; framing: Framing }>>>
 > = {
   "anal-finger": { "side-lying": { camera: "side", framing: "half-body" } },
+  "fingering-front": { "lying-back": { camera: "3/4", framing: "half-body" } },
+  "thigh-kiss": { "lying-back": { camera: "3/4", framing: "half-body" } },
+  "pussy-press-front": { "lying-back": { camera: "3/4", framing: "half-body" } },
+  "dick-hold": { "side-lying": { camera: "side", framing: "half-body" } },
   "pussy-rub-behind": { "side-lying": { camera: "side", framing: "half-body" } },
 };
 
@@ -152,11 +156,11 @@ export const CONTACT: Record<ContactAction, ContactDef> = {
     framing: "half-body",
     poses: ["lying-back", "straddle-facing", "standing-front", "side-lying", "seated-edge-back"],
     clauses: {
-      "lying-back": "her free hand slides down over her own belly and closes over the shape at the front of his clothing, just below his navel, fingers curled and thumb up, one slow draw; he leans over her on one arm, watching her",
-      "straddle-facing": "her hand slides down between them and closes over the shape at the front of his clothing, just below his navel, fingers curled and thumb up, one slow draw; she looks up at him",
-      "standing-front": "her arm reaching down between them, her fingers curled over the shape at the front of his clothing, just below his navel, thumb up, one slow draw upward; his hand at the back of her neck",
-      "side-lying": "her hand reaches back between them and closes over the shape at the front of his clothing, fingers curled, one slow draw",
-      "seated-edge-back": "she leans back on one hand and her other hand closes over the shape at the front of his clothing, just below his navel, fingers curled, one slow draw",
+      "lying-back": "he kneels over her between her thighs with his weight on one forearm beside her head, her knees up either side of his hips; her hand slides down over her own belly and cups {front}",
+      "straddle-facing": "she sits high over his hips, leaning forward on one hand beside his shoulder, her other hand comes down between them, cupped over {front}; her face lifted to his",
+      "standing-front": "her arm reaching down between them, her fingers cupped over {front}; his hand at the back of her neck",
+      "side-lying": "her arm reaches back past her own hip, cupped over {front}",
+      "seated-edge-back": "he stands between her knees; she leans back on one hand and her other hand comes down between them, cupped over {front}",
     },
   },
   "breast-press": {
@@ -288,7 +292,7 @@ export const CONTACT: Record<ContactAction, ContactDef> = {
     framing: "close-up",
     poses: ["lying-back", "seated-edge-back", "straddle-facing", "side-lying"],
     clauses: {
-      "lying-back": "his palm presses flat over her front, the heel of his hand low, holding still",
+      "lying-back": "his palm presses flat and low over the front of her body, below her navel, holding still",
       "seated-edge-back": "his palm presses flat over her front from below, holding still",
       "straddle-facing": "his palm presses flat up against her front, holding still",
       "side-lying": "his palm presses flat over her front, holding still",

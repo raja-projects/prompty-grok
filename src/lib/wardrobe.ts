@@ -26,61 +26,61 @@ export interface DressDef {
 
 export const FEMALE_DRESS: Record<FemaleBand, DressDef[]> = {
   preteen: [
-    { id: "pattu-pavada", label: "Pattu pavada", state: "the pavada to the knee, the blouse on", rear: "the pavada to the knee" },
-    { id: "pavada-blouse", label: "Pavada and blouse", state: "the pavada to the knee, the blouse on", rear: "the pavada to the knee" },
-    { id: "dhavani", label: "Dhavani", state: "the skirt to the knee, the upper cloth over one shoulder", rear: "the upper cloth thrown forward, the back bare" },
-    { id: "half-saree", label: "Half saree", state: "the skirt to the knee, the upper cloth loose over one shoulder", rear: "the upper cloth thrown forward, the back bare" },
-    { id: "churidar", label: "Churidar", state: "the kurta to the hip", rear: "the kurta pulled up to the hip" },
-    { id: "skirt-top", label: "Skirt and top", state: "the skirt to the knee, the top on", rear: "the skirt to the knee" },
+    { id: "pattu-pavada", label: "Pattu pavada", state: "the pavada pulled up over her hips, the seat bare, the blouse on", rear: "the pavada pulled up over her hips, the seat bare" },
+    { id: "pavada-blouse", label: "Pavada and blouse", state: "the pavada pulled up over her hips, the seat bare, the blouse on", rear: "the pavada pulled up over her hips, the seat bare" },
+    { id: "dhavani", label: "Dhavani", state: "the skirt pulled up over her hips, the seat bare, the upper cloth over one shoulder", rear: "the upper cloth thrown forward and the skirt pulled up over her hips, the seat bare" },
+    { id: "half-saree", label: "Half saree", state: "the skirt pulled up over her hips, the seat bare, the upper cloth loose over one shoulder", rear: "the upper cloth thrown forward and the skirt pulled up over her hips, the seat bare" },
+    { id: "churidar", label: "Churidar", state: "the kurta to the hip", rear: "the kurta pulled up over her hips, the seat bare in the churidar" },
+    { id: "skirt-top", label: "Skirt and top", state: "the skirt pulled up over her hips, the seat bare, the top on", rear: "the skirt pulled up over her hips, the seat bare" },
     { id: "long-skirt", label: "Long skirt and top", state: "the long skirt to the ankle, the top on", rear: "the long skirt to the ankle" },
     { id: "frock", label: "Frock", state: "the frock to the knee", rear: "the frock to the knee" },
     { id: "school-uniform", label: "School uniform", state: "the pinafore to the knee, the shirt tucked", rear: "the pinafore to the knee" },
     { id: "jeans-top", label: "Jeans and top", state: "the jeans at the hip, the top on", rear: "the jeans at the hip" },
     { id: "shorts-tshirt", label: "Shorts and T-shirt", state: "the shorts to the thigh, the t-shirt on", rear: "the shorts to the thigh" },
-    { id: "nightie", label: "Nightie", state: "the nightie to the knee", rear: "the nightie to the knee" },
+    { id: "nightie", label: "Nightie", state: "the nightie pulled up over her hips, the seat bare", rear: "the nightie pulled up over her hips, the seat bare" },
   ],
   teen: [
-    { id: "half-saree", label: "Half saree", state: "the skirt to the knee, the upper cloth loose over one shoulder", rear: "the upper cloth thrown forward, the back bare" },
-    { id: "cotton-saree", label: "Cotton saree", state: "wrapped to the hip, the pallu across it", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "saree-pallu", label: "Saree, pallu over shoulder", state: "wrapped to the hip, the pallu over her shoulder", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "churidar", label: "Churidar", state: "the kurta to the hip", rear: "the kurta pulled up to the hip" },
-    { id: "kurti-leggings", label: "Kurti and leggings", state: "the kurti to the thigh", rear: "the kurti pulled up to the thigh" },
-    { id: "kurti-skirt", label: "Kurti and skirt", state: "the kurti to the thigh, the skirt to the knee", rear: "the kurti pulled up, the skirt to the knee" },
-    { id: "salwar", label: "Salwar kameez", state: "the kameez to the thigh", rear: "the kameez pulled up to the thigh" },
+    { id: "half-saree", label: "Half saree", state: "the skirt pulled up over her hips, the seat bare, the upper cloth loose over one shoulder", rear: "the upper cloth thrown forward and the skirt pulled up over her hips, the seat bare" },
+    { id: "cotton-saree", label: "Cotton saree", state: "wrapped to the hip, the pallu across it", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "saree-pallu", label: "Saree, pallu over shoulder", state: "wrapped to the hip, the pallu over her shoulder", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "churidar", label: "Churidar", state: "the kurta to the hip", rear: "the kurta pulled up over her hips, the seat bare in the churidar" },
+    { id: "kurti-leggings", label: "Kurti and leggings", state: "the kurti to the thigh", rear: "the kurti pulled up over her hips, the seat bare in the leggings" },
+    { id: "kurti-skirt", label: "Kurti and skirt", state: "the kurti to the thigh, the skirt pulled up over her hips, the seat bare", rear: "the kurti pulled up, the skirt pulled up over her hips, the seat bare" },
+    { id: "salwar", label: "Salwar kameez", state: "the kameez to the thigh", rear: "the kameez pulled up over her hips, the seat bare in the salwar" },
     { id: "jeans-top", label: "Jeans and top", state: "the jeans at the hip, the top on", rear: "the jeans at the hip" },
-    { id: "college-uniform", label: "College uniform", state: "the skirt to the knee, the shirt tucked", rear: "the skirt to the knee" },
-    { id: "pattu-pavada", label: "Pattu pavada", state: "the pavada to the knee, the blouse on", rear: "the pavada to the knee" },
-    { id: "nightie", label: "Nightie", state: "the nightie to the knee", rear: "the nightie to the knee" },
+    { id: "college-uniform", label: "College uniform", state: "the skirt pulled up over her hips, the seat bare, the shirt tucked", rear: "the skirt pulled up over her hips, the seat bare" },
+    { id: "pattu-pavada", label: "Pattu pavada", state: "the pavada pulled up over her hips, the seat bare, the blouse on", rear: "the pavada pulled up over her hips, the seat bare" },
+    { id: "nightie", label: "Nightie", state: "the nightie pulled up over her hips, the seat bare", rear: "the nightie pulled up over her hips, the seat bare" },
     { id: "long-skirt", label: "Long skirt and top", state: "the long skirt to the ankle, the top on", rear: "the long skirt to the ankle" },
   ],
   young: [
-    { id: "kasavu-saree", label: "Kasavu saree", state: "wrapped to the hip, the pallu across it", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "silk-saree", label: "Silk saree", state: "wrapped to the hip, the pallu across it", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "cotton-saree", label: "Cotton saree", state: "wrapped to the hip, the pallu across it", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "chiffon-saree", label: "Chiffon saree", state: "wrapped to the hip, the pallu across it", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "office-saree", label: "Saree, office wear", state: "wrapped to the hip, the pallu pinned at the shoulder", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "churidar", label: "Churidar", state: "the kurta to the hip", rear: "the kurta pulled up to the hip" },
-    { id: "kurti-leggings", label: "Kurti and leggings", state: "the kurti to the thigh", rear: "the kurti pulled up to the thigh" },
-    { id: "salwar", label: "Salwar kameez", state: "the kameez to the thigh", rear: "the kameez pulled up to the thigh" },
+    { id: "kasavu-saree", label: "Kasavu saree", state: "wrapped to the hip, the pallu across it", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "silk-saree", label: "Silk saree", state: "wrapped to the hip, the pallu across it", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "cotton-saree", label: "Cotton saree", state: "wrapped to the hip, the pallu across it", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "chiffon-saree", label: "Chiffon saree", state: "wrapped to the hip, the pallu across it", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "office-saree", label: "Saree, office wear", state: "wrapped to the hip, the pallu pinned at the shoulder", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "churidar", label: "Churidar", state: "the kurta to the hip", rear: "the kurta pulled up over her hips, the seat bare in the churidar" },
+    { id: "kurti-leggings", label: "Kurti and leggings", state: "the kurti to the thigh", rear: "the kurti pulled up over her hips, the seat bare in the leggings" },
+    { id: "salwar", label: "Salwar kameez", state: "the kameez to the thigh", rear: "the kameez pulled up over her hips, the seat bare in the salwar" },
     { id: "jeans-top", label: "Jeans and top", state: "the jeans at the hip, the top on", rear: "the jeans at the hip" },
-    { id: "skirt-top", label: "Skirt and top", state: "the skirt to the knee, the top on", rear: "the skirt to the knee" },
+    { id: "skirt-top", label: "Skirt and top", state: "the skirt pulled up over her hips, the seat bare, the top on", rear: "the skirt pulled up over her hips, the seat bare" },
     { id: "coord-set", label: "Co-ord set", state: "the top to the waist, the shorts to the thigh", rear: "the shorts to the thigh" },
-    { id: "nightie", label: "Nightie", state: "the nightie to the knee", rear: "the nightie to the knee" },
-    { id: "nightdress", label: "Short nightdress", state: "the nightdress to the thigh", rear: "the nightdress to the thigh" },
+    { id: "nightie", label: "Nightie", state: "the nightie pulled up over her hips, the seat bare", rear: "the nightie pulled up over her hips, the seat bare" },
+    { id: "nightdress", label: "Short nightdress", state: "the nightdress pulled up over her hips, the seat bare", rear: "the nightdress pulled up over her hips, the seat bare" },
   ],
   woman: [
-    { id: "kasavu-saree", label: "Kasavu saree", state: "wrapped to the hip, the pallu across it", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "silk-saree", label: "Silk saree", state: "wrapped to the hip, the pallu across it", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "kanjeevaram", label: "Kanjeevaram saree", state: "wrapped to the hip, the pallu across it", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "cotton-saree", label: "Cotton saree", state: "wrapped to the hip, the pallu across it", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "chiffon-saree", label: "Chiffon saree", state: "wrapped to the hip, the pallu across it", rear: "the pallu thrown forward, the back bare to the waistband" },
-    { id: "churidar", label: "Churidar", state: "the kurta to the hip", rear: "the kurta pulled up to the hip" },
-    { id: "salwar", label: "Salwar kameez", state: "the kameez to the thigh", rear: "the kameez pulled up to the thigh" },
-    { id: "kurti-leggings", label: "Kurti and leggings", state: "the kurti to the thigh", rear: "the kurti pulled up to the thigh" },
-    { id: "nightie", label: "Nightie", state: "the nightie to the knee", rear: "the nightie to the knee" },
-    { id: "nightdress", label: "Short nightdress", state: "the nightdress to the thigh", rear: "the nightdress to the thigh" },
+    { id: "kasavu-saree", label: "Kasavu saree", state: "wrapped to the hip, the pallu across it", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "silk-saree", label: "Silk saree", state: "wrapped to the hip, the pallu across it", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "kanjeevaram", label: "Kanjeevaram saree", state: "wrapped to the hip, the pallu across it", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "cotton-saree", label: "Cotton saree", state: "wrapped to the hip, the pallu across it", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "chiffon-saree", label: "Chiffon saree", state: "wrapped to the hip, the pallu across it", rear: "the saree pulled up over her hips and tucked in at the waist, the seat bare" },
+    { id: "churidar", label: "Churidar", state: "the kurta to the hip", rear: "the kurta pulled up over her hips, the seat bare in the churidar" },
+    { id: "salwar", label: "Salwar kameez", state: "the kameez to the thigh", rear: "the kameez pulled up over her hips, the seat bare in the salwar" },
+    { id: "kurti-leggings", label: "Kurti and leggings", state: "the kurti to the thigh", rear: "the kurti pulled up over her hips, the seat bare in the leggings" },
+    { id: "nightie", label: "Nightie", state: "the nightie pulled up over her hips, the seat bare", rear: "the nightie pulled up over her hips, the seat bare" },
+    { id: "nightdress", label: "Short nightdress", state: "the nightdress pulled up over her hips, the seat bare", rear: "the nightdress pulled up over her hips, the seat bare" },
     { id: "jeans-top", label: "Jeans and top", state: "the jeans at the hip, the top on", rear: "the jeans at the hip" },
-    { id: "skirt-blouse", label: "Skirt and blouse", state: "the skirt to the knee, the blouse on", rear: "the skirt to the knee" },
+    { id: "skirt-blouse", label: "Skirt and blouse", state: "the skirt pulled up over her hips, the seat bare, the blouse on", rear: "the skirt pulled up over her hips, the seat bare" },
   ],
 };
 
@@ -272,4 +272,17 @@ export function findHair(
 ): DressDef | undefined {
   const list = female ? femaleHairStyles(age) : maleHairStyles(age);
   return list.find((d) => d.id === id) ?? list[0];
+}
+
+/** The exact point her hand must reach, named for the garment he is wearing. */
+export function frontPhrase(id: string): string {
+  if (id.includes("shorts")) return "the crotch of his shorts";
+  if (id.includes("jeans")) return "the crotch of his jeans";
+  if (id.includes("trousers") || id.includes("formal")) return "the crotch of his trousers";
+  if (id.includes("track")) return "the crotch of his track pants";
+  if (id.includes("mundu")) return "the fold at the front of his mundu";
+  if (id.includes("veshti")) return "the fold at the front of his veshti";
+  if (id.includes("dhoti")) return "the fold at the front of his dhoti";
+  if (id.includes("kurta")) return "the front of his kurta";
+  return "the front of his clothing";
 }
