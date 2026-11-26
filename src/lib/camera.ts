@@ -1,6 +1,7 @@
 export type CameraAngle =
   | "front"
   | "back"
+  | "back-low"
   | "side"
   | "3/4"
   | "over-shoulder"
@@ -57,12 +58,19 @@ export type PoseTag =
   | "wall-front"
   | "lifted"
   | "seated-edge"
+  | "seated-edge-back"
   | "oral-giving"
   | "oral-receiving"
   | "mutual-oral"
   | "breast-focus"
   | "rear-focus"
   | "crease-focus"
+  | "pussy-rub-behind"
+  | "breast-suck"
+  | "armpit-lick"
+  | "navel-lick"
+  | "asshole-lick"
+  | "dick-hold"
   | "mirror-view"
   | "crowd-standing-behind"
   | "crowd-seated-beside"
@@ -80,14 +88,15 @@ export type PoseTag =
   | "activity";
 
 export const CAMERA_ANGLES: { id: CameraAngle; label: string; prompt: string }[] = [
-  { id: "front", label: "Front", prompt: "front-facing camera angle" },
+  { id: "front", label: "Front", prompt: "front view" },
   { id: "back", label: "Back", prompt: "shot from behind her back with clear view of soft lower curves and strong fabric tension, she turns her head over her shoulder so her face is clearly visible" },
+  { id: "back-low", label: "Back low", prompt: "dead behind and low, her head turned back over her shoulder to the lens" },
   { id: "side", label: "Side", prompt: "side profile" },
-  { id: "3/4", label: "3/4", prompt: "three-quarter angle" },
+  { id: "3/4", label: "3/4", prompt: "three-quarter view" },
   { id: "over-shoulder", label: "Over-shoulder", prompt: "over-the-shoulder framing, her face still visible in frame" },
-  { id: "low-angle", label: "Low angle", prompt: "low-angle perspective" },
-  { id: "high-angle", label: "High angle", prompt: "high-angle perspective" },
-  { id: "eye-level", label: "Eye-level", prompt: "eye-level camera" },
+  { id: "low-angle", label: "Low angle", prompt: "low angle" },
+  { id: "high-angle", label: "High angle", prompt: "high angle" },
+  { id: "eye-level", label: "Eye-level", prompt: "eye level" },
 ];
 
 export const FRAMINGS: { id: Framing; label: string; prompt: string }[] = [
@@ -95,8 +104,8 @@ export const FRAMINGS: { id: Framing; label: string; prompt: string }[] = [
   { id: "close-up", label: "Close-up", prompt: "close-up portrait framing" },
   { id: "medium", label: "Medium", prompt: "medium shot" },
   { id: "half-body", label: "Half body", prompt: "half-body framing" },
-  { id: "3/4-body", label: "3/4 body", prompt: "three-quarter body framing" },
-  { id: "full-body", label: "Full body", prompt: "full-body framing" },
+  { id: "3/4-body", label: "3/4 body", prompt: "framed to the knees" },
+  { id: "full-body", label: "Full body", prompt: "full body, head to feet" },
   { id: "wide", label: "Wide", prompt: "wide environmental shot" },
 ];
 
@@ -150,7 +159,7 @@ export const POSE_CAMERA: Record<
   "all-fours": {
     cameraAngle: "side",
     framing: "3/4-body",
-    note: "she is on all fours, chest low, back arched, hips lifted; he kneels close behind with both hands planted on her hips and his weight forward; her head turned to the camera",
+    note: "she is on all fours, chest low, back arched, hips lifted; he kneels close behind with both hands planted on her hips and his weight forward; her head turned over her shoulder to the lens",
   },
   "kneeling-upright": {
     cameraAngle: "3/4",
@@ -217,6 +226,11 @@ export const POSE_CAMERA: Record<
     framing: "3/4-body",
     note: "she sits at the edge of the bed with her feet on the floor; he stands between her parted knees, her calves hooked around his legs; her face to the camera",
   },
+  "seated-edge-back": {
+    cameraAngle: "side",
+    framing: "3/4-body",
+    note: "she sits at the edge of the bed, leaning back on her hands, knees apart; he stands between her knees",
+  },
   "oral-giving": {
     cameraAngle: "3/4",
     framing: "half-body",
@@ -235,17 +249,47 @@ export const POSE_CAMERA: Record<
   "breast-focus": {
     cameraAngle: "front",
     framing: "close-up",
-    note: "his palm presses flat over her upper front through the fabric, fingers spread, cloth indented in a clear hand shape; she leans into the pressure",
+    note: "his palm presses flat over her upper front through the fabric, fingers spread wide, the cloth indented in a clear hand shape; she leans into the pressure, her head tipped back",
   },
   "rear-focus": {
-    cameraAngle: "back",
+    cameraAngle: "back-low",
     framing: "half-body",
-    note: "both his hands sink deep into the soft curves of her seat through the fabric, cloth stretched into two clear hand-shaped indentations; she turns her face over her shoulder",
+    note: "both his palms press deep into the soft curves of her seat, the cloth stretched into two clear hand-shaped indentations, his weight leaning in; her back arched",
   },
   "crease-focus": {
-    cameraAngle: "back",
+    cameraAngle: "back-low",
     framing: "half-body",
-    note: "her lower back is arched so the fabric pulls tight across the seat; his fingers press into the deep centre crease, knuckles readable through the stretched cloth; she looks back over her shoulder",
+    note: "her back arched, the fabric pulled tight across her seat; his palm presses into the centre line, fingers working in a slow circle, knuckles readable through the cloth",
+  },
+  "pussy-rub-behind": {
+    cameraAngle: "back",
+    framing: "3/4-body",
+    note: "her back arched, the saree pulled tight across her seat; he stands directly behind her and reaches down between her thighs, rubbing slow circles at her front, his wrist buried between her legs; her knees soften, camera low and dead behind",
+  },
+  "breast-suck": {
+    cameraAngle: "3/4",
+    framing: "close-up",
+    note: "she holds his head to her chest, his mouth at the upper curve, one hand cupping her from beneath, her head tipped back and eyes shut",
+  },
+  "armpit-lick": {
+    cameraAngle: "front",
+    framing: "close-up",
+    note: "her arm lifted high and hooked behind his neck, his mouth pressed into the hollow of her armpit, one hand flat on her ribs; her face turned to the lens",
+  },
+  "navel-lick": {
+    cameraAngle: "3/4",
+    framing: "close-up",
+    note: "she lies back, his head lowered so his mouth is at her navel, both hands flat on her hips holding her steady, her stomach drawn in, her face to the lens",
+  },
+  "asshole-lick": {
+    cameraAngle: "back-low",
+    framing: "full-body",
+    note: "she is on all fours, knees wide apart, hips lifted high and back dipped deep, the saree pulled up and tight across her seat, the fabric clinging; he kneels directly behind her with his knees outside her calves, his chest close to her hips, his head low between them, face pressed into the centre line, both hands spreading her seat apart",
+  },
+  "dick-hold": {
+    cameraAngle: "3/4",
+    framing: "close-up",
+    note: "her hand wrapped around him, fingers closed, one slow draw upward; she looks up at him, his head tipped back",
   },
   "mirror-view": {
     cameraAngle: "3/4",

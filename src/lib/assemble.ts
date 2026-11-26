@@ -1,7 +1,6 @@
 import {
   type Settings,
   ETH_LABEL,
-  MIX_LABEL,
   LIGHT_LABEL,
   NEGATIVE,
 } from "./settings";
@@ -13,6 +12,8 @@ import {
   type PoseTag,
 } from "./camera";
 import { coverPhrase, coverNeedsSheet } from "./cover";
+import { CONTACT, BASE, type ContactAction } from "./contacts";
+import { MODIFIER, type ModifierKey } from "./modifiers";
 
 const TITLE: Record<Settings["room"], string> = {
   bedroom: "Editorial bedroom photograph",
@@ -30,23 +31,33 @@ function framingPrompt(id: string): string {
 }
 
 function subject(s: Settings): string {
+  const eth = ETH_LABEL[s.ethnicity];
   const woman =
     s.femaleAge < 19
       ? `a girl of ${s.femaleAge}`
       : `an adult woman of ${s.femaleAge}`;
 
-  const who =
+  let who = `a ${eth} couple`;
+  if (s.genderMix === "solo-f") who = `a ${eth} woman`;
+  else if (s.genderMix === "ff") who = `two ${eth} women`;
+  else if (s.genderMix === "mmf") who = `a ${eth} woman and two men`;
+  else if (s.genderMix === "ffm") who = `two ${eth} women and a man`;
+  else if (s.genderMix === "mmmf") who = `a ${eth} woman and three men`;
+  else if (s.genderMix === "crowd") who = `a ${eth} crowd`;
+
+  const ages =
     s.genderMix === "solo-f" || s.genderMix === "ff"
       ? woman
       : `${woman} and a man of ${s.maleAge}`;
 
-  const hair = s.maleHairShort && s.genderMix !== "solo-f" && s.genderMix !== "ff"
-    ? "her long hair loose, his hair short"
-    : "her long hair loose";
+  const hair =
+    s.genderMix === "solo-f" || s.genderMix === "ff"
+      ? "her long hair loose"
+      : "her long hair loose, his hair short";
 
   const body = s.bodyNote.trim() ? `, ${s.bodyNote.trim()}` : "";
 
-  return `${MIX_LABEL[s.genderMix]}, ${ETH_LABEL[s.ethnicity]}, ${who}, ${hair}${body}`;
+  return `${who}, ${ages}, ${hair}${body}`;
 }
 
 function dress(s: Settings): string {
@@ -55,17 +66,23 @@ function dress(s: Settings): string {
   return `${cover}; his shirt open`;
 }
 
-function camera(s: Settings, pose: PoseTag): string {
+function cameraClause(
+  s: Settings,
+  pose: PoseTag,
+  contact?: ContactAction,
+): string {
   if (s.camera === "manual" && s.cameraOverride.trim()) {
     return s.cameraOverride.trim();
   }
-  const p = POSE_CAMERA[pose];
-  return `${anglePrompt(p.cameraAngle)}, ${framingPrompt(p.framing)}, ${LENS[p.framing]}`;
+  const c = contact ? CONTACT[contact] : undefined;
+  const angle = c ? c.camera : POSE_CAMERA[pose].cameraAngle;
+  const frame = c ? c.framing : POSE_CAMERA[pose].framing;
+  return `${anglePrompt(angle)}, ${framingPrompt(frame)}, ${LENS[frame]}`;
 }
 
 function texture(s: Settings): string {
-  if (s.length === "short") return "matte skin, visible pores";
-  return "matte skin, visible pores, slight film grain";
+  if (s.length === "short") return "anatomically correct, matte skin, visible pores";
+  return "anatomically correct, matte skin, visible pores, slight film grain";
 }
 
 function cap(t: string): string {
@@ -89,16 +106,29 @@ export interface Assembled {
   sheet: boolean;
 }
 
-export function assemblePrompt(s: Settings, pose?: PoseTag): Assembled {
+export function assemblePrompt(
+  s: Settings,
+  pose?: PoseTag,
+  contact?: ContactAction,
+  modifiers: ModifierKey[] = [],
+): Assembled {
   const tag: PoseTag = pose && POSE_CAMERA[pose] ? pose : "standing-front";
-  const geometry = cap(POSE_CAMERA[tag].note);
+  const base = contact ? BASE[tag] : undefined;
+  const clause = contact ? CONTACT[contact].clauses[tag] : undefined;
+  const mods = modifiers
+    .slice(0, 2)
+    .map((m) => MODIFIER[m]?.clause)
+    .filter(Boolean) as string[];
+  const core = base && clause ? `${base}; ${clause}` : POSE_CAMERA[tag].note;
+  const geometry = cap(mods.length ? `${core}; ${mods.join("; ")}` : core);
   const sheet = coverNeedsSheet(s.covering, s.femaleAge);
 
-  const head = `${TITLE[s.room]} of ${cap(subject(s))}. ${cap(dress(s))}.`;
+  const head = `${TITLE[s.room]} of ${subject(s)}. ${cap(dress(s))}.`;
+  const cam = cap(cameraClause(s, tag, contact));
 
   if (s.mode === "B") {
     return {
-      prompt: `${head} Keep both faces 100% identical to the references. If the arrangement drifts, move his hands to her hips. ${camera(s, tag)}. ${LIGHT_LABEL[s.light]}. ${texture(s)}, ${s.ratio}.`,
+      prompt: `${head} Keep both faces 100% identical to the references. If the arrangement drifts, move his hands to her hips. ${cam}. ${cap(LIGHT_LABEL[s.light])}. ${cap(texture(s))}, ${s.ratio}.`,
       negative: NEGATIVE,
       pose: tag,
       sheet,
@@ -108,7 +138,7 @@ export function assemblePrompt(s: Settings, pose?: PoseTag): Assembled {
   const sheetClause = sheet ? ` ${SHEET_RULE}.` : "";
 
   return {
-    prompt: `${head} ${geometry}.${sheetClause} ${camera(s, tag)}. ${LIGHT_LABEL[s.light]}. ${texture(s)}, ${s.ratio}.`,
+    prompt: `${head} ${geometry}.${sheetClause} ${cam}. ${cap(LIGHT_LABEL[s.light])}. ${cap(texture(s))}, ${s.ratio}.`,
     negative: NEGATIVE,
     pose: tag,
     sheet,

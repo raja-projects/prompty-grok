@@ -146,7 +146,7 @@ export const COVER_LABEL: Record<Covering, string> = {
 };
 
 export const NEGATIVE =
-  "no gloss, no wax skin, no floating bodies, no extra limbs, no merged fabric, no impossible drape";
+  "no gloss, no wax skin, no floating bodies, no extra limbs, no extra hands, no orphan hands, no reversed body, no twisted neck, no merged fabric, no impossible drape";
 
 /** Subject clause only — the frame assembler in step 3 does the rest. */
 export function subjectLine(s: Settings): string {

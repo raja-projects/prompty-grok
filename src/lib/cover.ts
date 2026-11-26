@@ -30,7 +30,7 @@ export const COVER_LEVELS: CoverDef[] = [
   {
     id: "none",
     label: "No cover",
-    prompt: "no cover across the hip",
+    prompt: "the saree low at the hip, the midriff bare",
     sheet: false,
   },
 ];

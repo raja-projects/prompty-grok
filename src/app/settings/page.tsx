@@ -10,6 +10,8 @@ import {
 } from "@/lib/settings";
 import { POSE_CAMERA, type PoseTag } from "@/lib/camera";
 import { assemblePrompt } from "@/lib/assemble";
+import { CONTACT, type ContactAction } from "@/lib/contacts";
+import { MODIFIER, availableModifiers, type ModifierKey } from "@/lib/modifiers";
 
 const box: React.CSSProperties = {
   border: "1px solid #2a2a33", borderRadius: 10, padding: 14, marginBottom: 14,
@@ -34,6 +36,8 @@ export default function SettingsPage() {
   const [loaded, setLoaded] = useState(false);
   const [presetName, setPresetName] = useState("");
   const [pose, setPose] = useState<PoseTag>("lying-back");
+  const [contact, setContact] = useState<ContactAction | "">("");
+  const [mods, setMods] = useState<ModifierKey[]>([]);
   const [presets, setPresets] = useState<Record<string, Settings>>({});
 
   useEffect(() => {
@@ -47,7 +51,11 @@ export default function SettingsPage() {
 
   if (!loaded) return <main style={{ padding: 24, color: "#e8e8ef" }}>Loading…</main>;
 
-  const built = assemblePrompt(s, pose);
+  const built = assemblePrompt(s, pose, contact || undefined, mods);
+  const poseList: PoseTag[] = contact
+    ? CONTACT[contact].poses
+    : (Object.keys(POSE_CAMERA) as PoseTag[]);
+  const modList = availableModifiers(pose, contact || undefined);
 
   return (
     <main style={{ padding: 24, maxWidth: 720, margin: "0 auto", color: "#e8e8ef", fontFamily: "system-ui, sans-serif" }}>
@@ -207,12 +215,54 @@ export default function SettingsPage() {
       </div>
 
       <div style={box}>
-        <h2 style={h}>Pose</h2>
+        <h2 style={h}>Action</h2>
+        <select
+          style={input}
+          value={contact}
+          onChange={(e) => {
+            const next = e.target.value as ContactAction | "";
+            setContact(next);
+            setMods([]);
+            if (next) setPose(CONTACT[next].poses[0]);
+          }}
+        >
+          <option value="">— none, pose only —</option>
+          {(Object.keys(CONTACT) as ContactAction[]).map((c) => (
+            <option key={c} value={c}>{CONTACT[c].label}</option>
+          ))}
+        </select>
+
+        <label style={{ ...label, marginTop: 10 }}>Pose</label>
         <select style={input} value={pose} onChange={(e) => setPose(e.target.value as PoseTag)}>
-          {(Object.keys(POSE_CAMERA) as PoseTag[]).map((p) => (
+          {poseList.map((p) => (
             <option key={p} value={p}>{p}</option>
           ))}
         </select>
+
+        {modList.length > 0 && (
+          <>
+            <label style={{ ...label, marginTop: 10 }}>Modifiers (max 2)</label>
+            {modList.map((m) => (
+              <label
+                key={m}
+                style={{ ...label, display: "flex", gap: 8, alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  checked={mods.includes(m)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setMods((p) => (p.length >= 2 ? p : [...p, m]));
+                    } else {
+                      setMods((p) => p.filter((x) => x !== m));
+                    }
+                  }}
+                />
+                {MODIFIER[m].label}
+              </label>
+            ))}
+          </>
+        )}
       </div>
 
       <div style={box}>
