@@ -12,7 +12,7 @@ import {
   type PoseTag,
 } from "./camera";
 import { coverPhrase, coverNeedsSheet } from "./cover";
-import { CONTACT, BASE, type ContactAction } from "./contacts";
+import { CONTACT, CONTACT_CAMERA, BASE, type ContactAction } from "./contacts";
 import { MODIFIER, type ModifierKey } from "./modifiers";
 import { findDress, findHair } from "./wardrobe";
 import { REAR_ACTIONS } from "./contacts";
@@ -52,7 +52,7 @@ function subject(s: Settings): string {
 
   let ages = woman;
   if (s.genderMix === "ff") ages = `two adult women, ${s.femaleAge} and ${s.femaleAge + 2}`;
-  else if (s.genderMix === "mf") ages = `${woman} and an adult man of ${s.maleAge}`;
+  else if (s.genderMix === "mf") ages = `${woman} and a man of ${s.maleAge}`;
   else if (s.genderMix === "mmf") ages = `${woman} and two adult men, ${s.maleAge} and ${man2}`;
   else if (s.genderMix === "ffm") ages = `two adult women, ${s.femaleAge} and ${s.femaleAge + 2}, and an adult man of ${s.maleAge}`;
   else if (s.genderMix === "mmmf") ages = `${woman} and three adult men, ${s.maleAge}, ${man2} and ${man3}`;
@@ -96,8 +96,9 @@ function cameraClause(
     return s.cameraOverride.trim();
   }
   const c = contact ? CONTACT[contact] : undefined;
-  const angle = c ? c.camera : POSE_CAMERA[pose].cameraAngle;
-  const frame = c ? c.framing : POSE_CAMERA[pose].framing;
+  const o = contact ? CONTACT_CAMERA[contact]?.[pose] : undefined;
+  const angle = o ? o.camera : c ? c.camera : POSE_CAMERA[pose].cameraAngle;
+  const frame = o ? o.framing : c ? c.framing : POSE_CAMERA[pose].framing;
   return `${anglePrompt(angle)}, ${framingPrompt(frame)}, ${LENS[frame]}`;
 }
 
