@@ -6,8 +6,10 @@ import {
   type Light, type Covering, type Garment, type Ratio, type Mode,
   DEFAULTS, LOCKS, FEMALE_AGE_MIN, FEMALE_AGE_MAX, clampAge,
   loadSettings, saveSettings, resetSettings,
-  loadPresets, savePreset, deletePreset, subjectLine, NEGATIVE,
+  loadPresets, savePreset, deletePreset,
 } from "@/lib/settings";
+import { POSE_CAMERA, type PoseTag } from "@/lib/camera";
+import { assemblePrompt } from "@/lib/assemble";
 
 const box: React.CSSProperties = {
   border: "1px solid #2a2a33", borderRadius: 10, padding: 14, marginBottom: 14,
@@ -31,6 +33,7 @@ export default function SettingsPage() {
   const [s, setS] = useState<Settings>(DEFAULTS);
   const [loaded, setLoaded] = useState(false);
   const [presetName, setPresetName] = useState("");
+  const [pose, setPose] = useState<PoseTag>("lying-back");
   const [presets, setPresets] = useState<Record<string, Settings>>({});
 
   useEffect(() => {
@@ -43,6 +46,8 @@ export default function SettingsPage() {
     setS((p) => ({ ...p, [k]: v }));
 
   if (!loaded) return <main style={{ padding: 24, color: "#e8e8ef" }}>Loading…</main>;
+
+  const built = assemblePrompt(s, pose);
 
   return (
     <main style={{ padding: 24, maxWidth: 720, margin: "0 auto", color: "#e8e8ef", fontFamily: "system-ui, sans-serif" }}>
@@ -202,9 +207,26 @@ export default function SettingsPage() {
       </div>
 
       <div style={box}>
-        <h2 style={h}>Preview</h2>
-        <p style={{ fontSize: 13, color: "#b9b9cc", margin: 0 }}>{subjectLine(s)}</p>
-        <p style={{ fontSize: 12, color: "#6f6f85", margin: "8px 0 0" }}>{NEGATIVE}</p>
+        <h2 style={h}>Pose</h2>
+        <select style={input} value={pose} onChange={(e) => setPose(e.target.value as PoseTag)}>
+          {(Object.keys(POSE_CAMERA) as PoseTag[]).map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+      </div>
+
+      <div style={box}>
+        <h2 style={h}>Output</h2>
+        <p style={{ fontSize: 13, color: "#d8d8e6", margin: "0 0 10px", lineHeight: 1.5 }}>
+          {built.prompt}
+        </p>
+        <p style={{ fontSize: 12, color: "#6f6f85", margin: "0 0 10px" }}>{built.negative}</p>
+        <button
+          style={btn}
+          onClick={() => navigator.clipboard.writeText(`${built.prompt} ${built.negative}`)}
+        >
+          Copy
+        </button>
       </div>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>

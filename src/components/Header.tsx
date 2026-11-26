@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 export function Header() {
@@ -37,6 +38,12 @@ export function Header() {
               <p className="hidden text-right text-xs text-prompty-muted sm:block">
                 Soft language · Kerala–Tamil defaults · One-click copy
               </p>
+              <Link
+                href="/settings"
+                className="rounded-lg border border-prompty-border px-2.5 py-1 text-xs text-prompty-muted transition hover:border-prompty-accent/50 hover:text-white"
+              >
+                Settings
+              </Link>
               <button
                 type="button"
                 onClick={signOut}

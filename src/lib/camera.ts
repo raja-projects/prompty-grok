@@ -82,7 +82,7 @@ export type PoseTag =
 export const CAMERA_ANGLES: { id: CameraAngle; label: string; prompt: string }[] = [
   { id: "front", label: "Front", prompt: "front-facing camera angle" },
   { id: "back", label: "Back", prompt: "shot from behind her back with clear view of soft lower curves and strong fabric tension, she turns her head over her shoulder so her face is clearly visible" },
-  { id: "side", label: "Side", prompt: "side profile angle" },
+  { id: "side", label: "Side", prompt: "side profile" },
   { id: "3/4", label: "3/4", prompt: "three-quarter angle" },
   { id: "over-shoulder", label: "Over-shoulder", prompt: "over-the-shoulder framing, her face still visible in frame" },
   { id: "low-angle", label: "Low angle", prompt: "low-angle perspective" },
@@ -138,19 +138,19 @@ export const POSE_CAMERA: Record<
     note: "both upright and close, her hands on his chest, his hands at her waist, faces turned toward each other",
   },
   "standing-back": {
-    cameraAngle: "back",
-    framing: "half-body",
-    note: "both upright, he stands directly behind her with both hands planted on her hips and lower back, her weight settled back into him; she turns her head over her shoulder so her face is fully visible",
+    cameraAngle: "side",
+    framing: "3/4-body",
+    note: "both upright, he stands directly behind her with both hands planted on her hips and lower back, her weight settled back into him; she turns her head to the camera",
   },
   "bent-forward": {
-    cameraAngle: "back",
-    framing: "half-body",
-    note: "she is bent forward braced on the furniture, back flat, hips pushed back; he stands behind gripping her waist with both hands; she turns her face back over her shoulder",
+    cameraAngle: "side",
+    framing: "3/4-body",
+    note: "she is bent forward braced on the furniture, back flat, hips pushed back; he stands behind gripping her waist with both hands; her head turned to the camera",
   },
   "all-fours": {
-    cameraAngle: "back",
-    framing: "half-body",
-    note: "she is on all fours, chest low, back arched, hips lifted; he kneels close behind with both hands planted on her hips and his weight forward; she looks back over her shoulder, face fully visible",
+    cameraAngle: "side",
+    framing: "3/4-body",
+    note: "she is on all fours, chest low, back arched, hips lifted; he kneels close behind with both hands planted on her hips and his weight forward; her head turned to the camera",
   },
   "kneeling-upright": {
     cameraAngle: "3/4",
@@ -173,24 +173,24 @@ export const POSE_CAMERA: Record<
     note: "she sits sideways with her legs folded to one side, one arm hooked around his neck; he holds her waist and lower back",
   },
   "lying-back": {
-    cameraAngle: "3/4",
+    cameraAngle: "side",
     framing: "full-body",
-    note: "she lies on her back, knees raised and parted, one hand above her head; he settles between her thighs leaning his upper body over her",
+    note: "she lies on her back, knees raised and parted, one hand above her head; he is above her between her thighs on his forearms, faces close, her face to the camera",
   },
   prone: {
-    cameraAngle: "3/4",
-    framing: "full-body",
+    cameraAngle: "side",
+    framing: "3/4-body",
     note: "she lies flat on her stomach, cheek turned so her face is visible; he covers her from behind, forearms braced either side of her shoulders, hips settled against her",
   },
   "side-lying": {
     cameraAngle: "side",
     framing: "half-body",
-    note: "they lie on their sides nested together, her back to his chest, his arm around her waist, her top knee drawn up; both faces visible",
+    note: "they lie on their sides nested together, her back to his chest, his arm under her neck, her top knee drawn up and hooked over his; her face turned to the camera",
   },
   "straddle-facing": {
     cameraAngle: "front",
     framing: "full-body",
-    note: "she straddles him face to face, knees either side of his hips, hands on his shoulders; his hands lock on her waist and draw her down",
+    note: "she straddles him face to face, knees either side of his hips, hands on his shoulders; his hands lock on her waist and draw her down; her face fully to the camera",
   },
   "straddle-away": {
     cameraAngle: "back",
@@ -203,9 +203,9 @@ export const POSE_CAMERA: Record<
     note: "she sits across his lap, one arm around his neck, legs draped over his thigh; he holds her waist and lower back",
   },
   "wall-front": {
-    cameraAngle: "3/4",
+    cameraAngle: "side",
     framing: "full-body",
-    note: "her back is to the wall, one leg lifted and hooked around him; he presses her flat with his hips, one hand under her thigh and one at her waist",
+    note: "her back is flat to the wall, one leg lifted and hooked around him; he presses her to the surface with his hips, one hand under her thigh and one at her waist; her face above his shoulder to the camera",
   },
   lifted: {
     cameraAngle: "side",
@@ -213,9 +213,9 @@ export const POSE_CAMERA: Record<
     note: "he carries her, her legs locked around his waist, her arms around his neck, her back to the wall; his hands support her seat",
   },
   "seated-edge": {
-    cameraAngle: "3/4",
-    framing: "full-body",
-    note: "she sits at the edge of the bed with her feet on the floor; he stands between her parted knees, her calves hooked around his legs",
+    cameraAngle: "side",
+    framing: "3/4-body",
+    note: "she sits at the edge of the bed with her feet on the floor; he stands between her parted knees, her calves hooked around his legs; her face to the camera",
   },
   "oral-giving": {
     cameraAngle: "3/4",
@@ -253,7 +253,7 @@ export const POSE_CAMERA: Record<
     note: "both stand before a full-length mirror, her back to his chest; both faces and both hands clearly readable in the glass",
   },
   "crowd-standing-behind": {
-    cameraAngle: "back",
+    cameraAngle: "side",
     framing: "half-body",
     note: "the crowd has pushed him right up behind her, hands on her hips as if steadying himself; both faces calm, both looking ahead as if nothing is happening",
   },
@@ -288,7 +288,7 @@ export const POSE_CAMERA: Record<
     note: "both upright, faces meeting in a kiss, hands at waists",
   },
   "floor-recline": {
-    cameraAngle: "high-angle",
+    cameraAngle: "3/4",
     framing: "full-body",
     note: "she reclines on the floor on a blanket, propped on one elbow; he leans over her, one knee down",
   },
@@ -303,9 +303,9 @@ export const POSE_CAMERA: Record<
     note: "she sits back in the chair, hands on the arms; he leans over or kneels in front of her",
   },
   "table-brace": {
-    cameraAngle: "back",
-    framing: "half-body",
-    note: "she braces both palms on the edge of the surface, hips back, back flat; he stands behind her with both hands on her waist",
+    cameraAngle: "side",
+    framing: "3/4-body",
+    note: "she braces both palms on the edge of the surface, hips back, back flat; he stands behind her with both hands on her waist; her head turned to the camera",
   },
   "queue-standing": {
     cameraAngle: "side",
@@ -352,7 +352,14 @@ export function randomCameraDefaults() {
   return {
     cameraAngle: pickRandom(CAMERA_ANGLES).id,
     framing: pickRandom(FRAMINGS).id,
-    aspectRatio: pickRandom(ASPECT_RATIOS),
-    timeOfDay: pickRandom(TIMES_OF_DAY).id,
+    aspectRatio: "1:1" as AspectRatio,
+    timeOfDay: "day" as TimeOfDay,
   };
 }
+
+/**
+ * Sheet sits at the hip only, never across the action line.
+ * Hard-tier poses pass "none".
+ */
+export const SHEET_RULE =
+  "sheet over the hip only, the join visible";

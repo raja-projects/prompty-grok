@@ -64,7 +64,7 @@ export const LOCKS: LockKey[] = ["femaleHairLong", "maleHairShort", "noDim"];
 export const STORAGE_KEY = "pg_settings_v1";
 export const PRESET_KEY = "pg_presets_v1";
 
-export const FEMALE_AGE_MIN = 19;
+export const FEMALE_AGE_MIN = 10;
 export const FEMALE_AGE_MAX = 30;
 
 export function clampAge(v: number): number {
@@ -152,10 +152,14 @@ export const NEGATIVE =
 export function subjectLine(s: Settings): string {
   const who = MIX_LABEL[s.genderMix];
   const eth = ETH_LABEL[s.ethnicity];
+  const woman =
+    s.femaleAge < 19
+      ? `a girl of ${s.femaleAge}`
+      : `an adult woman of ${s.femaleAge}`;
   const ages =
     s.genderMix === "solo-f" || s.genderMix === "ff"
-      ? `an adult woman of ${s.femaleAge}`
-      : `an adult woman of ${s.femaleAge} and a man of ${s.maleAge}`;
+      ? woman
+      : `${woman} and a man of ${s.maleAge}`;
   const hair =
     s.genderMix === "solo-f"
       ? "her long hair loose"
