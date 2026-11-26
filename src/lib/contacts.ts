@@ -3,6 +3,18 @@ import type { CameraAngle, Framing, PoseTag } from "./camera";
 export type ContactAction =
   | "asshole-lick"
   | "fingering-front"
+  | "anal-finger"
+  | "pussy-press-front"
+  | "nipple-pinch"
+  | "nipple-tongue"
+  | "thigh-kiss"
+  | "spank"
+  | "her-hand-on-his-chest"
+  | "her-fingers-in-his-mouth"
+  | "back-scratch"
+  | "tribbing"
+  | "wrist-hold-her"
+  | "foot-hold"
   | "pussy-lick"
   | "dick-suck"
   | "dick-hold"
@@ -25,8 +37,8 @@ export const BASE: Partial<Record<PoseTag, string>> = {
   "lying-back": "she lies on her back, knees raised and parted, one hand above her head",
   "kneeling-upright": "she kneels upright, weight on her heels, hands resting on her own thighs",
   "chair-sit": "she sits back in the chair, hands on the arms",
-  "standing-front": "both stand upright and close, her hands on his chest",
-  "standing-back": "both stand upright, her weight settled back into him",
+  "standing-front": "both stand upright and close",
+  "standing-back": "both stand upright, he stands directly behind her, chest to her back",
   "straddle-facing": "she straddles him face to face, knees either side of his hips",
   "lap-facing": "she sits across his lap, one leg draped over his thigh",
   "wall-front": "her back is flat to the wall, one leg lifted and hooked around him",
@@ -34,7 +46,28 @@ export const BASE: Partial<Record<PoseTag, string>> = {
   "table-brace": "she braces both palms on the edge of the surface, hips back, back flat",
   "walking-hold": "she walks ahead mid-stride, weight shifting onto one hip",
   "queue-standing": "she stands in a queue facing forward, weight on one hip",
+  "straddle-away": "she straddles him facing away, leaning forward on her hands",
 };
+
+/** Pose tags that duplicate a contact; hidden from the pose list. */
+export const CONTACT_TAGS: PoseTag[] = [
+  "asshole-lick",
+  "pussy-rub-behind",
+  "breast-suck",
+  "armpit-lick",
+  "navel-lick",
+  "dick-hold",
+];
+
+/** Contacts whose camera is behind her; these use a garment's rear state. */
+export const REAR_ACTIONS: ContactAction[] = [
+  "buttock-press",
+  "crease-press",
+  "asshole-lick",
+  "anal-finger",
+  "pussy-rub-behind",
+  "spank",
+];
 
 export interface ContactDef {
   label: string;
@@ -52,15 +85,15 @@ export const CONTACT: Record<ContactAction, ContactDef> = {
     poses: ["all-fours", "bent-forward", "side-lying", "seated-edge", "kneeling-low"],
     clauses: {
       "all-fours":
-        "he kneels directly behind her with his knees outside her calves, his head low between her hips, face pressed into the centre line, one hand spreading her seat apart",
+        "he kneels directly behind her with his knees outside her calves, his head low between her hips, face pressed into the centre line of her backside, one hand spreading her seat apart",
       "bent-forward":
-        "he kneels directly behind her, head low, face pressed into the centre line, one hand spreading her seat apart",
+        "he kneels directly behind her, head low, face pressed into the centre line of her backside, one hand spreading her seat apart",
       "side-lying":
-        "he slides down behind her, face pressed into the centre line, one hand lifting her top leg higher",
+        "he slides down behind her, face pressed into the centre line of her backside, one hand lifting her top leg higher",
       "seated-edge":
-        "he kneels on the floor behind her, head low, face pressed into the centre line, one hand spreading her seat apart",
+        "he kneels on the floor behind her, head low, face pressed into the centre line of her backside, one hand spreading her seat apart",
       "kneeling-low":
-        "he kneels over her from behind, head low between her hips, face pressed into the centre line, one hand spreading her seat apart",
+        "he kneels over her from behind, head low between her hips, face pressed into the centre line of her backside, one hand spreading her seat apart",
     },
   },
   "fingering-front": {
@@ -90,7 +123,7 @@ export const CONTACT: Record<ContactAction, ContactDef> = {
       "lying-back": "he kneels between her thighs with his face pressed close to her front, one hand cupping her hip, her fingers in his hair",
       "seated-edge-back": "he kneels on the floor between her parted knees, face pressed close to her front, one hand on her thigh",
       "side-lying": "he slides down her body, face pressed to her front, one hand holding her top leg up",
-      "straddle-facing": "she moves up and straddles his chest, he pulls her down to his face, one hand on her hip",
+      "straddle-facing": "she shifts up so her knees come either side of his head, he pulls her down to his face, one hand on her hip",
       "kneeling-upright": "he kneels in front of her and leans in, face pressed to her front, one hand on her hip",
     },
   },
@@ -100,7 +133,7 @@ export const CONTACT: Record<ContactAction, ContactDef> = {
     framing: "close-up",
     poses: ["kneeling-upright", "chair-sit", "standing-front", "seated-edge"],
     clauses: {
-      "kneeling-upright": "he kneels close in front of her and she leans in, face at his lap, one hand braced on his thigh",
+      "kneeling-upright": "he stands close in front of her and she leans in, face at his lap, one hand braced on his thigh",
       "chair-sit": "he sits back in the chair and she kneels between his knees, face at his lap, one hand on his thigh",
       "standing-front": "he stands and she kneels in front of him, face at his lap, one hand on his thigh",
       "seated-edge": "he stands between her knees and she leans forward, face at his lap, one hand at his hip",
@@ -112,11 +145,11 @@ export const CONTACT: Record<ContactAction, ContactDef> = {
     framing: "half-body",
     poses: ["lying-back", "straddle-facing", "standing-front", "side-lying", "seated-edge-back"],
     clauses: {
-      "lying-back": "her hand closed around him through the fabric at his front, drawing slowly; he leans over her on one arm",
-      "straddle-facing": "her hand reaches down between them and closes around him at his front, drawing slowly; she looks up at him",
-      "standing-front": "her hand closed around him through the fabric at his front, one slow draw upward; her other hand flat on his chest",
-      "side-lying": "her hand reaches back between them and closes around him at his front, drawing slowly",
-      "seated-edge-back": "she leans back on one hand and her other hand closes around him at his front, drawing slowly",
+      "lying-back": "her hand closed around the front of his trousers, drawing slowly; he leans over her on one arm",
+      "straddle-facing": "her hand reaches down and closes around the front of his trousers, drawing slowly; she looks up at him",
+      "standing-front": "her arm reaching down between them, her fingers closed around the shape of him through the fabric at the front of his trousers, one slow draw upward; his hand at the back of her neck",
+      "side-lying": "her hand reaches back and closes around the front of his trousers, drawing slowly",
+      "seated-edge-back": "she leans back on one hand and her other hand closes around the front of his trousers, drawing slowly",
     },
   },
   "breast-press": {
@@ -145,7 +178,7 @@ export const CONTACT: Record<ContactAction, ContactDef> = {
     clauses: {
       "lying-back": "he lowers his mouth to the upper curve, one hand cupping her from beneath, her head tipped back",
       "lap-facing": "she holds his head to her chest, his mouth at the upper curve, one hand cupping from beneath",
-      "straddle-facing": "she draws his head to her chest, his mouth at the upper curve, both hands at her waist",
+      "straddle-facing": "she draws his head to her chest, his mouth at the upper curve, one hand at her waist",
       "wall-front": "his mouth at the upper curve, one hand cupping from beneath, her head tipped back to the wall",
       "side-lying": "his mouth at the upper curve from behind, one hand cupping from beneath",
     },
@@ -168,9 +201,9 @@ export const CONTACT: Record<ContactAction, ContactDef> = {
     framing: "close-up",
     poses: ["lying-back", "seated-edge", "lap-facing", "side-lying"],
     clauses: {
-      "lying-back": "his head lowered so his mouth is at her navel, both hands flat on her hips holding her steady, her stomach drawn in",
-      "seated-edge": "he kneels in front of her, head lowered to her navel, both hands flat on her hips",
-      "lap-facing": "she sits across his lap and he lowers his head to her navel, both hands flat on her hips",
+      "lying-back": "his head lowered so his mouth is at her navel, one hand flat on her hip holding her steady, her stomach drawn in",
+      "seated-edge": "he kneels in front of her, head lowered to her navel, one hand flat on her hip",
+      "lap-facing": "she sits across his lap and he lowers his head to her navel, one hand flat on her hip",
       "side-lying": "he slides down, mouth at her navel, one hand flat on her hip",
     },
   },
@@ -186,42 +219,193 @@ export const CONTACT: Record<ContactAction, ContactDef> = {
       "table-brace",
       "walking-hold",
       "queue-standing",
+      "straddle-away",
     ],
     clauses: {
-      "all-fours": "the saree pulled tight across her seat; his palm presses deep into it, fingers sinking between the two halves, the cloth pulled tighter around his hand, his weight leaning in",
-      "bent-forward": "the saree pulled tight across her seat; his palm presses deep into it from behind, fingers sinking between the two halves",
-      "standing-back": "the saree pulled tight across her seat; his palm presses deep into it from behind, fingers curling between the two halves",
-      prone: "the saree pulled tight across her seat; he comes down over her back and drives his palm deep into it, fingers sinking between the two halves",
-      "table-brace": "the saree pulled tight across her seat; his palm presses deep into it, fingers sinking between the two halves",
+      "all-fours": "his hand low on the curve below her waistband, palm flat, fingers spread, pressing in, his weight leaning in",
+      "bent-forward": "his hand low on the curve below her waistband, palm flat, fingers spread, pressing in",
+      "standing-back": "his hand low on the curve below her waistband, palm flat, fingers spread, pressing in",
+      prone: "he comes down over her back and presses his palm flat into the curve below her waistband, fingers spread",
+      "table-brace": "his hand low on the curve below her waistband, palm flat, fingers spread",
       "walking-hold":
-        "the saree pulled tight across her seat; he walks half a step behind her and his palm presses deep into it mid-stride, fingers sinking between the two halves",
+        "he walks half a step behind her and his hand presses flat into the curve below her waistband, fingers spread",
       "queue-standing":
-        "the saree pulled tight across her seat; he stands close behind her and his palm presses deep into it, fingers sinking between the two halves",
+        "he stands close behind her and his hand presses flat into the curve below her waistband, fingers spread",
+      "straddle-away":
+        "his hand low on the curve below her waistband, palm flat, fingers spread, his other hand at her waist",
     },
   },
   "crease-press": {
     label: "Crease press",
     camera: "back-low",
     framing: "3/4-body",
-    poses: ["all-fours", "bent-forward", "prone", "table-brace", "standing-back"],
+    poses: ["all-fours", "bent-forward", "prone", "table-brace", "standing-back", "straddle-away"],
     clauses: {
-      "all-fours": "his palm presses into the centre line, fingers working in a slow circle, knuckles readable through the cloth",
-      "bent-forward": "his palm presses into the centre line from behind, fingers working in a slow circle",
-      prone: "he presses his palm into the centre line, fingers working in a slow circle, his weight on the other arm",
-      "table-brace": "his palm presses into the centre line, fingers working in a slow circle",
-      "standing-back": "his hand comes down and presses into the centre line, fingers working slowly",
+      "all-fours": "his palm presses into the centre line of her backside, fingers working in a slow circle, knuckles readable through the cloth",
+      "bent-forward": "his palm presses into the centre line of her backside from behind, fingers working in a slow circle",
+      prone: "he presses his palm into the centre line of her backside, fingers working in a slow circle, his weight on the other arm",
+      "table-brace": "his palm presses into the centre line of her backside, fingers working in a slow circle",
+      "standing-back": "his hand comes down and presses into the centre line of her backside, fingers working slowly",
+      "straddle-away": "his palm presses into the centre line of her backside, fingers working in a slow circle",
     },
   },
   "pussy-rub-behind": {
     label: "Pussy rub from behind",
     camera: "back-low",
     framing: "3/4-body",
-    poses: ["all-fours", "bent-forward", "side-lying", "standing-back"],
+    poses: ["all-fours", "bent-forward", "side-lying", "standing-back", "straddle-away"],
     clauses: {
       "all-fours": "his hand reaches down between her thighs and rubs slow circles at her front, his wrist buried between her legs",
       "bent-forward": "his hand comes around and down between her thighs, rubbing slow circles at her front",
       "side-lying": "his hand slides down between her thighs from behind, rubbing slow circles at her front",
       "standing-back": "his hand comes around and down between her thighs, rubbing slow circles at her front",
+      "straddle-away": "his hand reaches down between her thighs and rubs slow circles at her front",
+    },
+  },
+"anal-finger": {
+    label: "Anal finger",
+    camera: "back-low",
+    framing: "3/4-body",
+    poses: ["all-fours", "prone", "side-lying", "seated-edge", "bent-forward"],
+    clauses: {
+      "all-fours": "his fingers press into the centre line of her backside, one fingertip easing just past the edge, her back dipping",
+      prone: "his hand comes down between the cheeks of her backside, one fingertip easing in",
+      "side-lying": "his hand slips between her cheeks from behind, one fingertip easing in",
+      "seated-edge": "he kneels behind her and his fingers press into the centre line of her backside",
+      "bent-forward": "his fingers press into the centre line of her backside from behind, one fingertip easing in",
+    },
+  },
+  "pussy-press-front": {
+    label: "Pussy press, front",
+    camera: "front",
+    framing: "close-up",
+    poses: ["lying-back", "seated-edge-back", "straddle-facing", "side-lying"],
+    clauses: {
+      "lying-back": "his palm presses flat over her front, the heel of his hand low, holding still",
+      "seated-edge-back": "his palm presses flat over her front from below, holding still",
+      "straddle-facing": "his palm presses flat up against her front, holding still",
+      "side-lying": "his palm presses flat over her front, holding still",
+    },
+  },
+  "nipple-pinch": {
+    label: "Nipple pinch",
+    camera: "front",
+    framing: "close-up",
+    poses: ["lying-back", "straddle-facing", "side-lying", "standing-back", "lap-facing"],
+    clauses: {
+      "lying-back": "his thumb and finger close on one point of her chest through the cloth, tugging gently, her back lifting",
+      "straddle-facing": "his thumb and finger close on one point of her chest, tugging, she arches",
+      "side-lying": "his fingers find one point of her chest from behind and pinch, tugging gently",
+      "standing-back": "his hand comes around and pinches one point of her chest, tugging",
+      "lap-facing": "his thumb and finger close on one point of her chest, tugging gently",
+    },
+  },
+  "nipple-tongue": {
+    label: "Nipple tongue",
+    camera: "3/4",
+    framing: "close-up",
+    poses: ["lying-back", "straddle-facing", "lap-facing", "wall-front"],
+    clauses: {
+      "lying-back": "his tongue at one point of her chest, circling, the cloth wet through",
+      "straddle-facing": "she holds his head down, his tongue circling one point of her chest",
+      "lap-facing": "his tongue circling one point of her chest, her head tipped back",
+      "wall-front": "his tongue at one point of her chest, her back to the wall",
+    },
+  },
+  "thigh-kiss": {
+    label: "Thigh kiss",
+    camera: "3/4",
+    framing: "close-up",
+    poses: ["lying-back", "seated-edge-back", "side-lying", "prone"],
+    clauses: {
+      "lying-back": "he turns his head and presses his mouth to the inside of her thigh, working upward",
+      "seated-edge-back": "he kneels and presses his mouth to the inside of her thigh",
+      "side-lying": "he presses his mouth to the inside of her lifted thigh",
+      prone: "he presses his mouth to the back of her thigh, working up",
+    },
+  },
+  spank: {
+    label: "Spank",
+    camera: "back-low",
+    framing: "3/4-body",
+    poses: ["all-fours", "bent-forward", "prone", "table-brace", "straddle-away", "lap-facing"],
+    clauses: {
+      "all-fours": "his palm comes down flat on her backside, the cloth snapping tight, her hips jolting forward",
+      "bent-forward": "his palm comes down flat on her backside from behind, the cloth snapping tight",
+      prone: "he brings his palm down on her backside, the cloth snapping tight",
+      "table-brace": "his palm comes down flat on her backside, the cloth snapping tight",
+      "straddle-away": "his palm comes down on her backside, the cloth snapping tight, she rocks forward",
+      "lap-facing": "his palm comes down on her backside where it meets his lap",
+    },
+  },
+  "her-hand-on-his-chest": {
+    label: "Her hand on his chest",
+    camera: "3/4",
+    framing: "half-body",
+    poses: ["lying-back", "straddle-facing", "side-lying", "standing-front"],
+    clauses: {
+      "lying-back": "her palm flat on his chest, fingers spread, holding him up",
+      "straddle-facing": "her palm flat on his chest, bracing",
+      "side-lying": "her hand flat on his chest, holding him back",
+      "standing-front": "her palm flat on his chest, fingers spread",
+    },
+  },
+  "her-fingers-in-his-mouth": {
+    label: "Her fingers in his mouth",
+    camera: "3/4",
+    framing: "close-up",
+    poses: ["lying-back", "straddle-facing", "lap-facing", "side-lying"],
+    clauses: {
+      "lying-back": "she pushes two fingers into his mouth, he closes his lips around them",
+      "straddle-facing": "she lifts her hand to his mouth, two fingers between his lips",
+      "lap-facing": "her fingers at his mouth, he takes them in",
+      "side-lying": "she reaches back and slides two fingers into his mouth",
+    },
+  },
+  "back-scratch": {
+    label: "Back scratch",
+    camera: "3/4",
+    framing: "half-body",
+    poses: ["lying-back", "straddle-facing", "lap-facing", "wall-front"],
+    clauses: {
+      "lying-back": "her nails drag down his back as he leans over her",
+      "straddle-facing": "her nails drag down his back, leaving faint lines",
+      "lap-facing": "her nails drag slowly down his back",
+      "wall-front": "her nails drag down his back, her other arm around his neck",
+    },
+  },
+  tribbing: {
+    label: "Tribbing (ff)",
+    camera: "3/4",
+    framing: "3/4-body",
+    poses: ["side-lying", "straddle-facing", "lying-back"],
+    clauses: {
+      "side-lying": "their thighs interlocked, fronts pressed together, both rocking",
+      "straddle-facing": "she lies over her, fronts pressed together, hips rolling",
+      "lying-back": "she lies over her, one thigh between both of hers, hips rocking",
+    },
+  },
+  "wrist-hold-her": {
+    label: "Her wrists held",
+    camera: "3/4",
+    framing: "half-body",
+    poses: ["lying-back", "wall-front", "prone", "standing-front"],
+    clauses: {
+      "lying-back": "his hand closed around both her wrists, pinning them above her head",
+      "wall-front": "his hand closed around both her wrists, pinning them to the wall",
+      prone: "his hand closed around both her wrists, pinning them above her head",
+      "standing-front": "his hand closed around both her wrists, drawing them together",
+    },
+  },
+  "foot-hold": {
+    label: "Foot hold",
+    camera: "3/4",
+    framing: "close-up",
+    poses: ["lying-back", "seated-edge-back", "side-lying"],
+    clauses: {
+      "lying-back": "his hand closed around her ankle, lifting her foot to his chest",
+      "seated-edge-back": "his hand closed around her ankle, drawing her foot up",
+      "side-lying": "his hand closed around her top ankle, holding her leg up",
     },
   },
 };

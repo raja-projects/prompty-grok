@@ -14,6 +14,8 @@ import {
 import { coverPhrase, coverNeedsSheet } from "./cover";
 import { CONTACT, BASE, type ContactAction } from "./contacts";
 import { MODIFIER, type ModifierKey } from "./modifiers";
+import { findDress, findHair } from "./wardrobe";
+import { REAR_ACTIONS } from "./contacts";
 
 const TITLE: Record<Settings["room"], string> = {
   bedroom: "Editorial bedroom photograph",
@@ -37,6 +39,9 @@ function subject(s: Settings): string {
       ? `a girl of ${s.femaleAge}`
       : `an adult woman of ${s.femaleAge}`;
 
+  const man2 = s.maleAge + 3;
+  const man3 = s.maleAge + 7;
+
   let who = `a ${eth} couple`;
   if (s.genderMix === "solo-f") who = `a ${eth} woman`;
   else if (s.genderMix === "ff") who = `two ${eth} women`;
@@ -45,25 +50,41 @@ function subject(s: Settings): string {
   else if (s.genderMix === "mmmf") who = `a ${eth} woman and three men`;
   else if (s.genderMix === "crowd") who = `a ${eth} crowd`;
 
-  const ages =
-    s.genderMix === "solo-f" || s.genderMix === "ff"
-      ? woman
-      : `${woman} and a man of ${s.maleAge}`;
+  let ages = woman;
+  if (s.genderMix === "ff") ages = `two adult women, ${s.femaleAge} and ${s.femaleAge + 2}`;
+  else if (s.genderMix === "mf") ages = `${woman} and an adult man of ${s.maleAge}`;
+  else if (s.genderMix === "mmf") ages = `${woman} and two adult men, ${s.maleAge} and ${man2}`;
+  else if (s.genderMix === "ffm") ages = `two adult women, ${s.femaleAge} and ${s.femaleAge + 2}, and an adult man of ${s.maleAge}`;
+  else if (s.genderMix === "mmmf") ages = `${woman} and three adult men, ${s.maleAge}, ${man2} and ${man3}`;
+  else if (s.genderMix === "crowd") ages = `${woman} and several adult men`;
 
+  const herHair = findHair(s.femaleAge, s.femaleHair, true)?.state ?? "her thick hair loose";
+  const hisHair = findHair(s.maleAge, s.maleHair, false)?.state ?? "his hair short";
+  const manyMen =
+    s.genderMix === "mmf" || s.genderMix === "mmmf" || s.genderMix === "crowd";
   const hair =
     s.genderMix === "solo-f" || s.genderMix === "ff"
-      ? "her long hair loose"
-      : "her long hair loose, his hair short";
+      ? herHair
+      : `${herHair}, ${manyMen ? "each man with short hair" : hisHair}`;
 
   const body = s.bodyNote.trim() ? `, ${s.bodyNote.trim()}` : "";
 
   return `${who}, ${ages}, ${hair}${body}`;
 }
 
-function dress(s: Settings): string {
-  const cover = coverPhrase(s.covering, s.femaleAge);
+function dress(s: Settings, contact?: ContactAction): string {
+  const d = findDress(s.femaleAge, s.femaleDress, true);
+  const rear = !!contact && REAR_ACTIONS.includes(contact);
+  const state = d ? (rear && d.rear ? d.rear : d.state) : "";
+  const cover =
+    s.covering === "bedsheet" || s.covering === "none"
+      ? coverPhrase(s.covering, s.femaleAge)
+      : state;
   if (s.genderMix === "solo-f" || s.genderMix === "ff") return cover;
-  return `${cover}; his shirt open`;
+  const m = findDress(s.maleAge, s.maleDress, false);
+  const many = s.genderMix === "mmf" || s.genderMix === "mmmf" || s.genderMix === "crowd";
+  const manState = m ? m.state : "his shirt open";
+  return `${cover}; ${many ? `each man in ${manState.replace(/\bthe /g, "")}` : manState}`;
 }
 
 function cameraClause(
@@ -78,6 +99,21 @@ function cameraClause(
   const angle = c ? c.camera : POSE_CAMERA[pose].cameraAngle;
   const frame = c ? c.framing : POSE_CAMERA[pose].framing;
   return `${anglePrompt(angle)}, ${framingPrompt(frame)}, ${LENS[frame]}`;
+}
+
+function extraCast(s: Settings): string {
+  switch (s.genderMix) {
+    case "mmf":
+      return "the second man close at her head, one hand in her hair";
+    case "ffm":
+      return "the second woman at her shoulder, her hand on her hip";
+    case "mmmf":
+      return "the other two men close at her head and her side, hands on her shoulder and hip";
+    case "crowd":
+      return "more men close around her, hands on her hips, shoulders and waist";
+    default:
+      return "";
+  }
 }
 
 function texture(s: Settings): string {
@@ -119,11 +155,13 @@ export function assemblePrompt(
     .slice(0, 2)
     .map((m) => MODIFIER[m]?.clause)
     .filter(Boolean) as string[];
+  const castExtra = extraCast(s);
   const core = base && clause ? `${base}; ${clause}` : POSE_CAMERA[tag].note;
-  const geometry = cap(mods.length ? `${core}; ${mods.join("; ")}` : core);
+  const withCast = castExtra ? `${core}; ${castExtra}` : core;
+  const geometry = cap(mods.length ? `${withCast}; ${mods.join("; ")}` : withCast);
   const sheet = coverNeedsSheet(s.covering, s.femaleAge);
 
-  const head = `${TITLE[s.room]} of ${subject(s)}. ${cap(dress(s))}.`;
+  const head = `${TITLE[s.room]} of ${subject(s)}. ${cap(dress(s, contact))}.`;
   const cam = cap(cameraClause(s, tag, contact));
 
   if (s.mode === "B") {

@@ -33,7 +33,7 @@ export const MODIFIER: Record<ModifierKey, ModifierDef> = {
   },
   "deep-kiss": {
     label: "Deep kiss",
-    clause: "mouths open, her hand at the back of his neck",
+    clause: "mouths open, her free hand at the back of his neck",
     hosts: ["dick-hold", "breast-suck"],
     poses: ["lying-back", "straddle-facing", "lap-facing", "wall-front", "standing-front"],
   },
@@ -69,7 +69,7 @@ export const MODIFIER: Record<ModifierKey, ModifierDef> = {
   },
   "pallu-away": {
     label: "Pallu away",
-    clause: "the pallu pulled clear of her shoulder",
+    clause: "the pallu drawn back off her hip",
     hosts: ["breast-press", "breast-suck", "armpit-lick", "buttock-press", "crease-press", "asshole-lick"],
     poses: ["standing-front", "standing-back", "lying-back", "all-fours", "bent-forward"],
   },

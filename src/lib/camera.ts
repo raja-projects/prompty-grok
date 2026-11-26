@@ -90,7 +90,7 @@ export type PoseTag =
 export const CAMERA_ANGLES: { id: CameraAngle; label: string; prompt: string }[] = [
   { id: "front", label: "Front", prompt: "front view" },
   { id: "back", label: "Back", prompt: "shot from behind her back with clear view of soft lower curves and strong fabric tension, she turns her head over her shoulder so her face is clearly visible" },
-  { id: "back-low", label: "Back low", prompt: "dead behind and low, her head turned back over her shoulder to the lens" },
+  { id: "back-low", label: "Back low", prompt: "directly behind her and low, her body facing fully away, only her head turned back over her shoulder to the lens" },
   { id: "side", label: "Side", prompt: "side profile" },
   { id: "3/4", label: "3/4", prompt: "three-quarter view" },
   { id: "over-shoulder", label: "Over-shoulder", prompt: "over-the-shoulder framing, her face still visible in frame" },
@@ -101,7 +101,7 @@ export const CAMERA_ANGLES: { id: CameraAngle; label: string; prompt: string }[]
 
 export const FRAMINGS: { id: Framing; label: string; prompt: string }[] = [
   { id: "extreme-close-up", label: "Extreme close-up", prompt: "extreme close-up" },
-  { id: "close-up", label: "Close-up", prompt: "close-up portrait framing" },
+  { id: "close-up", label: "Close-up", prompt: "tight close-up" },
   { id: "medium", label: "Medium", prompt: "medium shot" },
   { id: "half-body", label: "Half body", prompt: "half-body framing" },
   { id: "3/4-body", label: "3/4 body", prompt: "framed to the knees" },

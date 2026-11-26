@@ -13,15 +13,15 @@ export interface Settings {
   ethnicity: Ethnicity;
   femaleAge: number;
   maleAge: number;
-  femaleHairLong: boolean;
-  maleHairShort: boolean;
   bodyNote: string;
   room: Room;
   surface: Surface;
   light: Light;
   noDim: boolean;
-  femaleGarment: Garment;
-  maleGarment: Garment;
+  femaleDress: string;
+  maleDress: string;
+  femaleHair: string;
+  maleHair: string;
   covering: Covering;
   camera: "auto" | "manual";
   cameraOverride: string;
@@ -30,27 +30,23 @@ export interface Settings {
   mode: Mode;
 }
 
-export type LockKey =
-  | "femaleHairLong"
-  | "maleHairShort"
-  | "noDim"
-  | "ethnicity"
-  | "light";
+export type LockKey = "noDim" | "ethnicity" | "light";
 
 export const DEFAULTS: Settings = {
   genderMix: "mf",
   ethnicity: "tamil",
   femaleAge: 19,
   maleAge: 25,
-  femaleHairLong: true,
-  maleHairShort: true,
+  
   bodyNote: "",
   room: "bedroom",
   surface: "bed",
   light: "window",
   noDim: true,
-  femaleGarment: "saree",
-  maleGarment: "saree",
+  femaleDress: "cotton-saree",
+  maleDress: "shirt-jeans",
+  femaleHair: "loose",
+  maleHair: "side-part",
   covering: "pallu-hip",
   camera: "auto",
   cameraOverride: "",
@@ -59,7 +55,7 @@ export const DEFAULTS: Settings = {
   mode: "A",
 };
 
-export const LOCKS: LockKey[] = ["femaleHairLong", "maleHairShort", "noDim"];
+export const LOCKS: LockKey[] = ["ethnicity", "noDim"];
 
 export const STORAGE_KEY = "pg_settings_v1";
 export const PRESET_KEY = "pg_presets_v1";
@@ -72,13 +68,23 @@ export function clampAge(v: number): number {
   return Math.min(FEMALE_AGE_MAX, Math.max(FEMALE_AGE_MIN, Math.round(v)));
 }
 
+export function clampMaleAge(v: number): number {
+  if (Number.isNaN(v)) return DEFAULTS.maleAge;
+  return Math.min(70, Math.max(10, Math.round(v)));
+}
+
 export function loadSettings(): Settings {
   if (typeof window === "undefined") return DEFAULTS;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULTS;
     const parsed = JSON.parse(raw) as Partial<Settings>;
-    return { ...DEFAULTS, ...parsed, femaleAge: clampAge(parsed.femaleAge ?? DEFAULTS.femaleAge) };
+    return {
+      ...DEFAULTS,
+      ...parsed,
+      femaleAge: clampAge(parsed.femaleAge ?? DEFAULTS.femaleAge),
+      maleAge: clampMaleAge(parsed.maleAge ?? DEFAULTS.maleAge),
+    };
   } catch {
     return DEFAULTS;
   }
@@ -161,10 +167,8 @@ export function subjectLine(s: Settings): string {
       ? woman
       : `${woman} and a man of ${s.maleAge}`;
   const hair =
-    s.genderMix === "solo-f"
+    s.genderMix === "solo-f" || s.genderMix === "ff"
       ? "her long hair loose"
-      : s.maleHairShort
-        ? "her long hair loose, his hair short"
-        : "her long hair loose";
+      : "her long hair loose, his hair short";
   return `${who}, ${eth}, ${ages}, ${hair}`;
 }

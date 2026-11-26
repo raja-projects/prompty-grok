@@ -3,15 +3,21 @@
 import { useEffect, useState } from "react";
 import {
   type Settings, type GenderMix, type Ethnicity, type Room, type Surface,
-  type Light, type Covering, type Garment, type Ratio, type Mode,
-  DEFAULTS, LOCKS, FEMALE_AGE_MIN, FEMALE_AGE_MAX, clampAge,
+  type Light, type Covering, type Ratio, type Mode,
+  DEFAULTS, LOCKS, FEMALE_AGE_MIN, FEMALE_AGE_MAX, clampAge, clampMaleAge,
   loadSettings, saveSettings, resetSettings,
   loadPresets, savePreset, deletePreset,
 } from "@/lib/settings";
 import { POSE_CAMERA, type PoseTag } from "@/lib/camera";
 import { assemblePrompt } from "@/lib/assemble";
-import { CONTACT, type ContactAction } from "@/lib/contacts";
+import { CONTACT, CONTACT_TAGS, type ContactAction } from "@/lib/contacts";
 import { MODIFIER, availableModifiers, type ModifierKey } from "@/lib/modifiers";
+import {
+  femaleDresses,
+  maleDresses,
+  femaleHairStyles,
+  maleHairStyles,
+} from "@/lib/wardrobe";
 
 const box: React.CSSProperties = {
   border: "1px solid #2a2a33", borderRadius: 10, padding: 14, marginBottom: 14,
@@ -49,12 +55,25 @@ export default function SettingsPage() {
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) =>
     setS((p) => ({ ...p, [k]: v }));
 
+  useEffect(() => {
+    const fd = femaleDresses(s.femaleAge);
+    if (!fd.some((x) => x.id === s.femaleDress)) set("femaleDress", fd[0].id);
+    const fh = femaleHairStyles(s.femaleAge);
+    if (!fh.some((x) => x.id === s.femaleHair)) set("femaleHair", fh[0].id);
+    const md = maleDresses(s.maleAge);
+    if (!md.some((x) => x.id === s.maleDress)) set("maleDress", md[0].id);
+    const mh = maleHairStyles(s.maleAge);
+    if (!mh.some((x) => x.id === s.maleHair)) set("maleHair", mh[0].id);
+  }, [s.femaleAge, s.maleAge]);
+
   if (!loaded) return <main style={{ padding: 24, color: "#e8e8ef" }}>Loading…</main>;
 
   const built = assemblePrompt(s, pose, contact || undefined, mods);
   const poseList: PoseTag[] = contact
     ? CONTACT[contact].poses
-    : (Object.keys(POSE_CAMERA) as PoseTag[]);
+    : (Object.keys(POSE_CAMERA) as PoseTag[]).filter(
+        (p) => !CONTACT_TAGS.includes(p),
+      );
   const modList = availableModifiers(pose, contact || undefined);
 
   return (
@@ -99,20 +118,30 @@ export default function SettingsPage() {
           <div>
             <label style={label}>Man age</label>
             <input
-              style={input} type="number" min={18} max={60}
+              style={input} type="number" min={10} max={70}
               value={s.maleAge}
-              onChange={(e) => set("maleAge", Math.max(18, Math.round(Number(e.target.value) || 25)))}
+              onChange={(e) => set("maleAge", clampMaleAge(Number(e.target.value)))}
             />
           </div>
         </div>
-        <label style={{ ...label, display: "flex", gap: 8, alignItems: "center" }}>
-          <input type="checkbox" checked={s.femaleHairLong} disabled={LOCKS.includes("femaleHairLong")} onChange={(e) => set("femaleHairLong", e.target.checked)} />
-          Woman long hair (locked)
-        </label>
-        <label style={{ ...label, display: "flex", gap: 8, alignItems: "center" }}>
-          <input type="checkbox" checked={s.maleHairShort} disabled={LOCKS.includes("maleHairShort")} onChange={(e) => set("maleHairShort", e.target.checked)} />
-          Man short hair (locked)
-        </label>
+        <div style={row}>
+          <div>
+            <label style={label}>Her hair</label>
+            <select style={input} value={s.femaleHair} onChange={(e) => set("femaleHair", e.target.value)}>
+              {femaleHairStyles(s.femaleAge).map((h) => (
+                <option key={h.id} value={h.id}>{h.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label style={label}>His hair</label>
+            <select style={input} value={s.maleHair} onChange={(e) => set("maleHair", e.target.value)}>
+              {maleHairStyles(s.maleAge).map((h) => (
+                <option key={h.id} value={h.id}>{h.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
         <label style={{ ...label, marginTop: 8 }}>Body note</label>
         <input style={input} value={s.bodyNote} placeholder="slim, average build…" onChange={(e) => set("bodyNote", e.target.value)} />
       </div>
@@ -151,24 +180,28 @@ export default function SettingsPage() {
         <h2 style={h}>Dress</h2>
         <div style={row}>
           <div>
-            <label style={label}>Her garment</label>
-            <select style={input} value={s.femaleGarment} onChange={(e) => set("femaleGarment", e.target.value as Garment)}>
-              <option value="saree">saree</option>
-              <option value="half-saree">half saree</option>
-              <option value="churidar">churidar</option>
-              <option value="kurta-skirt">kurta and skirt</option>
+            <label style={label}>Her dress</label>
+            <select style={input} value={s.femaleDress} onChange={(e) => set("femaleDress", e.target.value)}>
+              {femaleDresses(s.femaleAge).map((d) => (
+                <option key={d.id} value={d.id}>{d.label}</option>
+              ))}
             </select>
           </div>
           <div>
-            <label style={label}>Covering</label>
-            <select style={input} value={s.covering} onChange={(e) => set("covering", e.target.value as Covering)}>
-              <option value="pallu-hip">pallu across her hip</option>
-              <option value="saree-waist">saree open at the waist</option>
-              <option value="bedsheet">bedsheet only</option>
-              <option value="none">none</option>
+            <label style={label}>His dress</label>
+            <select style={input} value={s.maleDress} onChange={(e) => set("maleDress", e.target.value)}>
+              {maleDresses(s.maleAge).map((d) => (
+                <option key={d.id} value={d.id}>{d.label}</option>
+              ))}
             </select>
           </div>
         </div>
+        <label style={{ ...label, marginTop: 10 }}>Covering override</label>
+        <select style={input} value={s.covering} onChange={(e) => set("covering", e.target.value as Covering)}>
+          <option value="pallu-hip">use the dress state</option>
+          <option value="bedsheet">bedsheet only</option>
+          <option value="none">none</option>
+        </select>
       </div>
 
       <div style={box}>
