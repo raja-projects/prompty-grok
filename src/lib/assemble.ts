@@ -14,12 +14,17 @@ import {
   type PoseTag,
 } from "./camera";
 import { coverPhrase, coverNeedsSheet } from "./cover";
-import { CONTACT, CONTACT_CAMERA, BASE, type ContactAction } from "./contacts";
+import {
+  CONTACT,
+  CONTACT_CAMERA,
+  BASE,
+  REAR_ACTIONS,
+  type ContactAction,
+} from "./contacts";
 import { MODIFIER, type ModifierKey } from "./modifiers";
-import { findDress, findHair, frontPhrase } from "./wardrobe";
-import { REAR_ACTIONS } from "./contacts";
+import { findDress, findHair, femaleDresses, frontPhrase } from "./wardrobe";
 import { TOUCH } from "./touches";
-import { applyCast } from "./pronoun";
+import { applyCast, castFor } from "./pronoun";
 
 const TITLE: Record<Settings["room"], string> = {
   bedroom: "Editorial bedroom photograph",
@@ -67,9 +72,11 @@ function subject(s: Settings): string {
   const manyMen =
     s.genderMix === "mmf" || s.genderMix === "mmmf" || s.genderMix === "crowd";
   const hair =
-    s.genderMix === "solo-f" || s.genderMix === "ff"
+    s.genderMix === "solo-f"
       ? herHair
-      : `${herHair}, ${manyMen ? "each man with short hair" : hisHair}`;
+      : s.genderMix === "ff"
+        ? `${herHair}, the other woman with her hair tied back`
+        : `${herHair}, ${manyMen ? "each man with short hair" : hisHair}`;
 
   const body = s.bodyNote.trim() ? `, ${s.bodyNote.trim()}` : "";
 
@@ -81,6 +88,14 @@ function tint(state: string, colour: string): string {
   return state.replace(/^(the [a-z-]+)/, `$1 in ${colour}`);
 }
 
+/** A second woman's garment, so ff never shows one woman undressed twice. */
+function otherWomanDress(s: Settings, rear: boolean): string {
+  const list = femaleDresses(s.femaleAge);
+  const other = list.find((d) => d.id !== s.femaleDress) ?? list[0];
+  const state = rear && other.rear ? other.rear : other.state;
+  return tint(state, s.femaleColour).replace(/^the /, "a ");
+}
+
 function dress(s: Settings, contact?: ContactAction): string {
   const d = findDress(s.femaleAge, s.femaleDress, true);
   const rear = !!contact && REAR_ACTIONS.includes(contact);
@@ -89,7 +104,12 @@ function dress(s: Settings, contact?: ContactAction): string {
     s.covering === "bedsheet" || s.covering === "none"
       ? coverPhrase(s.covering, s.femaleAge)
       : tint(state, s.femaleColour);
-  if (s.genderMix === "solo-f" || s.genderMix === "ff") return cover;
+
+  if (s.genderMix === "solo-f") return cover;
+  if (s.genderMix === "ff") {
+    return `${cover}; the other woman in ${otherWomanDress(s, rear)}`;
+  }
+
   const m = findDress(s.maleAge, s.maleDress, false);
   const many = s.genderMix === "mmf" || s.genderMix === "mmmf" || s.genderMix === "crowd";
   const manState = m ? tint(m.state, s.maleColour) : "his shirt open";
@@ -162,33 +182,46 @@ export function assemblePrompt(
   modifiers: ModifierKey[] = [],
 ): Assembled {
   const tag: PoseTag = pose && POSE_CAMERA[pose] ? pose : "standing-front";
+  const cast = castFor(s.genderMix, contact);
   const touch = s.touch ? TOUCH[s.touch] : undefined;
   const base = contact ? BASE[tag] : undefined;
+
+  // {front} is always his clothing, so no gender is needed. Where there is no
+  // man in frame the token is overridden rather than left dangling.
+  const front =
+    s.genderMix === "ff"
+      ? "the front of the other woman's body"
+      : s.genderMix === "solo-f"
+        ? "the front of her body"
+        : frontPhrase(findDress(s.maleAge, s.maleDress, false)?.id ?? "");
+
   const clause = contact
-    ? CONTACT[contact].clauses[tag]?.replace(
-        "{front}",
-        frontPhrase(findDress(s.maleAge, s.maleDress, false)?.id ?? ""),
-      )
+    ? CONTACT[contact].clauses[tag]?.replace("{front}", front)
     : undefined;
+
   const mods = modifiers
     .slice(0, 2)
-    .map((m) => MODIFIER[m]?.clause && applyCast(MODIFIER[m].clause, s.genderMix))
+    .map((m) => MODIFIER[m]?.clause && applyCast(MODIFIER[m].clause, cast))
     .filter(Boolean) as string[];
+
   const castExtra = extraCast(s);
   const core = touch
     ? clause
-      ? `${touch.pretext}; ${applyCast(clause, s.genderMix)}; ${touch.witness}`
-      : `${applyCast(POSE_CAMERA[tag].note, s.genderMix)}; ${touch.witness}`
+      ? `${touch.pretext}; ${applyCast(clause, cast)}; ${touch.witness}`
+      : `${applyCast(POSE_CAMERA[tag].note, cast)}; ${touch.witness}`
     : base && clause
-      ? `${applyCast(base, s.genderMix)}; ${applyCast(clause, s.genderMix)}`
-      : applyCast(POSE_CAMERA[tag].note, s.genderMix);
+      ? `${applyCast(base, cast)}; ${applyCast(clause, cast)}`
+      : applyCast(POSE_CAMERA[tag].note, cast);
+
   const withCast = castExtra && !touch ? `${core}; ${castExtra}` : core;
+
   const hands =
     s.genderMix === "solo-f"
       ? ""
-      : s.genderMix === "ff"
-        ? " Each has exactly two hands, each hand on its own arm."
-        : " He has exactly two hands, each hand on its own arm.";
+      : s.genderMix === "mf"
+        ? " He has exactly two hands, each hand on its own arm."
+        : " Each person has exactly two hands, each hand on its own arm.";
+
   const raw = cap(mods.length ? `${withCast}; ${mods.join("; ")}` : withCast) + hands;
   const geometry = s.expressions ? raw : stripExpressions(raw);
   const sheet = coverNeedsSheet(s.covering, s.femaleAge);
@@ -197,8 +230,12 @@ export function assemblePrompt(
   const cam = cap(cameraClause(s, tag, contact));
 
   if (s.mode === "B") {
+    const drift =
+      s.genderMix === "ff"
+        ? "move her hands to the other woman's hips"
+        : "move his hands to her hips";
     return {
-      prompt: `${head} Keep both faces 100% identical to the references. If the arrangement drifts, move his hands to her hips. ${cam}. ${cap(LIGHT_LABEL[s.light])}. ${cap(texture(s))}, ${s.ratio}.`,
+      prompt: `${head} Keep both faces 100% identical to the references. If the arrangement drifts, ${drift}. ${cam}. ${cap(LIGHT_LABEL[s.light])}. ${cap(texture(s))}, ${s.ratio}.`,
       negative: NEGATIVE,
       pose: tag,
       sheet,

@@ -1,5 +1,5 @@
-import { Builder } from "@/components/Builder";
+import { Studio } from "@/components/Studio";
 
 export default function HomePage() {
-  return <Builder />;
+  return <Studio />;
 }
